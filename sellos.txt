@@ -1,0 +1,2 @@
+# fecha_utc eventos huella_sha256  (verificar con robot/verificar.py)
+2026-11-08T20:08:05Z 5591 343f564d38144c0b09b74f4e5840d737bf13e01b6ed0ed7a5ad1b21baf4f671c
