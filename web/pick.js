@@ -206,7 +206,7 @@ function pickItems() {
   const hoy = D.partidos.filter((g) => esHoy(g.at) && new Date(g.at) > Date.now());
   const it = [];
   for (const g of hoy) {
-    it.push({ k: "g", g, p: g.pick.p, mk: "res", dep: g.dep, eq: 1 });
+    if (!g.pick.bajo) it.push({ k: "g", g, p: g.pick.p, mk: "res", dep: g.dep, eq: 1 });
     if (g.extra) {
       g.extra.picks.forEach((x) => it.push({ k: "x", g, x, p: x.p, mk: x.s, dep: "futbol", eq: 1 }));
       g.extra.jug.forEach((x) => it.push({ k: "x", g, x, p: x.p, mk: x.s, dep: "futbol", eq: 0 }));

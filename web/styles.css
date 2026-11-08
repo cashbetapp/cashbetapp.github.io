@@ -599,3 +599,15 @@ img.hpimg.foto { width: 48%; height: 100%; object-fit: cover; object-position: t
 .pvb i:not(.on), .pvb u:not(.on) { background: var(--tx3); opacity: .45; }
 .pvb i.on, .pvb u.on { background: var(--pkokt); opacity: 1; }
 .godds span { gap: 8px; }
+.gpk.low { color: var(--tx3); font-weight: 600; font-size: 12.5px; }
+.ghven { display: flex; justify-content: center; align-items: flex-start; gap: 6px; color: var(--tx2); font-size: 12.5px; margin-top: 12px; line-height: 1.35; }
+.ghven svg { width: 14px; height: 14px; flex: none; margin-top: 2px; } .ghven b { color: var(--tx); font-weight: 700; }
+.elp .v { display: block; font-size: 17px; } .elp > span { color: var(--tx2); font-size: 13.5px; }
+.elp .erow { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-size: 14.5px; }
+.elp .erow svg { width: 17px; height: 17px; color: var(--tx2); flex: none; }
+.elp .erow em { font-style: normal; font-size: 11.5px; font-weight: 700; background: var(--pkbg); padding: 2px 8px; border-radius: 7px; margin-left: 4px; }
+.pkcard.elp { padding: 0; overflow: hidden; } .elp .in { padding: 16px; }
+.elp .vimg { width: 100%; height: 190px; object-fit: cover; display: block; }
+.elp hr { border: 0; border-top: 1px solid var(--pkl); margin: 12px 0 2px; }
+.alin { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; font-size: 13px; font-weight: 700; color: var(--tx2); border: 1px solid var(--pkl); padding: 5px 12px; border-radius: 99px; }
+.alin svg { width: 15px; height: 15px; }

@@ -32,10 +32,50 @@ def load(key):
             det = json.load(f)
     except FileNotFoundError:
         det = {}
-    games = [x for x in g.values() if x["st"] == "post" and x["h"] and x["a"]
+    ahora = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%MZ")
+    games = [x for x in g.values() if x["st"] == "post" and x["h"] and x["a"] and x["at"] <= ahora
              and x["h"]["s"] is not None and x["a"]["s"] is not None]
     games.sort(key=lambda x: x["at"])
-    return games, det, [x for x in g.values() if x["st"] == "pre"]
+    pre = [x for x in g.values() if x["st"] == "pre"]
+    if key != "nba":
+        malos = choques(g)
+        pre = [x for x in pre if x["id"] not in malos]
+    return games, det, pre
+
+
+def choques(g, horas=44):
+    """Partidos de fútbol con datos imposibles: un equipo con otro partido a
+    menos de 'horas' (la fuente a veces repite partidos o deja fechas viejas)."""
+    por = {}
+    for x in g.values():
+        if not x.get("h") or not x.get("a"):
+            continue
+        t = dt.datetime.fromisoformat(x["at"].replace("Z", ""))
+        for s in ("h", "a"):
+            por.setdefault(x[s]["id"], []).append((t, x["id"], x["st"]))
+    # "bloque de relleno": 5 o más partidos sin jugar a la misma hora exacta
+    # (la fuente pone así fechas aún sin confirmar)
+    hora = {}
+    for x in g.values():
+        if x.get("st") == "pre":
+            hora.setdefault(x["at"], []).append(x["id"])
+    bloque = {i for ids in hora.values() if len(ids) >= 5 for i in ids}
+    ahora = dt.datetime.utcnow()
+    malos = set()
+    for xs in por.values():
+        xs.sort()
+        for (t1, i1, s1), (t2, i2, s2) in zip(xs, xs[1:]):
+            if (t2 - t1).total_seconds() >= horas * 3600:
+                continue
+            par = [(t1, i1, s1), (t2, i2, s2)]
+            dudosos = [i for t, i, st in par if st != "post" or t > ahora]
+            # si uno está en el bloque de relleno y el otro no, solo cae el del bloque
+            en_b = [i for i in dudosos if i in bloque]
+            fuera = [i for t, i, st in par if i not in bloque]
+            malos |= set(en_b) if en_b and fuera else set(dudosos)
+    # un "terminado" con fecha futura nunca vale
+    malos |= {x["id"] for x in g.values() if x.get("st") == "post" and dt.datetime.fromisoformat(x["at"].replace("Z", "")) > ahora}
+    return malos
 
 
 # ---------------------------------------------------------------- fútbol

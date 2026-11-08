@@ -128,8 +128,14 @@ def run(d0, d1, workers=4):
                 continue
             evs = data.get("events", [])
             open_ = False
+            vistos = {ev["id"] for ev in evs}
+            # partidos que antes salían en este día y la fuente ya no muestra
+            # (cambiados de fecha o cancelados): se borran si no han terminado
+            for gid in [k for k, v in db["games"].items() if v.get("dq") == day and k not in vistos and v.get("st") != "post"]:
+                del db["games"][gid]
             for ev in evs:
                 g = slim(ev, key)
+                g["dq"] = day
                 old = db["games"].get(g["id"]) or {}
                 # en vivo o terminado, la fuente cambia o borra las cuotas:
                 # conservar las últimas de antes del partido

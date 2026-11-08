@@ -16,7 +16,7 @@ from model import (DATA, SOCCER, Poi, load, soccer_markets, nba_teams, is_presea
                    nba_walk, STATS, stat_val)
 
 DIAS = 8  # cuántos días hacia adelante
-CUOTA_MIN = 1.30  # el usuario no quiere picks que paguen menos de 1.30
+CUOTA_MIN = 1.50  # el usuario pidió cuota mínima 1.50 (antes 1.30)
 
 
 def cuota_ef(s):
@@ -34,8 +34,9 @@ def elegir(sels, prefer=None):
             return max(pa, key=lambda s: s["p"])
     if apt:
         return max(apt, key=lambda s: s["p"])
-    ok = [s for s in sels if cuota_ef(s) >= CUOTA_MIN]
-    return max(ok or sels, key=lambda s: s["p"])
+    # nada probable paga >= CUOTA_MIN (favorito muy claro): se muestra el favorito
+    # marcado como "bajo"; no entra a las listas de picks ni a la libreta
+    return dict(max(sels, key=lambda s: s["p"]), bajo=True)
 
 
 def now():
@@ -119,6 +120,7 @@ def soccer(par, report):
             val = [s for s in sels if s.get("valor", -1) > 0.05 and s["p"] >= 0.30]
             out.append({
                 "id": g["id"], "dep": "futbol", "lg": key, "liga": LEAGUES[key][2], "at": g["at"],
+                "ven": g.get("ven"), "city": g.get("city"), "tv": g.get("tv"),
                 "h": {k: g["h"][k] for k in ("id", "n", "ab", "logo", "rec")},
                 "a": {k: g["a"][k] for k in ("id", "n", "ab", "logo", "rec")},
                 "goles_esperados": [round(gh, 2), round(ga, 2)],
@@ -231,6 +233,8 @@ def nba(par):
         val = [s for s in sels[:2] if s.get("valor", -1) > 0.03]
         out.append({
             "id": g["id"], "dep": "nba", "lg": "nba", "liga": "NBA", "at": g["at"],
+            "ven": g.get("ven"), "city": g.get("city"), "tv": g.get("tv"),
+            "vimg_espn": ((((sm.get("gameInfo") or {}).get("venue") or {}).get("images") or [{}])[0]).get("href"),
             "h": {k: g["h"][k] for k in ("id", "n", "ab", "logo", "rec")},
             "a": {k: g["a"][k] for k in ("id", "n", "ab", "logo", "rec")},
             "puntos_esperados": [round(marg / 2 + tot / 2, 1), round(tot / 2 - marg / 2, 1)],
@@ -403,7 +407,7 @@ def ledger(partidos, props_, extras=None):
                                                  "aid": g["a"]["id"], "m": x["m"], "s": x["s"], "sc": x["sc"],
                                                  "txt": x["txt"], "p": x["p"], "cuota": x["justa"]}
     for g in partidos:
-        if g["at"] > ahora and g.get("pick"):
+        if g["at"] > ahora and g.get("pick") and not g["pick"].get("bajo"):
             pk = g["pick"]
             L["partidos"][g["id"]] = {"at": g["at"], "lg": g["lg"], "liga": g["liga"], "dep": g["dep"],
                                       "h": g["h"]["n"], "a": g["a"]["n"], "hl": g["h"]["logo"], "al": g["a"]["logo"],
@@ -419,6 +423,14 @@ def ledger(partidos, props_, extras=None):
         games, det, _ = load(key)
         for g in games:
             res[g["id"]] = (g["h"]["s"], g["a"]["s"], det.get(g["id"]))
+    from model import choques
+    malos = set()
+    for key in SOCCER:
+        with open(os.path.join(DATA, "hist", key + ".json"), encoding="utf-8") as f:
+            malos |= choques(json.load(f)["games"])
+    for coll in ("partidos", "extra"):
+        for k in [k for k, e in L.get(coll, {}).items() if "ok" not in e and (e.get("ev") or k) in malos]:
+            del L[coll][k]   # partido dudoso que no ha terminado: se quita de la libreta
     for gid, e in L["partidos"].items():
         if "ok" not in e and gid in res:
             e["ok"] = outcome(e["m"], res[gid][0], res[gid][1])
@@ -610,6 +622,8 @@ def main():
             teams[g[s]["id"]] = {"ab": g[s]["ab"], "logo": g[s]["logo"], "n": g[s]["n"]}
     for x in pr:
         x["eq"] = teams.get(x["equipo"])
+    from venues import completar
+    print("estadios nuevos buscados:", completar(f + nb))
     rec = ledger(f + nb, pr)
     xrep = json.load(open(os.path.join(DATA, "model", "extra.json"), encoding="utf-8"))
     images(f + nb, pr)

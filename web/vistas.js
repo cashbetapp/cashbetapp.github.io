@@ -33,7 +33,7 @@ function gCard(g) {
   return `<button class="gc" data-g="${g.id}"><div class="gt">${t("h")}
       <div class="mid"><b>${hora(g.at)}</b><span class="lg">${esc(g.liga)}</span><div class="fm">${dotsF(f.h)}<i>FORMA</i>${dotsF(f.a)}</div><span class="det">Detalles</span></div>${t("a")}</div>
     <div class="godds"><span><em>${esc(abT(g.h))}</em><b>${odd(o1)}</b></span>${oX ? `<span><em>X</em><b>${odd(oX)}</b></span>` : ""}<span><em>${esc(abT(g.a))}</em><b>${odd(o2)}</b></span></div>
-    <div class="gpk ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(g.pick.txt)}</span><b>${pct(g.pick.p)}</b></div></button>`;
+    ${g.pick.bajo ? `<div class="gpk low"><span>Favorito claro: ${esc(g.pick.txt)} · paga menos de ${odd(D.cuota_min || 1.5)}, sin pick</span></div>` : `<div class="gpk ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(g.pick.txt)}</span><b>${pct(g.pick.p)}</b></div>`}</button>`;
 }
 function calendario() {
   const dias = [];
@@ -138,8 +138,10 @@ function openGame(id, tab) {
   const up = isUp(g.pick.m);
   const html = `<div class="gh"><div class="ghtop"><span class="ghp"><i></i>${hora(g.at)}</span><small>${lgLogo(g.lg, 16)}${esc(g.liga)} · ${esc(cap(fmtS.format(new Date(g.at))))}</small></div>
       <div class="ghteams">${tm("h", "LOCAL")}<div class="vs">VS</div>${tm("a", "VISITANTE")}</div>
+      ${g.ven ? `<div class="ghven">${ic("pin")}<span><b>${esc(g.ven)}</b>${g.city ? `<br>${esc(g.city)}` : ""}</span></div>` : ""}
       <div class="ghc">${c1 ? `<span>${c1}</span>` : ""}<b>${c2}</b></div></div>
-    <div class="gpick"><div><small>PICK DEL MODELO</small><span class="pcpill ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(g.pick.txt)}</span></span></div><div class="r"><b>${pct(g.pick.p)}</b><span>cuota ${odd(g.pick.cuota || g.pick.justa)}</span></div></div>
+    ${g.pick.bajo ? `<div class="ajnote">Favorito claro (${esc(g.pick.txt)}, ${pct(g.pick.p)}), pero paga menos de ${odd(D.cuota_min || 1.5)}: no hay pick de partido. Mira Cuotas y Jugadores para otros mercados.</div>` : ""}
+    <div class="gpick" ${g.pick.bajo ? 'style="display:none"' : ""}><div><small>PICK DEL MODELO</small><span class="pcpill ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(g.pick.txt)}</span></span></div><div class="r"><b>${pct(g.pick.p)}</b><span>cuota ${odd(g.pick.cuota || g.pick.justa)}</span></div></div>
     <div class="gacts"><button class="pkseg ${seg[id] ? "on" : ""}" data-act="seg">${ic(seg[id] ? "check" : "heart")}${seg[id] ? "Siguiendo" : "Seguir pick"}</button><button class="pkseg" data-act="tobank">${ic("plus")}Al bankroll</button></div>
     <div class="pktabs dark gtabs">${tabs.map(([k, l]) => `<button class="${t === k ? "on" : ""}" data-act="gtab" data-k="${k}">${l}</button>`).join("")}</div>
     ${t === "previa" ? gPrevia(g) : t === "cuotas" ? gCuotas(g) : t === "equipos" ? gEquipos(g) : gJugadores(g)}`;
@@ -183,7 +185,12 @@ function gPrevia(g) {
   const h2h = `<h4 class="pksub">Últimos enfrentamientos</h4><div class="pkcard">${(g.h2h || []).map((m) => `<div class="fr"><span class="d" style="margin:0 10px 0 0;text-align:left">${new Date(m.at).toLocaleDateString("es-CO", { day: "numeric", month: "short", year: "2-digit" }).replace(".", "")}</span>${esc(m.h)} vs ${esc(m.a)}<span class="s">${esc(m.m)}</span></div>`).join("") || `<div class="small">No se han enfrentado desde agosto de 2025.</div>`}</div>`;
   const T = g.extra && g.extra.tabla;
   const pos = T && T.h && T.a ? `<h4 class="pksub">Posiciones</h4><div class="pkcard pos">${["h", "a"].map((s) => `<div class="pcol">${crest(g[s], 34)}<b>${esc(abT(g[s]))}</b><div class="big">${T[s].g}-${T[s].e}-${T[s].p}</div><span>${T[s].pts} pts · goles ${T[s].gf}-${T[s].gc}</span><span>${T[s].pos}º de ${T.n}</span></div>`).join("")}</div>` : "";
-  return probBox(g) + `<div class="pkcard"><h4 class="ia">${ic("spark")}Análisis IA del enfrentamiento</h4><div class="small">Escrito automáticamente con los números de la temporada y del modelo.</div><p class="iat">${iaPartido(g)}</p></div>` +
+  const fecha = new Date(g.at).toLocaleDateString("es-CO", { weekday: "short", day: "numeric", month: "short" }).replace(".", "");
+  const elp = `<h4 class="pksub">El partido</h4><div class="pkcard elp">${g.vimg ? `<img class="vimg" src="${esc(g.vimg)}" alt="" loading="lazy">` : ""}<div class="in">${g.ven ? `<b class="v">${esc(g.ven)}</b><span>${esc([g.city, g.cap ? `Capacidad ${Number(g.cap).toLocaleString("es-CO")}` : ""].filter(Boolean).join(" · "))}</span>` : `<span>Estadio por confirmar</span>`}<hr>
+    <div class="erow">${ic("cal")}<b>${esc(fecha)} · ${hora(g.at)}</b><em>${esc(cuenta(g.at)[1])}</em></div>
+    <div class="erow">${ic("star")}<span>${esc(g.liga)}</span></div>${g.tv ? `<div class="erow">${ic("screen")}<span>${esc(g.tv)}</span></div>` : ""}
+    <span class="alin">${ic("user")}Alineaciones ~1 h antes</span></div></div>`;
+  return elp + probBox(g) + `<div class="pkcard"><h4 class="ia">${ic("spark")}Análisis IA del enfrentamiento</h4><div class="small">Escrito automáticamente con los números de la temporada y del modelo.</div><p class="iat">${iaPartido(g)}</p></div>` +
     lesion + pos + forma + h2h;
 }
 function tilesMk(titulo, sels, g) {
@@ -289,7 +296,7 @@ function ajustes(arg) {
   }
   if (arg === "responsable") return subTop("Juego responsable") + heroAj("heartP", "Juego responsable", "Solo para mayores de 18 años") + `<div class="pkcard"><div class="small">${esc(D.aviso)}<br><br>Ningún modelo acierta siempre: incluso un pick de 75 % falla 1 de cada 4 veces. Apuesta solo lo que puedas perder, pon un límite a tu bankroll y nunca persigas pérdidas.</div></div>`;
   if (arg === "privacidad") return subTop("Privacidad") + heroAj("shield", "Privacidad", "Qué datos usamos") + `<div class="pkcard"><div class="small"><b>Sin cuenta ni registro.</b> CASHBET no te pide correo ni contraseña.<br><br><b>Tus datos se quedan en tu celular.</b> Tu nombre, tus picks seguidos y tu bankroll se guardan solo en este dispositivo. No se envían a ningún servidor.<br><br><b>Sin anuncios ni rastreo.</b> No usamos publicidad ni herramientas de seguimiento.<br><br><b>De dónde salen los datos.</b> Resultados, estadísticas y cuotas públicas de partidos; el robot los procesa cada 2 horas.</div></div>`;
-  if (arg === "ayuda") return subTop("Ayuda y soporte") + heroAj("help", "Ayuda", "Preguntas frecuentes") + `<div class="pkcard"><div class="small"><b>¿Qué es la cuota justa?</b><br>Lo que debería pagar un pick según el modelo. Si tu casa paga más, el pick tiene valor.<br><br><b>¿Por qué no hay picks de cuota menor a 1.30?</b><br>Porque pagan muy poco para el riesgo que tienen.<br><br><b>¿Cada cuánto se actualiza?</b><br>Cada 2 horas, automáticamente.<br><br><b>¿Cómo instalo la app?</b><br>En el navegador del celular, elige "Agregar a pantalla de inicio".</div></div>`;
+  if (arg === "ayuda") return subTop("Ayuda y soporte") + heroAj("help", "Ayuda", "Preguntas frecuentes") + `<div class="pkcard"><div class="small"><b>¿Qué es la cuota justa?</b><br>Lo que debería pagar un pick según el modelo. Si tu casa paga más, el pick tiene valor.<br><br><b>¿Por qué no hay picks de cuota menor a ${odd(D.cuota_min || 1.5)}?</b><br>Porque pagan muy poco para el riesgo que tienen.<br><br><b>¿Cada cuánto se actualiza?</b><br>Cada 2 horas, automáticamente.<br><br><b>¿Cómo instalo la app?</b><br>En el navegador del celular, elige "Agregar a pantalla de inicio".</div></div>`;
   return ajustes();
 }
 

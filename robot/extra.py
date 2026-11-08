@@ -26,7 +26,7 @@ LE = {"cor": [2.5, 3.5, 4.5, 5.5, 6.5], "sot": [1.5, 2.5, 3.5, 4.5, 5.5], "tir":
 # jugadores: estadística -> (campo en el box score, líneas)
 PJ = {"sot": ("shotsOnTarget", [0.5, 1.5]), "tir": ("totalShots", [0.5, 1.5, 2.5]),
       "fal": ("foulsCommitted", [0.5, 1.5]), "tar": ("yellowCards", [0.5])}
-CUOTA_MIN = 1.30            # el usuario no quiere picks con cuota menor a 1.30
+CUOTA_MIN = 1.50            # el usuario pidió cuota mínima 1.50 (antes 1.30)
 MAXP = 1 / CUOTA_MIN        # -> probabilidad máxima de un pick: 76,9 %
 
 
