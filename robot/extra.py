@@ -77,6 +77,7 @@ class Liga:
         self.th = {}        # equipo -> historial para la app (rival, local, stats propias y del rival)
         self.logo = {}      # sigla del rival -> escudo
         self.ph = {}        # jugador -> lista de valores cuando fue titular
+        self.pap = {}       # jugador -> lista de (fecha, titular) de cada partido que jugó
         self.pinfo = {}     # jugador -> (nombre, posición, equipo)
         self.prior = {}     # (posición, stat) -> [suma, n]
         self.ready = False
@@ -115,6 +116,9 @@ class Liga:
                                                 "gf": gf, "gc": gc, "r": "G" if gf > gc else "E" if gf == gc else "P",
                                                 **{s: tval(t, s) for s in STATS},
                                                 **{"o" + s: tval(ot, s) for s in STATS}})
+            for pid, v in pl.items():
+                if v.get("t") == tid and (v.get("st") or (v.get("appearances") or 0) > 0 or (v.get("subIns") or 0) > 0):
+                    self.pap.setdefault(pid, []).append((g["at"][:10], bool(v.get("st"))))
             for pid in st:
                 v = pl[pid]
                 pg = pos_g(v.get("pos"))
@@ -337,6 +341,26 @@ def _sel(m, p, txt, **kw):
     return {"m": m, "p": round(float(p), 4), "justa": round(1 / max(float(p), 1e-6), 2), "txt": txt, **kw}
 
 
+def temporadas(vals, lado, ln):
+    """Acierto de la línea por año (los 2 más recientes): [{y, n, ok, prom}]."""
+    por = {}
+    for v, d in vals:
+        por.setdefault(d[:4], []).append(v)
+    out = []
+    for y in sorted(por, reverse=True)[:2]:
+        xs = por[y]
+        ok = sum(1 for v in xs if (v > ln if lado == "mas" else v < ln))
+        out.append({"y": y, "n": len(xs), "ok": ok, "prom": round(sum(xs) / len(xs), 2)})
+    return out
+
+
+def estado(L, pid, tid):
+    """Últimos 5 partidos del equipo: en cuántos jugó y en cuántos fue titular."""
+    fechas = [e["d"] for e in L.th.get(tid, [])[-5:]]
+    ap = {d: st for d, st in L.pap.get(pid, [])}
+    return {"pj": sum(1 for d in fechas if d in ap), "tit": sum(1 for d in fechas if ap.get(d)), "n": len(fechas)}
+
+
 def _ab(g, sd):
     return g[sd].get("ab") or (g[sd].get("n") or "?")[:3].upper()
 
@@ -401,8 +425,11 @@ def predict(soon, today_ord):
                     gr[sc] = [[ln, round(p, 4)] for ln, p in zip(lines, pov)]
                     b = _best(pov, lines)
                     if b:
+                        tid = g["a" if sc == "a" else "h"]["id"]
+                        vals = [((e[s] + e["o" + s]) if sc == "t" else e[s], e["d"]) for e in L0.th.get(tid, [])]
                         picks.append(_sel(f"{s}|{sc}|{b[1]}|{b[2]:g}", b[0], _txt(s, "e", b[1], b[2], quien),
-                                          s=s, sc=sc, prueba=acierto.get(f"{s}_{'t' if sc == 't' else 'e'}")))
+                                          s=s, sc=sc, prueba=acierto.get(f"{s}_{'t' if sc == 't' else 'e'}"),
+                                          temp=temporadas(vals, b[1], b[2])))
                 if len(gr) > 3:
                     grupos.append(gr)
             jug = []
@@ -420,7 +447,9 @@ def predict(soon, today_ord):
                                     esp=round(float(m), 2), prueba=acierto.get(f"{s}_j"),
                                     ult=[[e[s], e["_vs"], e["_l"]] for e in L0.ph.get(r["pid"], [])[-30:]][::-1],
                                     vr=[[e[s], e["_d"], e["_l"]] for e in L0.ph.get(r["pid"], [])
-                                        if e["_vs"] == _ab(g, "a" if r["side"] == "h" else "h")][-5:][::-1]))
+                                        if e["_vs"] == _ab(g, "a" if r["side"] == "h" else "h")][-5:][::-1],
+                                    temp=temporadas([(e[s], e["_d"]) for e in L0.ph.get(r["pid"], [])], b[1], b[2]),
+                                    est=estado(L0, r["pid"], g[r["side"]]["id"])))
             jug.sort(key=lambda x: -x["p"])
             hist = {sd: L0.th.get(g[sd]["id"], [])[-30:][::-1] for sd in ("h", "a")}
             vr = {sd: [e for e in L0.th.get(g[sd]["id"], []) if e["vs"] == _ab(g, "a" if sd == "h" else "h")][-5:][::-1]
