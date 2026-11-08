@@ -503,12 +503,30 @@ def images(partidos, props_):
             t["logo"] = "data/" + rel
     for g in partidos:
         team(g["h"]); team(g["a"])
+        lg = (g.get("extra") or {}).get("lg") or {}
+        for ab, u in list(lg.items()):
+            if u and not u.startswith("data/"):
+                rel = f"img/t/{_h(u)}.png"
+                jobs.setdefault(rel, (u, 128))
+                lg[ab] = "data/" + rel
         for s in ("h", "a"):
             for r in (g.get("forma") or {}).get(s, []):
                 if r.get("logo") and not r["logo"].startswith("data/"):
                     rel = f"img/t/{_h(r['logo'])}.png"
                     jobs.setdefault(rel, (r["logo"], 128))
                     r["logo"] = "data/" + rel
+    # futbolistas: solo partidos de las próximas 36 h; las que no existen se recuerdan
+    nofoto_p = os.path.join(DATA, "img", "nofoto.json")
+    nofoto = set(json.load(open(nofoto_p))) if os.path.exists(nofoto_p) else set()
+    limite = (now() + dt.timedelta(hours=36)).strftime("%Y-%m-%dT%H:%MZ")
+    fjobs = {}
+    for g in partidos:
+        for x in (g.get("extra") or {}).get("jug", []):
+            rel = f"img/f/{x['pid']}.png"
+            if os.path.exists(os.path.join(DATA, rel)):
+                x["foto"] = "data/" + rel
+            elif g["at"] <= limite and x["pid"] not in nofoto:
+                fjobs[rel] = (f"https://a.espncdn.com/i/headshots/soccer/players/full/{x['pid']}.png", 200)
     for x in props_:
         rel = f"img/p/{x['pl']}.png"
         jobs[rel] = (f"https://a.espncdn.com/i/headshots/nba/players/full/{x['pl']}.png", 160)
@@ -518,6 +536,17 @@ def images(partidos, props_):
     with ThreadPoolExecutor(4) as ex:
         ok = list(ex.map(lambda kv: (kv[0], _img(kv[1][0], os.path.join(DATA, kv[0]), kv[1][1])), jobs.items()))
     bad = {k for k, v in ok if not v}
+    with ThreadPoolExecutor(6) as ex:
+        okf = list(ex.map(lambda kv: (kv[0], _img(kv[1][0], os.path.join(DATA, kv[0]), kv[1][1])), fjobs.items()))
+    for k, v in okf:
+        if not v:
+            nofoto.add(k.split("/")[-1][:-4])
+    os.makedirs(os.path.dirname(nofoto_p), exist_ok=True)
+    json.dump(sorted(nofoto), open(nofoto_p, "w"))
+    for g in partidos:
+        for x in (g.get("extra") or {}).get("jug", []):
+            if os.path.exists(os.path.join(DATA, f"img/f/{x['pid']}.png")):
+                x["foto"] = f"data/img/f/{x['pid']}.png"
     # si una imagen no se pudo bajar, la app muestra la sigla
     for g in partidos:
         for s in ("h", "a"):
@@ -526,6 +555,10 @@ def images(partidos, props_):
             for r in (g.get("forma") or {}).get(s, []):
                 if (r.get("logo") or "")[5:] in bad:
                     r["logo"] = None
+        lg = (g.get("extra") or {}).get("lg") or {}
+        for ab, u in list(lg.items()):
+            if (u or "")[5:] in bad:
+                lg[ab] = None
     for x in props_:
         if (x["foto"] or "")[5:] in bad:
             x["foto"] = None

@@ -74,6 +74,8 @@ class Liga:
         self.Y = {s: ([], []) for s in STATS}
         self.seen = {}
         self.tlast = {}     # equipo -> lista de (titulares, valores de equipo)
+        self.th = {}        # equipo -> historial para la app (rival, local, stats propias y del rival)
+        self.logo = {}      # sigla del rival -> escudo
         self.ph = {}        # jugador -> lista de valores cuando fue titular
         self.pinfo = {}     # jugador -> (nombre, posición, equipo)
         self.prior = {}     # (posición, stat) -> [suma, n]
@@ -104,10 +106,20 @@ class Liga:
             self.seen[tid] = self.seen.get(tid, 0) + 1
             st = [pid for pid, v in pl.items() if v.get("t") == tid and v.get("st")]
             self.tlast.setdefault(tid, []).append((st, {s: tval(t, s) for s in STATS}))
+            o = "a" if side == "h" else "h"
+            ot = ta if side == "h" else th
+            vs = g[o].get("ab") or (g[o].get("n") or "?")[:3].upper()
+            self.logo[vs] = g[o].get("logo")
+            gf, gc = (g["h"]["s"], g["a"]["s"]) if side == "h" else (g["a"]["s"], g["h"]["s"])
+            self.th.setdefault(tid, []).append({"vs": vs, "l": int(side == "h"), "d": g["at"][:10],
+                                                "gf": gf, "gc": gc, "r": "G" if gf > gc else "E" if gf == gc else "P",
+                                                **{s: tval(t, s) for s in STATS},
+                                                **{"o" + s: tval(ot, s) for s in STATS}})
             for pid in st:
                 v = pl[pid]
                 pg = pos_g(v.get("pos"))
                 vals = {s: (v.get(PJ[s][0]) or 0) for s in PJ}
+                vals["_vs"], vals["_l"], vals["_d"] = vs, int(side == "h"), g["at"][:10]
                 self.ph.setdefault(pid, []).append(vals)
                 self.pinfo[pid] = (v.get("n"), pg, tid)
                 for s in PJ:
@@ -325,6 +337,34 @@ def _sel(m, p, txt, **kw):
     return {"m": m, "p": round(float(p), 4), "justa": round(1 / max(float(p), 1e-6), 2), "txt": txt, **kw}
 
 
+def _ab(g, sd):
+    return g[sd].get("ab") or (g[sd].get("n") or "?")[:3].upper()
+
+
+def tabla(L, g):
+    """Posiciones de la temporada actual (desde el 1 de julio) para los dos equipos."""
+    hoy = g["at"][:10]
+    ini = f"{int(hoy[:4]) - (1 if hoy[5:7] < '07' else 0)}-07-01"
+    t = {}
+    for x in L.games:
+        if x["at"][:10] < ini:
+            continue
+        for sd, o in (("h", "a"), ("a", "h")):
+            r = t.setdefault(x[sd]["id"], {"pj": 0, "g": 0, "e": 0, "p": 0, "gf": 0, "gc": 0})
+            gf, gc = x[sd]["s"], x[o]["s"]
+            r["pj"] += 1; r["gf"] += gf; r["gc"] += gc
+            r["g" if gf > gc else "e" if gf == gc else "p"] += 1
+    for r in t.values():
+        r["pts"] = 3 * r["g"] + r["e"]
+    orden = sorted(t, key=lambda k: (-t[k]["pts"], -(t[k]["gf"] - t[k]["gc"]), -t[k]["gf"]))
+    out = {"n": len(orden)}
+    for sd in ("h", "a"):
+        tid = g[sd]["id"]
+        if tid in t:
+            out[sd] = {**t[tid], "pos": orden.index(tid) + 1}
+    return out
+
+
 def predict(soon, today_ord):
     """Mercados de estadísticas para los próximos partidos de fútbol.
     Devuelve {id_partido: {...}} solo con mercados que pasaron la prueba."""
@@ -377,9 +417,19 @@ def predict(soon, today_ord):
                 if b:
                     jug.append(_sel(f"{s}|j:{r['pid']}|{b[1]}|{b[2]:g}", b[0], _txt(s, "j", b[1], b[2], r["n"]),
                                     s=s, sc="j", pid=r["pid"], jugador=r["n"], side=r["side"],
-                                    esp=round(float(m), 2), prueba=acierto.get(f"{s}_j")))
+                                    esp=round(float(m), 2), prueba=acierto.get(f"{s}_j"),
+                                    ult=[[e[s], e["_vs"], e["_l"]] for e in L0.ph.get(r["pid"], [])[-30:]][::-1],
+                                    vr=[[e[s], e["_d"], e["_l"]] for e in L0.ph.get(r["pid"], [])
+                                        if e["_vs"] == _ab(g, "a" if r["side"] == "h" else "h")][-5:][::-1]))
             jug.sort(key=lambda x: -x["p"])
-            out[g["id"]] = {"grupos": grupos, "picks": sorted(picks, key=lambda x: -x["p"]), "jug": jug}
+            hist = {sd: L0.th.get(g[sd]["id"], [])[-30:][::-1] for sd in ("h", "a")}
+            vr = {sd: [e for e in L0.th.get(g[sd]["id"], []) if e["vs"] == _ab(g, "a" if sd == "h" else "h")][-5:][::-1]
+                  for sd in ("h", "a")}
+            out[g["id"]] = {"grupos": grupos, "picks": sorted(picks, key=lambda x: -x["p"]), "jug": jug,
+                            "hist": hist, "vr": vr, "lg": {}, "tabla": tabla(L0, g)}
+            for sd in ("h", "a"):
+                for e in hist[sd]:
+                    out[g["id"]]["lg"][e["vs"]] = L0.logo.get(e["vs"])
     return out
 
 

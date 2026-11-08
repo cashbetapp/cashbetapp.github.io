@@ -127,10 +127,11 @@ function after(tab) {
 }
 window.addEventListener("hashchange", route);
 document.addEventListener("click", (e) => {
-  const t = e.target.closest("[data-go],[data-g],[data-pr],[data-act]");
+  const t = e.target.closest("[data-go],[data-g],[data-pr],[data-pk],[data-act]");
   if (!t) return;
   if (t.dataset.go) { location.hash = t.dataset.go; }
   else if (t.dataset.g) openGame(t.dataset.g, t.dataset.t || "resumen");
+  else if (t.dataset.pk) openPick(t.dataset.pk, t.dataset.m);
   else if (t.dataset.pr) openProp(+t.dataset.pr);
   else act(t.dataset.act, t);
 });
@@ -216,7 +217,7 @@ function calendario() {
 }
 
 // ------------------------------------------------------------ PICKS
-function picks() {
+function picksViejo() {
   const f = ui.pf;
   let body = "";
   const STAT = { cor: "Córners", sot: "Tiros a puerta", tir: "Tiros", fal: "Faltas", tar: "Tarjetas" };
@@ -402,7 +403,7 @@ function openGame(id, tab = "resumen") {
     const J = (g.extra && g.extra.jug) || [];
     body = J.length ? ["h", "a"].map((sd) => {
       const xs = J.filter((x) => x.side === sd);
-      return xs.length ? `<div class="box"><h4><span style="display:flex;gap:8px;align-items:center">${crest(g[sd], 24)}${esc(g[sd].n)}</span></h4>${xs.map((x) => `<div class="mk"><div class="l">${esc(x.jugador)}<span>${esc(x.txt.split(": ")[1])} · cuota justa ${odd(x.justa)}</span></div>
+      return xs.length ? `<div class="box"><h4><span style="display:flex;gap:8px;align-items:center">${crest(g[sd], 24)}${esc(g[sd].n)}</span></h4>${xs.map((x) => `<div class="mk" data-pk="${g.id}" data-m="${esc(x.m)}"><div class="l">${esc(x.jugador)}<span>${esc(x.txt.split(": ")[1])} · cuota justa ${odd(x.justa)}</span></div>
         <div class="pb"><b>${pct(x.p)}</b><div class="tr"><i style="width:${x.p * 100}%"></i></div></div></div>`).join("")}</div>` : "";
     }).join("") + `<div class="small" style="margin:10px 2px">Titulares probables según sus últimos partidos. Solo picks con cuota justa de ${odd(D.cuota_min || 1.3)} o más.</div>`
       : `<div class="empty">No hay picks de jugadores para este partido.</div>`;
@@ -434,7 +435,7 @@ function statsHtml(g) {
   const celda = (p) => `<td class="${p >= 0.5 && p <= mx ? "ok" : p > mx ? "dim" : ""}">${pct(p)}</td>`;
   const tabla = (rows, nom) => rows ? `<div class="sub">${esc(nom)}</div><table class="tbl st"><tr><th>Línea</th><th>Más</th><th>Menos</th></tr>${rows.map(([ln, p]) => `<tr><td>${ln}</td>${celda(p)}${celda(1 - p)}</tr>`).join("")}</table>` : "";
   const top = X.picks.slice(0, 8);
-  return (top.length ? `<div class="box"><h4>Mejores picks de estadísticas</h4>${top.map((x) => `<div class="mk"><div class="l">${esc(x.txt)}<span>cuota justa ${odd(x.justa)}${x.prueba ? ` · en prueba acertó ${x.prueba}%` : ""}</span></div>
+  return (top.length ? `<div class="box"><h4>Mejores picks de estadísticas</h4>${top.map((x) => `<div class="mk" data-pk="${g.id}" data-m="${esc(x.m)}"><div class="l">${esc(x.txt)}<span>cuota justa ${odd(x.justa)}${x.prueba ? ` · en prueba acertó ${x.prueba}%` : ""}</span></div>
       <div class="pb"><b>${pct(x.p)}</b><div class="tr"><i style="width:${x.p * 100}%"></i></div></div></div>`).join("")}</div>` : "") +
     X.grupos.map((gr) => `<div class="box"><h4>${esc(gr.titulo)} <small>esperados ${gr.esp[0]} - ${gr.esp[1]}</small></h4>
       ${tabla(gr.t, "Total del partido")}${tabla(gr.h, g.h.n)}${tabla(gr.a, g.a.n)}</div>`).join("") +
@@ -486,6 +487,7 @@ function openProp(i) {
 // ------------------------------------------------------------ acciones
 function act(a, el) {
   const k = el.dataset.k;
+  if (typeof actPick === "function" && actPick(a, el)) return;
   if (a === "close") return closeSheet();
   if (a === "cal") { ui.cal = +el.dataset.i; return rerender(); }
   if (a === "caldep") { ui.calDep = k; return rerender(); }
