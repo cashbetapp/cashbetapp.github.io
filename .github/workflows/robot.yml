@@ -56,6 +56,24 @@ jobs:
         working-directory: robot
         run: python predict.py
 
+      - name: Sellar el registro (rama sellos, CON historial) y verificarlo contra todos los sellos anteriores
+        run: |
+          URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          if git ls-remote --exit-code --heads origin sellos >/dev/null; then
+            git clone -q --branch sellos "$URL" sellos
+          else
+            mkdir sellos && git -C sellos init -q -b sellos
+          fi
+          if [ -f sellos/sellos.txt ]; then (cd robot && python verificar.py ../data/ledger.json ../sellos/sellos.txt); fi
+          python robot/sellar.py data sellos
+          cp robot/registro.py robot/verificar.py sellos/
+          cd sellos
+          git config user.name "robot-cashbet"
+          git config user.email "robot-cashbet@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -q -m "sello $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push -q "$URL" sellos
+
       - name: Guardar los datos (rama datos, sin historial para no crecer)
         run: |
           cd data
@@ -73,6 +91,7 @@ jobs:
           cp -r web/* _site/
           rm -rf _site/data/*
           cp data/picks.json _site/data/
+          cp data/historial.json data/ledger.json data/sello.json _site/data/ 2>/dev/null || true
           cp -r data/img _site/data/ 2>/dev/null || true
           touch _site/.nojekyll
 

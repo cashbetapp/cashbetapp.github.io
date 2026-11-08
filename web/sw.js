@@ -1,6 +1,6 @@
 // CASHBET: guarda la app para abrir rápido; los pronósticos siempre se piden nuevos.
-const V = "cashbet-v23";
-const SHELL = ["./", "index.html", "styles.css?v=23", "app.js?v=23", "pick.js?v=23", "vistas.js?v=23", "manifest.webmanifest", "icon-192.png"];
+const V = "cashbet-v24";
+const SHELL = ["./", "index.html", "styles.css?v=24", "app.js?v=24", "pick.js?v=24", "vistas.js?v=24", "historial.js?v=24", "manifest.webmanifest", "icon-192.png"];
 self.addEventListener("install", (e) => { e.waitUntil(caches.open(V).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", (e) => {
   e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== V).map((k) => caches.delete(k)))).then(() => self.clients.claim()));

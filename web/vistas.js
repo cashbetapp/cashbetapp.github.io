@@ -87,7 +87,7 @@ function inicio() {
   return `<div class="top"><div class="logo">CASH<b>BET</b></div><div class="ic">
       <button class="icb" data-act="novedades" aria-label="Novedades">${ic("bell")}</button><button class="icb" data-go="ajustes" aria-label="Perfil">${ic("user")}</button></div></div>
     <h1>Buen ${esc(dia)}${nom ? `, ${esc(nom)}` : ""}</h1><div class="sub2">${fmtD.format(new Date())} · ${its.length} mejores picks</div>
-    <div class="ban">${ic("star")}<div>${sem.n ? `<b>CASHBET acertó ${sem.g}/${sem.n}</b><span>Últimos 7 días · picks reales</span>` : `<b>Registro real en marcha</b><span>Cada pick se califica al terminar el partido</span>`}</div><button data-go="picks">Ver picks ${ic("right")}</button></div>
+    <div class="ban">${ic("star")}<div>${sem.n ? `<b>CASHBET acertó ${sem.g}/${sem.n}</b><span>Últimos 7 días · picks reales</span>` : `<b>Registro real en marcha</b><span>Cada pick se califica al terminar el partido</span>`}</div><button data-go="historial">Historial ${ic("right")}</button></div>
     <div class="tiles t2">
       <div class="tile"><div class="k">Efectividad</div><div class="v">${real ? Math.round(rec.ef) : Math.round(efPrueba)}%<small>${real ? "real" : "prueba"}</small></div></div>
       <div class="tile"><div class="k">Racha</div><div class="v">${rec.n ? rec.racha.replace(" ", "") : "—"}</div></div>
@@ -268,6 +268,7 @@ function ajustes(arg) {
       ${row("tema", "moon", "Tema", TEMA[tema])}
       ${row("idioma", "globe", "Idioma", "Español")}
       ${row("acierto", "chart", "Cómo medimos el acierto", "Prueba honesta y registro real")}
+      <button class="ajrow" data-go="historial"><span class="oi">${ic("shield")}</span><div><b>Historial público</b><small>Todos los picks, sellados y verificables</small></div>${ic("right")}</button>
       ${row("responsable", "heartP", "Juego responsable", "Apuesta solo lo que puedas perder")}
       ${row("privacidad", "shield", "Privacidad", "Qué datos usamos")}
       ${row("ayuda", "help", "Ayuda y soporte", "Preguntas frecuentes")}</div>

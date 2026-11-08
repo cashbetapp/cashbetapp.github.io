@@ -453,36 +453,92 @@ def outcome(m, hs, as_):
     return None
 
 
+FUENTE = "ESPN (site.api.espn.com)"
+MODELO = {"partidos_futbol": "futbol-poisson-v2+casa", "partidos_nba": "nba-logit-v2+casa",
+          "extra": "estadisticas-nb-v2", "props": "nba-jugadores-v1+casa"}
+
+
+def version_codigo():
+    v = os.environ.get("GITHUB_SHA")
+    if v:
+        return v[:7]
+    try:
+        import subprocess
+        return subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=os.path.dirname(__file__), text=True).strip()
+    except Exception:
+        return "local"
+
+
+def estado_partido(m, hs, as_):
+    """acierto / fallo / push (línea exacta en totales o hándicap entero)."""
+    if m.startswith("mas_") or m.startswith("menos_"):
+        ln = float(m.split("_", 1)[1])
+        if hs + as_ == ln:
+            return "push"
+    if m.startswith("hcp_local_") and hs - as_ + float(m[10:]) == 0:
+        return "push"
+    if m.startswith("hcp_visita_") and as_ - hs + float(m[11:]) == 0:
+        return "push"
+    ok = outcome(m, hs, as_)
+    return None if ok is None else "acierto" if ok else "fallo"
+
+
 def ledger(partidos, props_, extras=None):
-    """Anota cada pick ANTES de empezar el partido y lo califica después.
-    Así la efectividad que muestra la app es real (no de prueba)."""
+    """Registro inalterable (ver registro.py): cada pick se anota ANTES del partido la
+    primera vez que se publica, no se edita, y se califica una sola vez al terminar."""
+    import registro as R
     p = os.path.join(DATA, "ledger.json")
-    L = json.load(open(p, encoding="utf-8")) if os.path.exists(p) else {"partidos": {}, "props": {}}
+    L = json.load(open(p, encoding="utf-8")) if os.path.exists(p) else {"partidos": {}, "props": {}, "extra": {}}
     L.setdefault("extra", {})
-    ahora = now().strftime("%Y-%m-%dT%H:%MZ")
-    # mercados de estadísticas (córners, tiros, faltas, tarjetas; equipo y jugador)
+    R.migrar(L)
+    ahora = now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    ahora_m = ahora[:16] + "Z"
+    ver = version_codigo()
+    vivos = set()
+    # 1) anotar lo publicado en esta corrida (solo partidos que no han empezado)
     for g in partidos:
-        ex = g.get("extra")
-        if not ex or g["at"] <= ahora:
+        if g["at"] <= ahora_m:
             continue
-        for x in ex["picks"] + ex["jug"]:
-            L["extra"][f"{g['id']}|{x['m']}"] = {"at": g["at"], "ev": g["id"], "lg": g["lg"], "hid": g["h"]["id"],
-                                                 "aid": g["a"]["id"], "m": x["m"], "s": x["s"], "sc": x["sc"],
-                                                 "txt": x["txt"], "p": x["p"], "cuota": x["justa"]}
-    for g in partidos:
-        if g["at"] > ahora and g.get("pick") and not g["pick"].get("bajo"):
-            pk = g["pick"]
-            L["partidos"][g["id"]] = {"at": g["at"], "lg": g["lg"], "liga": g["liga"], "dep": g["dep"],
-                                      "h": g["h"]["n"], "a": g["a"]["n"], "hl": g["h"]["logo"], "al": g["a"]["logo"],
-                                      "m": pk["m"], "txt": pick_name(pk["m"], g), "p": pk.get("pv", pk["p"]), "pm": pk["p"],
-                                      "q": pk.get("casa"), "tipo": pk.get("tipo"), "valor": pk.get("valor"),
-                                      "cuota": pk.get("cuota") or pk["justa"], "cuota_casa": bool(pk.get("cuota"))}
+        base = {"at": g["at"], "ev": g["id"], "lg": g["lg"], "liga": g["liga"], "dep": g["dep"],
+                "h": g["h"]["n"], "a": g["a"]["n"], "fuente": FUENTE, "ver": ver}
+        ex = g.get("extra")
+        if ex:
+            for x in ex["picks"] + ex["jug"]:
+                k = f"{g['id']}|{x['m']}"
+                vivos.add(("extra", k))
+                R.anotar(L, "extra", k, dict(base, hid=g["h"]["id"], aid=g["a"]["id"], m=x["m"], s=x["s"], sc=x["sc"],
+                                            txt=x["txt"], p=x["p"], cuota=x["justa"], casa_real=False,
+                                            modelo=MODELO["extra"]), ahora)
+        pk = g.get("pick")
+        if pk and not pk.get("bajo"):
+            viejo = L["partidos"].get(g["id"])      # registro anterior al sello (clave = id del partido)
+            if viejo and viejo.get("m") == pk["m"]:
+                vivos.add(("partidos", g["id"]))
+                continue
+            k = f"{g['id']}|{pk['m']}"
+            vivos.add(("partidos", k))
+            R.anotar(L, "partidos", k, dict(base, hl=g["h"]["logo"], al=g["a"]["logo"], m=pk["m"],
+                                            txt=pick_name(pk["m"], g), p=pk.get("pv", pk["p"]), pm=pk["p"],
+                                            q=pk.get("casa"), tipo=pk.get("tipo"), valor=pk.get("valor"),
+                                            cuota=pk.get("cuota") or pk["justa"], cuota_casa=bool(pk.get("cuota")),
+                                            cq=ahora if pk.get("cuota") else None,
+                                            modelo=MODELO["partidos_" + g["dep"]]), ahora)
     for x in props_:
-        if x["at"] > ahora:
-            k = f"{x['ev']}_{x['pl']}_{x['t']}_{x['linea']}"
-            L["props"][k] = {kk: x.get(kk) for kk in ("ev", "at", "pl", "jugador", "t", "tipo", "linea", "lado", "p", "pm", "cuota", "casa", "valor")}
-    # calificar
-    res = {}
+        if x["at"] <= ahora_m:
+            continue
+        k = f"{x['ev']}_{x['pl']}_{x['t']}_{x['linea']}"
+        vivos.add(("props", k))
+        rec = {kk: x.get(kk) for kk in ("ev", "at", "pl", "jugador", "equipo", "partido", "t", "tipo", "linea", "lado",
+                                         "p", "pm", "cuota", "casa", "valor")}
+        R.anotar(L, "props", k, dict(rec, dep="nba", liga="NBA", cuota_casa=True, cq=ahora, fuente=FUENTE,
+                                     modelo=MODELO["props"], ver=ver), ahora)
+    # 2) antes del partido: un pick que el modelo ya no publica queda "retirado" (no cuenta)
+    for coll in ("partidos", "extra", "props"):
+        for k, e in L[coll].items():
+            if not e.get("estado") and e["at"] > ahora_m:
+                e["ret"] = (coll, k) not in vivos
+    # 3) calificar (una sola vez)
+    res, names = {}, {}
     for key in SOCCER + ["nba"]:
         games, det, _ = load(key)
         for g in games:
@@ -492,29 +548,42 @@ def ledger(partidos, props_, extras=None):
     for key in SOCCER:
         with open(os.path.join(DATA, "hist", key + ".json"), encoding="utf-8") as f:
             malos |= choques(json.load(f)["games"])
-    for coll in ("partidos", "extra"):
-        for k in [k for k, e in L.get(coll, {}).items() if "ok" not in e and (e.get("ev") or k) in malos]:
-            del L[coll][k]   # partido dudoso que no ha terminado: se quita de la libreta
-    for gid, e in L["partidos"].items():
-        if "ok" not in e and gid in res:
-            e["ok"] = outcome(e["m"], res[gid][0], res[gid][1])
-            e["res"] = f"{res[gid][0]}-{res[gid][1]}"
-    for k, e in L["props"].items():
-        if "ok" in e or e["ev"] not in res or not res[e["ev"]][2]:
-            continue
-        v = (res[e["ev"]][2].get("pl") or {}).get(e["pl"])
-        if not v:
-            e["ok"] = None  # no jugó: apuesta anulada
-            continue
-        tot = sum(stat_val(v, kk) or 0 for kk in PROP_TYPES[e["t"]])
-        e["real"] = tot
-        e["ok"] = (tot > e["linea"]) if e["lado"] == "mas" else (tot < e["linea"])
-    for k, e in L["extra"].items():
-        if "ok" in e or e["ev"] not in res or not res[e["ev"]][2]:
-            continue
-        e["ok"], e["real"] = extra_outcome(e["m"], res[e["ev"]][2], e["hid"], e["aid"])
+    for coll in ("partidos", "extra", "props"):
+        for k, e in L[coll].items():
+            if e.get("estado") or e["at"] > ahora_m:
+                continue
+            gid = e.get("ev") or k.split("|")[0]
+            if e.get("ret"):
+                R.calificar(L, coll, k, "retirado", motivo="el modelo cambió de pick antes del partido")
+            elif gid in malos and gid not in res:
+                R.calificar(L, coll, k, "nulo", motivo="partido dudoso en la fuente de datos")
+            elif coll == "partidos" and gid in res:
+                hs, as_ = res[gid][0], res[gid][1]
+                est = estado_partido(e["m"], hs, as_)
+                if est:
+                    R.calificar(L, coll, k, est, res=f"{hs}-{as_}")
+            elif coll == "props" and gid in res and res[gid][2]:
+                v = (res[gid][2].get("pl") or {}).get(e["pl"])
+                if not v:
+                    R.calificar(L, coll, k, "nulo", motivo="el jugador no jugó")
+                    continue
+                tot = sum(stat_val(v, kk) or 0 for kk in PROP_TYPES[e["t"]])
+                est = "push" if tot == e["linea"] else "acierto" if ((tot > e["linea"]) == (e["lado"] == "mas")) else "fallo"
+                R.calificar(L, coll, k, est, real=tot)
+            elif coll == "extra" and gid in res and res[gid][2]:
+                ok, real = extra_outcome(e["m"], res[gid][2], e["hid"], e["aid"])
+                if ok is None:
+                    R.calificar(L, coll, k, "nulo", real=real, motivo="sin dato oficial de la estadística")
+                else:
+                    R.calificar(L, coll, k, "acierto" if ok else "fallo", real=real)
+    okc, n, h, err = R.verificar(L)
+    if not okc:
+        raise SystemExit("REGISTRO ROTO: " + "; ".join(err))
     with open(p, "w", encoding="utf-8") as f:
         json.dump(L, f, ensure_ascii=False, separators=(",", ":"))
+    with open(os.path.join(DATA, "sello.json"), "w", encoding="utf-8") as f:
+        json.dump({"t": ahora, "n": n, "h": h, "ver": ver}, f)
+    historial(L, ahora, n, h)
 
     def stats(items):
         done = sorted([e for e in items if e.get("ok") is not None], key=lambda e: e["at"])
@@ -542,8 +611,88 @@ def ledger(partidos, props_, extras=None):
     val = [e for e in list(L["partidos"].values()) + list(L["props"].values())
            if (e.get("valor") or -1) >= VALOR_MIN and e.get("cuota")]
     return {"partidos": stats(L["partidos"].values()), "props": stats(L["props"].values()), "ultimos": hist,
-            "valor": stats(val),
+            "valor": stats(val), "sello": {"n": n, "h": h, "t": ahora},
             "extra": stats(L["extra"].values()), "extra_por": {k: stats(v) for k, v in por.items()}, "semana": semana}
+
+
+MERCADO = {"res": "Resultado", "cor": "Córners", "sot": "Tiros a puerta", "tir": "Tiros", "fal": "Faltas", "tar": "Tarjetas"}
+
+
+def _mercado(coll, e):
+    if coll == "props":
+        return "Jugadores NBA · " + (e.get("tipo") or "")
+    if coll == "extra":
+        return MERCADO.get(e["s"], e["s"]) + (" (jugador)" if e["sc"] == "j" else " (partido)" if e["sc"] == "t" else " (equipo)")
+    m = e["m"]
+    if e.get("dep") == "nba":
+        return "NBA · " + ("Total de puntos" if m.startswith(("mas_", "menos_")) else "Hándicap" if m.startswith("hcp") else "Ganador")
+    return "Goles" if m.startswith(("mas_", "menos_", "btts")) else "Resultado"
+
+
+def metricas(items):
+    """Acierto, ROI real (solo con cuota de una casa), Brier, Log Loss y calibración."""
+    g = [e for e in items if e.get("estado") in ("acierto", "fallo")]
+    out = {"total": len(items), "calificados": len(g),
+           "aciertos": sum(1 for e in g if e["estado"] == "acierto"), "fallos": sum(1 for e in g if e["estado"] == "fallo"),
+           "push": sum(1 for e in items if e.get("estado") == "push"), "nulos": sum(1 for e in items if e.get("estado") == "nulo"),
+           "retirados": sum(1 for e in items if e.get("estado") == "retirado"),
+           "pendientes": sum(1 for e in items if not e.get("estado"))}
+    if g:
+        y = [1 if e["estado"] == "acierto" else 0 for e in g]
+        pp = [min(max(float(e["p"]), 0.001), 0.999) for e in g]
+        out["acierto"] = round(100 * sum(y) / len(y), 1)
+        out["prob_media"] = round(100 * sum(pp) / len(pp), 1)
+        out["brier"] = round(sum((a - b) ** 2 for a, b in zip(pp, y)) / len(y), 4)
+        out["logloss"] = round(-sum(math.log(a) if b else math.log(1 - a) for a, b in zip(pp, y)) / len(y), 4)
+        reales = [e for e in g if e.get("cuota_casa") or e.get("casa_real") or e.get("pl")]   # props NBA: cuota real
+        if reales:
+            gan = sum((e["cuota"] - 1) if e["estado"] == "acierto" else -1 for e in reales)
+            out["roi"] = {"n": len(reales), "unidades": round(gan, 2), "pct": round(100 * gan / len(reales), 1)}
+    return out
+
+
+BANDAS = [(0.0, 0.5), (0.5, 0.55), (0.55, 0.6), (0.6, 0.65), (0.65, 0.7), (0.7, 0.75), (0.75, 0.8), (0.8, 1.01)]
+
+
+def historial(L, ahora, n, h):
+    """data/historial.json: lo que publica la página Historial (últimos 21 días de picks y
+    métricas sobre TODO el registro)."""
+    todos = []
+    for coll in ("partidos", "extra", "props"):
+        for k, e in L[coll].items():
+            todos.append((coll, k, e))
+    def dep(coll, e):
+        return "nba" if coll == "props" or e.get("dep") == "nba" else "futbol"
+    vis = [e for c, k, e in todos if e.get("estado") != "retirado" and not e.get("ret")]
+    por_dep, por_mk, por_conf = {}, {}, {}
+    for c, k, e in todos:
+        if e.get("estado") == "retirado" or e.get("ret"):
+            continue
+        por_dep.setdefault(dep(c, e), []).append(e)
+        por_mk.setdefault(_mercado(c, e), []).append(e)
+        for lo, hi in BANDAS:
+            if lo <= float(e["p"]) < hi:
+                por_conf.setdefault(f"{round(lo * 100):02d}-{min(round(hi * 100), 100)}%", []).append(e)
+    desde = (now() - dt.timedelta(days=14)).strftime("%Y-%m-%dT%H:%MZ")
+    filas = []
+    for c, k, e in todos:
+        if e["at"] < desde:
+            continue
+        filas.append({"c": c[0], "k": k, "at": e["at"], "pub": e.get("pub"), "d": dep(c, e), "lg": e.get("liga") or e.get("lg"),
+                      "pt": e.get("partido") or (f"{e['h']} vs {e['a']}" if e.get("h") else None),
+                      "mk": _mercado(c, e), "sel": e.get("txt") or f"{e.get('jugador')}: {'más' if e.get('lado') == 'mas' else 'menos'} de {e.get('linea')} {(e.get('tipo') or '').lower()}",
+                      "p": e["p"], "cu": e.get("cuota"), "cr": bool(e.get("cuota_casa")), "cq": e.get("cq"),
+                      "st": e.get("estado"), "r": e.get("res") if e.get("res") is not None else e.get("real"),
+                      "mo": e.get("motivo"), "rt": 1 if e.get("ret") else None, "md": e.get("modelo"), "v": e.get("ver"), "h": (e.get("h_") or "")[:12]})
+    filas.sort(key=lambda r: (r["at"], r["k"]), reverse=True)
+    out = {"generado": ahora, "sello": {"n": n, "h": h, "t": ahora},
+           "global": metricas(vis),
+           "deporte": {k: metricas(v) for k, v in por_dep.items()},
+           "mercado": {k: metricas(v) for k, v in sorted(por_mk.items(), key=lambda kv: -len(kv[1]))},
+           "confianza": {k: metricas(por_conf[k]) for k in sorted(por_conf)},
+           "filas": filas}
+    with open(os.path.join(DATA, "historial.json"), "w", encoding="utf-8") as f:
+        json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
 
 
 def _img(url, path, size):

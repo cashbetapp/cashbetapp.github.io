@@ -896,3 +896,38 @@ img.hpimg.foto { width: auto; height: 100%; max-width: 50%; right: 0; left: auto
 .pkvale svg { width: 17px; height: 17px; flex: none; margin-top: 1px; color: var(--tx3); }
 .pkvale b { color: var(--tx); }
 .pkvale.v { background: rgba(57,255,122,.1); border: 1px solid rgba(57,255,122,.35); } .pkvale.v svg { color: #22c55e; }
+
+/* ===== Historial público ===== */
+.hsello { display: flex; gap: 12px; align-items: flex-start; margin-top: 12px; padding: 14px; border-radius: 16px; background: rgba(57,255,122,.08); border: 1px solid rgba(57,255,122,.35); }
+.hsello > svg { width: 22px; height: 22px; color: #22c55e; flex: none; margin-top: 2px; }
+.hsello b { display: block; font-size: 15px; } .hsello span { display: block; font-size: 12.5px; color: var(--tx2); margin-top: 2px; word-break: break-all; }
+.hsello a { display: inline-flex; align-items: center; gap: 2px; margin-top: 8px; font-size: 13px; font-weight: 700; color: var(--gtx); }
+.hsello a svg { width: 14px; height: 14px; }
+.hk { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.hk > div { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 11px 12px; min-width: 0; }
+.hk span { display: block; font-size: 11.5px; color: var(--tx2); } .hk b { display: block; font-size: 21px; font-weight: 800; margin: 2px 0 1px; }
+.hk small { display: block; font-size: 10.5px; color: var(--tx3); line-height: 1.3; }
+.hk em { font-style: normal; } .hk .g, .htb .g, .hk em.g { color: #22c55e; } .hk .r, .htb .r, .hk em.r { color: #ef4444; }
+.hcal { padding: 14px; } .hcl { display: flex; gap: 16px; font-size: 12px; color: var(--tx2); margin-bottom: 8px; }
+.hcl span { display: flex; align-items: center; gap: 6px; } .hcl i.d { width: 2px; height: 12px; background: var(--tx); } .hcl i.p { width: 12px; height: 8px; border-radius: 3px; background: #22c55e; }
+.hcr { display: grid; grid-template-columns: 62px 1fr 58px; gap: 10px; align-items: center; margin-top: 9px; }
+.hcr .b { font-size: 12.5px; color: var(--tx2); }
+.hcr .t { position: relative; height: 10px; border-radius: 9px; background: var(--pkl); }
+.hcr .t s { display: block; height: 100%; border-radius: 9px; background: #22c55e; }
+.hcr .t u { position: absolute; top: -4px; height: 18px; border-left: 2px solid var(--tx); }
+.hcr .v { text-align: right; } .hcr .v b { display: block; font-size: 14px; } .hcr .v small { font-size: 10.5px; color: var(--tx3); }
+.htb td:first-child { font-size: 13px; }
+.hchips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 4px 0 6px; }
+.hchips button { flex: none; font-size: 12.5px; font-weight: 700; padding: 6px 12px; border-radius: 99px; background: var(--card); border: 1px solid var(--line); color: var(--tx2); }
+.hchips button.on { background: var(--pksel); color: var(--pkseltx); border-color: transparent; }
+.hd { font-size: 12px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; color: var(--tx3); margin: 16px 2px 6px; }
+.hr { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--line); border-radius: 14px; padding: 10px 12px; margin-bottom: 8px; }
+.hr.ok { border-left-color: #22c55e; } .hr.no { border-left-color: #ef4444; } .hr.pe { border-left-color: #f08a1c; }
+.hr .h1 { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--tx3); }
+.hr .h1 .tm { margin-left: auto; }
+.hr .st { font-weight: 800; font-size: 10.5px; letter-spacing: .4px; text-transform: uppercase; padding: 2px 8px; border-radius: 99px; background: rgba(127,127,127,.16); color: var(--tx2); }
+.hr .st.ok { background: rgba(34,197,94,.16); color: #22c55e; } .hr .st.no { background: rgba(239,68,68,.14); color: #ef4444; } .hr .st.pe { background: rgba(240,138,28,.14); color: #f08a1c; }
+.hr .h2 { font-size: 13px; color: var(--tx2); margin-top: 5px; }
+.hr .h3 { margin-top: 2px; } .hr .h3 b { display: block; font-size: 15px; } .hr .h3 span { font-size: 11.5px; color: var(--tx3); }
+.hr .h4 { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--tx2); margin-top: 6px; } .hr .h4 b { color: var(--tx); }
+.hr .h5 { font-size: 10.5px; color: var(--tx3); margin-top: 6px; word-break: break-word; }
