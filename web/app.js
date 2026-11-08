@@ -148,11 +148,14 @@ function saludo() {
   const n = store.get("nombre", "");
   return n ? `${s}, ${esc(n)}` : s;
 }
-const proximas = (h = 36) => D.partidos.filter((g) => new Date(g.at) - Date.now() < h * 3600e3 && new Date(g.at) > Date.now() - 2 * 3600e3);
+// solo los partidos que se juegan HOY (fecha del celular); los de días siguientes
+// aparecen cuando llegue su día (mientras tanto se ven en el Calendario)
+const esHoy = (at) => dkey(new Date(at)) === dkey(new Date());
+const delDia = () => D.partidos.filter((g) => esHoy(g.at) && new Date(g.at) > Date.now() - 2 * 3600e3);
 
 // ------------------------------------------------------------ INICIO
 function inicio() {
-  const hoy = proximas(30);
+  const hoy = delDia();
   const rec = (D.registro && D.registro.partidos) || { n: 0 };
   const a = D.acierto;
   const nPrueba = a.futbol_partidos + a.nba_partidos;
@@ -172,7 +175,7 @@ function inicio() {
   <div class="car">${top.map(heroCard).join("")}</div>
   <div class="dots">${top.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</div>` : ""}
   <div class="sec"><h2>Picks principales</h2><button class="pill" data-go="calendario">Ver todos</button></div>
-  ${lista.map(rowCard).join("") || `<div class="empty">No hay partidos en las próximas horas.</div>`}`;
+  ${lista.map(rowCard).join("") || `<div class="empty">Hoy ya no quedan partidos. Los de mañana aparecen aquí desde mañana; puedes verlos antes en el Calendario.</div>`}`;
 }
 function heroCard(g) {
   const c = g.pick.cuota;
@@ -218,14 +221,14 @@ function picks() {
   let body = "";
   if (f === "jugadores") {
     body = `<div class="note">${ic("warn")}<div><b>En prueba.</b> Las ventajas contra la casa en jugadores todavía no se han comprobado con resultados reales. El robot las está calificando todos los días; cuando haya suficientes, verás aquí su acierto.</div></div>` +
-      (D.propsOk.slice(0, 40).map(propCard).join("") || `<div class="empty">Todavía no hay líneas de jugadores para los próximos partidos.</div>`);
+      (D.propsOk.filter((x) => esHoy(x.at)).slice(0, 40).map(propCard).join("") || `<div class="empty">Todavía no hay líneas de jugadores para los partidos de hoy.</div>`);
   } else {
     let gs = D.partidos.filter((g) => new Date(g.at) > Date.now());
     if (f !== "todos") gs = gs.filter((g) => g.dep === f);
-    gs = gs.filter((g) => new Date(g.at) - Date.now() < 4 * 86400e3).sort((a, b) => b.pick.p - a.pick.p);
-    body = gs.map((g, i) => vCard(g, i)).join("") || `<div class="empty">No hay picks.</div>`;
+    gs = gs.filter((g) => esHoy(g.at)).sort((a, b) => b.pick.p - a.pick.p);
+    body = gs.map((g, i) => vCard(g, i)).join("") || `<div class="empty">Hoy ya no quedan picks. Los de mañana aparecen aquí desde mañana; puedes verlos antes en el Calendario.</div>`;
   }
-  return header("Picks", f === "jugadores" ? `Jugadores donde el modelo ve ventaja · ${D.propsOk.length}` : "Ordenados por confianza · próximos 4 días") + `
+  return header("Picks", f === "jugadores" ? `Jugadores de hoy donde el modelo ve ventaja · ${D.propsOk.filter((x) => esHoy(x.at)).length}` : "Partidos de hoy · ordenados por confianza") + `
   <div class="chips" style="margin-top:14px">${[["todos", "Todos"], ["jugadores", "Jugadores"], ["futbol", "Fútbol"], ["nba", "NBA"]].map(([k, t]) => `<button class="chip ${f === k ? "on" : ""}" data-act="pf" data-k="${k}">${t}</button>`).join("")}</div>${body}`;
 }
 function vCard(g, i) {
@@ -235,9 +238,9 @@ function vCard(g, i) {
     <div class="ed"><b>${pct(g.pick.p)}</b><span>${esc(g.liga.split(" ")[0])} · ${odd(c || g.pick.justa)}</span></div></div>
     <div class="bar2">${casa ? `Casa <b>${pct(casa)}</b>` : `<span>${cuando(g.at)}</span>`}<span class="tr"><i style="width:${g.pick.p * 100}%"></i>${casa ? `<u style="left:${casa * 100}%"></u>` : ""}</span>Modelo <b>${pct(g.pick.p)}</b></div></button>`;
 }
-function propCard(x) {
+function propCard(x, n) {
   const i = D.props.indexOf(x), up = x.lado === "mas", ed = x.p - x.casa;
-  return `<button class="vrow" data-pr="${i}"><div class="r1"><span class="rank">${D.propsOk.indexOf(x) + 1}</span>${x.foto ? `<img class="head" src="${esc(x.foto)}" alt="" loading="lazy">` : `<span class="head crest-f">${esc(sigla({ n: x.jugador }))}</span>`}
+  return `<button class="vrow" data-pr="${i}"><div class="r1"><span class="rank">${n + 1}</span>${x.foto ? `<img class="head" src="${esc(x.foto)}" alt="" loading="lazy">` : `<span class="head crest-f">${esc(sigla({ n: x.jugador }))}</span>`}
     <div style="min-width:0;flex:1"><div class="nm">${esc(x.jugador)}</div><div class="pk ${up ? "" : "bad"}">${ic(up ? "up" : "down")}${up ? "Más" : "Menos"} de ${x.linea} ${esc(x.tipo.toLowerCase())}</div></div>
     <div class="ed"><b>+${(ed * 100).toFixed(1)}%</b><span>ventaja · ${odd(x.cuota)}</span></div></div>
     <div class="bar2">Casa <b>${pct(x.casa)}</b><span class="tr"><i style="width:${x.p * 100}%"></i><u style="left:${x.casa * 100}%"></u></span>Modelo <b>${pct(x.p)}</b></div></button>`;
