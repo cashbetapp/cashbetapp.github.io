@@ -39,6 +39,14 @@ def _norm(s):
 def buscar(nombre, ciudad):
     """Devuelve {"img": url, "cap": int|None, "t": título} o {} si no hay un resultado seguro."""
     for lang in ("en", "es"):
+        # 1) título exacto con redirecciones (nombres comerciales -> página del estadio)
+        rr = _json(f"https://{lang}.wikipedia.org/w/api.php?action=query&titles={urllib.parse.quote(nombre)}&redirects=1&format=json")
+        for pg in ((rr or {}).get("query", {}).get("pages") or {}).values():
+            if "missing" in pg:
+                continue
+            info = _pagina(lang, pg["title"])
+            if info:
+                return info
         q = urllib.parse.quote(f"{nombre} {ciudad or ''}".strip())
         r = _json(f"https://{lang}.wikipedia.org/w/api.php?action=query&list=search&srsearch={q}&srlimit=3&format=json")
         for hit in (r or {}).get("query", {}).get("search", []):
@@ -46,12 +54,22 @@ def buscar(nombre, ciudad):
             # el título debe compartir palabras con el nombre del estadio
             if not (_norm(t) & _norm(nombre)):
                 continue
+            info = _pagina(lang, t)
+            if info:
+                return info
+    return {}
+
+
+def _pagina(lang, t):
+    """Foto y capacidad de una página de Wikipedia si de verdad es un estadio."""
+    if True:
+        if True:
             s = _json(f"https://{lang}.wikipedia.org/api/rest_v1/page/summary/{urllib.parse.quote(t.replace(' ', '_'))}")
             if not s or not PAL.search((s.get("description") or "") + " " + t + " " + (s.get("extract") or "")[:200]):
-                continue
+                return None
             # no confundir con barrios, distritos o ciudades que se llaman igual
             if NO.search(t + " " + (s.get("description") or "")):
-                continue
+                return None
             img = (s.get("originalimage") or s.get("thumbnail") or {}).get("source")
             cap = None
             qid = s.get("wikibase_item")
@@ -64,7 +82,7 @@ def buscar(nombre, ciudad):
                     cap = None
             if img or cap:
                 return {"img": img, "cap": cap, "t": t}
-    return {}
+            return None
 
 
 def foto(url, nombre):

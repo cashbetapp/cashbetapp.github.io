@@ -611,3 +611,4 @@ img.hpimg.foto { width: 48%; height: 100%; object-fit: cover; object-position: t
 .elp hr { border: 0; border-top: 1px solid var(--pkl); margin: 12px 0 2px; }
 .alin { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; font-size: 13px; font-weight: 700; color: var(--tx2); border: 1px solid var(--pkl); padding: 5px 12px; border-radius: 99px; }
 .alin svg { width: 15px; height: 15px; }
+.pkm svg { width: 13px; height: 13px; vertical-align: -2px; margin-right: 3px; }

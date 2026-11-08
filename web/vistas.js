@@ -176,6 +176,13 @@ function iaPartido(g) {
   t.push(`El pick es "${g.pick.txt}" (${pct(g.pick.p)}), con cuota ${g.pick.cuota ? "de la casa " + odd(g.pick.cuota) : "justa " + odd(g.pick.justa)}.`);
   return t.map(esc).join(" ");
 }
+function elPartido(g) {
+  const fecha = new Date(g.at).toLocaleDateString("es-CO", { weekday: "short", day: "numeric", month: "short" }).replace(".", "");
+  return `<h4 class="pksub">El partido</h4><div class="pkcard elp">${g.vimg ? `<img class="vimg" src="${esc(g.vimg)}" alt="" loading="lazy">` : ""}<div class="in">${g.ven ? `<b class="v">${esc(g.ven)}</b><span>${esc([g.city, g.cap ? `Capacidad ${Number(g.cap).toLocaleString("es-CO")}` : ""].filter(Boolean).join(" · "))}</span>` : `<span>Estadio por confirmar</span>`}<hr>
+    <div class="erow">${ic("cal")}<b>${esc(fecha)} · ${hora(g.at)}</b><em>${cuenta(g.at)[0] ? "en " : ""}${esc(cuenta(g.at)[1])}</em></div>
+    <div class="erow">${ic("star")}<span>${esc(g.liga)}</span></div>${g.tv ? `<div class="erow">${ic("screen")}<span>${esc(g.tv)}</span></div>` : ""}
+    <span class="alin">${ic("user")}Alineaciones ~1 h antes</span></div></div>`;
+}
 function gPrevia(g) {
   const lesion = g.dep === "nba" ? `<h4 class="pksub">Reporte de lesiones</h4><div class="pkcard">${["h", "a"].map((s) => `<div class="fo">${crest(g[s], 22)}<b>${esc(abT(g[s]))}</b><span class="cnt">${(g.bajas?.[s] || []).length}</span></div>
       ${(g.bajas?.[s] || []).map((b) => `<div class="les"><b>${esc(b.n)}</b><em class="${b.s === "Out" ? "out" : "dd"}">${b.s === "Out" ? "Fuera" : esc(b.s)}</em></div>`).join("") || `<div class="small">Sin lesionados reportados.</div>`}`).join("")}</div>` : "";
@@ -185,11 +192,7 @@ function gPrevia(g) {
   const h2h = `<h4 class="pksub">Últimos enfrentamientos</h4><div class="pkcard">${(g.h2h || []).map((m) => `<div class="fr"><span class="d" style="margin:0 10px 0 0;text-align:left">${new Date(m.at).toLocaleDateString("es-CO", { day: "numeric", month: "short", year: "2-digit" }).replace(".", "")}</span>${esc(m.h)} vs ${esc(m.a)}<span class="s">${esc(m.m)}</span></div>`).join("") || `<div class="small">No se han enfrentado desde agosto de 2025.</div>`}</div>`;
   const T = g.extra && g.extra.tabla;
   const pos = T && T.h && T.a ? `<h4 class="pksub">Posiciones</h4><div class="pkcard pos">${["h", "a"].map((s) => `<div class="pcol">${crest(g[s], 34)}<b>${esc(abT(g[s]))}</b><div class="big">${T[s].g}-${T[s].e}-${T[s].p}</div><span>${T[s].pts} pts · goles ${T[s].gf}-${T[s].gc}</span><span>${T[s].pos}º de ${T.n}</span></div>`).join("")}</div>` : "";
-  const fecha = new Date(g.at).toLocaleDateString("es-CO", { weekday: "short", day: "numeric", month: "short" }).replace(".", "");
-  const elp = `<h4 class="pksub">El partido</h4><div class="pkcard elp">${g.vimg ? `<img class="vimg" src="${esc(g.vimg)}" alt="" loading="lazy">` : ""}<div class="in">${g.ven ? `<b class="v">${esc(g.ven)}</b><span>${esc([g.city, g.cap ? `Capacidad ${Number(g.cap).toLocaleString("es-CO")}` : ""].filter(Boolean).join(" · "))}</span>` : `<span>Estadio por confirmar</span>`}<hr>
-    <div class="erow">${ic("cal")}<b>${esc(fecha)} · ${hora(g.at)}</b><em>${esc(cuenta(g.at)[1])}</em></div>
-    <div class="erow">${ic("star")}<span>${esc(g.liga)}</span></div>${g.tv ? `<div class="erow">${ic("screen")}<span>${esc(g.tv)}</span></div>` : ""}
-    <span class="alin">${ic("user")}Alineaciones ~1 h antes</span></div></div>`;
+  const elp = elPartido(g);
   return elp + probBox(g) + `<div class="pkcard"><h4 class="ia">${ic("spark")}Análisis IA del enfrentamiento</h4><div class="small">Escrito automáticamente con los números de la temporada y del modelo.</div><p class="iat">${iaPartido(g)}</p></div>` +
     lesion + pos + forma + h2h;
 }

@@ -62,7 +62,7 @@ function openPick(gid, m, keep) {
   const html = `<div class="pkh">
       <div class="pkl">
         <div class="pkt">${mini}<h3>${esc(titulo)}</h3></div>
-        <div class="pkm">${esc(abT(g.h))} vs ${esc(abT(g.a))} · ${cuando(g.at)}</div>
+        <div class="pkm">${esc(abT(g.h))} vs ${esc(abT(g.a))} · ${cuando(g.at)}${g.ven ? `<br>${ic("pin")}${esc(g.ven)}${g.city ? `, ${esc(g.city)}` : ""}` : ""}</div>
         <span class="pkpill ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(pkPill(P))}</span></span>
         <div class="pkprog"><span><i style="width:${x.p * 100}%"></i></span><b>${pct(x.p)}</b></div>
       </div>${bigImg(P)}</div>
@@ -168,6 +168,7 @@ function pkContexto(P) {
       return `<div class="fr"><span class="d" style="margin:0 10px 0 0">${fDia(e.d)}</span>${esc(loc)} ${hs} vs ${esc(vis)} ${as}<span class="s"><em class="tg">${esc(w)}</em></span></div>`; }).join("") : `<div class="small">No se han enfrentado desde agosto de 2025.</div>`}</div>
     <h2 class="pkh2">Mercado</h2><h4 class="pksub">Predicción del partido</h4>
     <div class="pk3">${tres.map(([t, s]) => s ? `<div class="pkbox c ${s.p === best ? "sel" : ""}"><div class="k">${esc(t.toUpperCase())}</div><b>${pct(s.p, 1)}</b></div>` : "").join("")}</div>
+    ${elPartido(g)}
     <h4 class="pksub">Calendario</h4><div class="pkcard">${cal("h")}${cal("a")}<div class="small">Cuenta solo partidos de esta liga.</div></div>
     <h4 class="pksub">Claves de la predicción <small>Lo que dicen los datos de esta apuesta</small></h4><div class="pkcard"><ul class="why">
       <li>${ic("check")}<span>Cumplió en ${hits10} de los últimos ${v10.length} · promedia ${n1(media(vv))} (línea ${P.ln}).</span></li>
