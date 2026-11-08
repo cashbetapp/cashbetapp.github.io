@@ -784,3 +784,14 @@ img.hpimg.foto { width: 48%; height: 100%; object-fit: cover; object-position: t
 .mci { background: rgba(197,107,255,.16); }
 .mci svg, .mcpp svg { color: var(--nep); }
 :root.light .iaconf b, :root.light .mcpp b, :root.light .mcr b, :root.light .iah em { text-shadow: none; }
+
+/* jugador sin foto: silueta con iniciales y escudo pequeño */
+.sfj { position: relative; }
+.sfj .sfi { width: var(--s); height: var(--s); border-radius: 50%; display: grid; place-items: center; position: relative; overflow: hidden;
+  background: linear-gradient(160deg, #2a3330, #161b19); border: 1px solid rgba(255,255,255,.08); color: rgba(255,255,255,.18); }
+.light .sfj .sfi { background: linear-gradient(160deg, #e9ecef, #d5dadf); color: rgba(0,0,0,.12); border-color: rgba(0,0,0,.06); }
+.sfj .sfi svg { position: absolute; width: 92%; height: 92%; bottom: -14%; stroke-width: 1.2; }
+.sfj .sfi b { position: relative; font-size: calc(var(--s) * .3); font-weight: 800; color: var(--tx); letter-spacing: -.5px; }
+.sfj .sfe { position: absolute; right: calc(50% - var(--s) / 2 - 4px); bottom: -2px; }
+.sfj .sfe img, .sfj .sfe span { width: calc(var(--s) * .34) !important; height: calc(var(--s) * .34) !important; filter: drop-shadow(0 2px 4px rgba(0,0,0,.5)); }
+.hpimg.sfj .sfi, .pkbig.sfj .sfi { box-shadow: 0 8px 24px rgba(0,0,0,.35); }

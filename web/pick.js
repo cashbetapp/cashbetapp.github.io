@@ -44,8 +44,13 @@ function pkEsp(P) {
   if (!gr) return null;
   return P.sc === "t" ? gr.esp[0] + gr.esp[1] : P.sc === "h" ? gr.esp[0] : gr.esp[1];
 }
+// jugador sin foto en ninguna fuente: silueta con sus iniciales y el escudo pequeño
+function sinFoto(nombre, tm, px, cls) {
+  return `<div class="${cls} sfj" style="--s:${px}px"><span class="sfi"><b>${esc(sigla({ n: nombre }))}</b></span><span class="sfe">${crest(tm, Math.round(px * 0.34))}</span></div>`;
+}
 function bigImg(P) {
   if (P.sc === "j" && P.x.foto) return `<img class="pkbig foto" src="${esc(P.x.foto)}" alt="">`;
+  if (P.sc === "j") return sinFoto(P.x.jugador, pkTeam(P), 130, "pkbig");
   if (P.sc === "t") return `<div class="pkbig dos">${crest(P.g.h, 96)}${crest(P.g.a, 96)}</div>`;
   return `<div class="pkbig">${crest(pkTeam(P), 150)}</div>`;
 }
@@ -432,7 +437,7 @@ function pcCard(e) {
   } else if (e.k === "x") {
     const g = e.g, x = e.x, P = pkFind(g.id, x.m); up = P.lado === "mas" || pkPill(P) === "Recibe tarjeta";
     const tm = pkTeam(P);
-    img = P.sc === "j" ? (x.foto ? `<img class="pcimg foto" src="${esc(x.foto)}" alt="" loading="lazy">` : `<div class="pcimg">${crest(tm, 74)}</div>`)
+    img = P.sc === "j" ? (x.foto ? `<img class="pcimg foto" src="${esc(x.foto)}" alt="" loading="lazy">` : sinFoto(x.jugador, tm, 74, "pcimg"))
       : P.sc === "t" ? `<div class="pcimg dos">${crest(g.h, 46)}${crest(g.a, 46)}</div>` : `<div class="pcimg">${crest(tm, 74)}</div>`;
     lab = P.sc === "j" ? `JUGADOR · ${abT(tm)}` : P.sc === "t" ? "TOTAL DEL PARTIDO" : "TOTAL EQUIPO";
     tit = P.sc === "j" ? x.jugador : P.sc === "t" ? `Total de ${UN[P.s]}` : tm.n;

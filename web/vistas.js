@@ -108,7 +108,7 @@ function heroPick(e) {
     chip = g.liga; small = P.sc === "j" ? tm.n : P.sc === "t" ? "Total del partido" : "Total equipo";
     big = P.sc === "j" ? x.jugador : P.sc === "t" ? `${g.h.n} vs ${g.a.n}` : tm.n; sub = `${abT(g.h)} vs ${abT(g.a)} · ${hora(g.at)}`;
     pick = pkPill(P); cuota = x.justa; attr = `data-pk="${g.id}" data-m="${esc(x.m)}"`;
-    img = P.sc === "j" && x.foto ? `<img class="hpimg foto" src="${esc(x.foto)}" alt="">` : P.sc === "t" ? `<div class="hpimg dos">${crest(g.h, 84)}${crest(g.a, 84)}</div>` : `<div class="hpimg">${crest(tm, 130)}</div>`;
+    img = P.sc === "j" ? (x.foto ? `<img class="hpimg foto" src="${esc(x.foto)}" alt="">` : sinFoto(x.jugador, tm, 120, "hpimg")) : P.sc === "t" ? `<div class="hpimg dos">${crest(g.h, 84)}${crest(g.a, 84)}</div>` : `<div class="hpimg">${crest(tm, 130)}</div>`;
   } else {
     const x = e.x; up = x.lado === "mas";
     chip = "NBA"; small = x.eq ? x.eq.n : "NBA"; big = x.jugador; sub = `${x.partido || ""} · ${hora(x.at)}`;
