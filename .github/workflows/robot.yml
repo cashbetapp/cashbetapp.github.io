@@ -50,7 +50,7 @@ jobs:
         working-directory: robot
         run: |
           if [ ! -f ../data/model/report.json ] || [ "$(date -u +%H)" = "08" ]; then python model.py > /dev/null; fi
-          if [ ! -f ../data/model/extra.json ] || [ "$(date -u +%H)" = "08" ]; then python -W ignore extra.py; fi
+          if [ ! -f ../data/model/extra.json ] || [ "$(date -u +%H)" = "08" ] || ! python -c "import json,sys,extra; sys.exit(0 if json.load(open('../data/model/extra.json')).get('cuota_min') == extra.CUOTA_MIN else 1)"; then python -W ignore extra.py; fi
 
       - name: Pronósticos
         working-directory: robot
