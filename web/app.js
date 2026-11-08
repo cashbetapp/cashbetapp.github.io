@@ -552,4 +552,16 @@ function rerender() { $("#app").dataset.tab = ""; route(); }
 // ------------------------------------------------------------ arranque
 load();
 setInterval(() => { if (!document.hidden && !document.querySelector(".sheet.on")) load(); }, 15 * 60e3);
-if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+// actualización automática: si hay versión nueva de la app, se instala y la página se recarga sola
+if ("serviceWorker" in navigator) {
+  const habia = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).then((reg) => {
+    const revisar = () => reg.update().catch(() => {});
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) revisar(); });
+    setInterval(revisar, 30 * 60 * 1000);
+  }).catch(() => {});
+  let recargado = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (habia && !recargado) { recargado = true; location.reload(); }
+  });
+}
