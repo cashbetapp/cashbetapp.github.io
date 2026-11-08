@@ -101,8 +101,11 @@ async function load() {
   D.byId = Object.fromEntries(D.partidos.map((g) => [g.id, g]));
   // props NBA: solo las que tienen valor real contra la casa (probabilidad ya mezclada
   // con la de la casa según lo que el modelo ha demostrado)
-  D.propsOk = (D.props || []).filter((x) => new Date(x.at).getTime() > Date.now() && x.valor >= (D.valor_min || 0.05))
-    .sort((a, b) => b.valor - a.valor);
+  // jugadores NBA: primero los que tienen valor real (+5 %); el resto se muestra EN PRUEBA
+  // (probabilidad ya mezclada con la casa >= 55 %), con la cuota real de la casa
+  D.propsOk = (D.props || []).filter((x) => new Date(x.at).getTime() > Date.now() && (x.valor >= (D.valor_min || 0.05) || x.p >= 0.55))
+    .sort((a, b) => b.valor - a.valor || b.p - a.p);
+  D.propsOk.forEach((x) => (x.prueba = !(x.valor >= (D.valor_min || 0.05))));
   route();
 }
 

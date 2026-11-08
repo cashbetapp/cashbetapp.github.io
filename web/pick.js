@@ -379,7 +379,7 @@ function pickItems() {
   D.propsOk.filter((x) => esHoy(x.at) && x.cuota >= 1.4).forEach((x) => {
     if (vistoJ.has(x.pl) || (porEv[x.ev] || 0) >= 3) return;
     vistoJ.add(x.pl); porEv[x.ev] = (porEv[x.ev] || 0) + 1;
-    it.push({ k: "pr", x, p: x.p, mk: "nbaj", dep: "nba", eq: 0, val: x.valor, casa: x.cuota });
+    it.push({ k: "pr", x, p: x.p, mk: "nbaj", dep: "nba", eq: 0, val: x.prueba ? null : x.valor, casa: x.cuota, prueba: x.prueba });
   });
   it.forEach((e) => { e.gid = e.g ? e.g.id : e.x.ev; e.pr = pruebaDe(e); });
   return it;
@@ -400,7 +400,7 @@ const vale = (justa) => Math.round(justa * (D.margen || 1.05) * 100) / 100;
 const valorCasa = (e) => e.val || 0;
 const valTxt = (v) => `+${Math.round(v * 100)}%`;
 // nivel de confianza: Alta >= 70 %, Media 60-70 %, Baja < 60 % (los de valor llevan además su etiqueta)
-const nivel = (e) => (e.p >= 0.7 ? "ALTA" : e.p >= 0.6 ? "MEDIA" : "BAJA");
+const nivel = (e) => { const r = Math.round(e.p * 100); return r >= 70 ? "ALTA" : r >= 60 ? "MEDIA" : "BAJA"; };
 // pick "fuerte": puede acompañar al mejor del mismo partido
 const fuerte = (e) => valorCasa(e) >= (D.valor_min || 0.05) || (e.k !== "pr" && e.p >= 0.65 && e.pr >= 61);
 const tipoMk = (e) => (e.k === "x" ? e.x.s + "|" + (e.x.sc === "j" ? "j" : "e") : e.mk);
@@ -423,7 +423,7 @@ function picks() {
   if (ui.pmk !== "todos") it = it.filter((e) => e.mk === ui.pmk);
   // Todos: 1 por partido y sin jugadores NBA en prueba; Jugadores/Equipos o con filtro: 2 por partido
   if (ui.pseg === "todos" && ui.pmk === "todos") it = mejores(it.filter((e) => e.k !== "pr"), 3);
-  else it = mejores(it, 3);
+  else it = ordenar([...mejores(it.filter((e) => e.k !== "pr"), 3), ...it.filter((e) => e.k === "pr")]);   // NBA: hasta 3 jugadores por partido
   const total = it.length;
   it = it.slice(0, 80);
   const fil = ui.pdep !== "todos" || ui.pmk !== "todos";
@@ -463,7 +463,7 @@ function pcCard(e) {
   }
   return `<button class="pcard ${jug ? "jg" : ""}" ${attr}>${img}<div class="pcm"><div class="pcl">${jug ? lab : esc(lab)}</div><div class="pct">${esc(tit)}</div><div class="pcs">${esc(sub)}</div>
     <span class="pcpill ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(pill)}</span></span></div>
-    <div class="pcr"><span class="pcp"><i></i>${pct(e.p)}<em>${nivel(e)}</em></span>${e.val != null ? `<span class="pcval">VALOR ${valTxt(e.val)}</span><span class="pcc">casa ${odd(e.casa)}</span>` : `<span class="pcc">vale desde ${odd(e.min || cuota)}</span>`}</div></button>`;
+    <div class="pcr"><span class="pcp"><i></i>${pct(e.p)}<em>${nivel(e)}</em></span>${e.val != null ? `<span class="pcval">VALOR ${valTxt(e.val)}</span><span class="pcc">casa ${odd(e.casa)}</span>` : e.prueba ? `<span class="pcpru">EN PRUEBA</span><span class="pcc">casa ${odd(e.casa)}</span>` : `<span class="pcc">vale desde ${odd(e.min || cuota)}</span>`}</div></button>`;
 }
 function openFiltros() {
   openSheet(`<h2 class="pkh2" style="margin-top:4px">Filtros</h2>

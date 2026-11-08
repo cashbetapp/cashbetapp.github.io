@@ -1116,3 +1116,4 @@ body { font-variant-numeric: tabular-nums; }
   --pkbad: #fde4d3; --pkbadtx: #d65f0c; }
 .pkbox.dir.bad { border-color: rgba(255,138,31,.45); }
 .hr.pe { border-left-color: var(--a); }
+.pcpru { font-size: 9.5px; font-weight: 800; letter-spacing: .4px; color: var(--atx); background: var(--asoft); padding: 3px 7px; border-radius: 99px; }
