@@ -123,9 +123,10 @@ function actMatchPick(a, el) {
   if (a === "mpside") { sheetState.side = k; openMatchPick(gid, true); return true; }
   if (a === "mpfollow") {
     const s = store.get("seg", {}), g = D.byId[gid];
+    if (s[gid] && !puedeQuitar(s[gid])) { toast("El partido ya empezó: este pick queda en tus Seguidos y en tu Bankroll"); return true; }
     if (s[gid]) delete s[gid];
     else s[gid] = { at: g.at, liga: g.liga, lg: g.lg, dep: g.dep, h: g.h.n, a: g.a.n, hl: g.h.logo, al: g.a.logo, hab: g.h.ab, aab: g.a.ab, txt: g.pick.txt, pill: g.pick.txt, up: isUp(g.pick.m),
-      p: g.pick.tipo === "valor" ? g.pick.pv : g.pick.p, m: g.pick.m, cuota: g.pick.cuota || g.pick.justa, tipo: "Partido", nom: `${g.h.n} vs ${g.a.n}` };
+      p: g.pick.tipo === "valor" ? g.pick.pv : g.pick.p, m: g.pick.m, cuota: g.pick.cuota || g.pick.justa, oc: g.pick.tipo === "valor" ? g.pick.cuota : g.pick.minima || vale(g.pick.justa), tipo: "Partido", nom: `${g.h.n} vs ${g.a.n}` };
     store.set("seg", s); toast(s[gid] ? "Siguiendo esta predicción" : "Dejaste de seguirla");
     openMatchPick(gid, true); return true;
   }

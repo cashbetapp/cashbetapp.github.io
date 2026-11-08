@@ -514,10 +514,11 @@ function actPick(a, el) {
   if (a === "pkside") { sheetState.side = k; openPick(sheetState.pk.gid, sheetState.pk.m, true); return true; }
   if (a === "pkfollow") {
     const P = pkFind(sheetState.pk.gid, sheetState.pk.m), s = store.get("seg", {}), id = `pk|${P.g.id}|${P.x.m}`;
+    if (s[id] && !puedeQuitar(s[id])) { toast("El partido ya empezó: este pick queda en tus Seguidos y en tu Bankroll"); return true; }
     if (s[id]) delete s[id];
     else { const tm = pkTeam(P);
       s[id] = { at: P.g.at, liga: P.g.liga, lg: P.g.lg, dep: P.g.dep, h: P.g.h.n, a: P.g.a.n, hl: P.g.h.logo, al: P.g.a.logo, hab: abT(P.g.h), aab: abT(P.g.a),
-        txt: P.x.txt, pill: pkPill(P), up: P.lado === "mas", p: P.x.p, cuota: P.x.justa, ln: P.ln,
+        txt: P.x.txt, pill: pkPill(P), up: P.lado === "mas", p: P.x.p, cuota: P.x.justa, oc: vale(P.x.justa), ln: P.ln,
         tipo: P.sc === "j" ? "Jugador" : P.sc === "t" ? "Total del partido" : "Total del equipo",
         nom: P.sc === "j" ? P.x.jugador : P.sc === "t" ? `${P.g.h.n} vs ${P.g.a.n}` : tm.n, foto: P.sc === "j" ? P.x.foto || null : null,
         tl: tm ? tm.logo : null }; }

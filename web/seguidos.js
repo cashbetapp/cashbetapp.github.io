@@ -86,7 +86,7 @@ function seguidos() {
     const up = v.up != null ? v.up : !/^menos/i.test(v.txt || "");
     const bar = e.st === "acierto" ? 100 : e.st === "fallo" ? 100 : Math.round((v.p || 0) * 100);
     return `<div class="sgt ${cls}" ${at} role="button">
-      <div class="sgtop">${img}<button class="sgq" data-act="sgx" data-k="${esc(id)}" aria-label="Dejar de seguir">${ic("x")}</button><span class="sgs ${cls}">${icono}</span></div>
+      <div class="sgtop">${img}${puedeQuitar(v0) ? `<button class="sgq" data-act="sgx" data-k="${esc(id)}" aria-label="Dejar de seguir">${ic("x")}</button>` : `<span class="sgq lock" title="Ya empezó: no se puede quitar">${ic("lock")}</span>`}<span class="sgs ${cls}">${icono}</span></div>
       <div class="sgbody"><div class="sgty"><span>${esc(v.tipo || "Pick")}</span>${lg ? lgLogo(lg, 26) : ""}</div>
         <b class="sgn">${esc(v.nom || v.txt || "")}</b>
         <small>${esc(v.hab || (v.h || "").slice(0, 3).toUpperCase())} @ ${esc(v.aab || (v.a || "").slice(0, 3).toUpperCase())}</small>
@@ -120,7 +120,7 @@ function openSgRango() {
 function actSeguidos(a, el) {
   const k = el.dataset.k;
   if (a === "sgfil") { openSgFiltros(); return true; }
-  if (a === "sgx") { const s = store.get("seg", {}); delete s[k]; store.set("seg", s); toast("Dejaste de seguirlo"); rerender(); return true; }
+  if (a === "sgx") { const s = store.get("seg", {}); if (s[k] && !puedeQuitar(s[k])) { toast("El partido ya empezó: este pick queda en tus Seguidos y en tu Bankroll"); return true; } delete s[k]; store.set("seg", s); toast("Dejaste de seguirlo"); rerender(); return true; }
   if (a === "sgrango") { openSgRango(); return true; }
   if (a === "sgDep" || a === "sgEst" || a === "sgR") { ui[a] = k; closeSheet(true); rerender(); return true; }
   return false;

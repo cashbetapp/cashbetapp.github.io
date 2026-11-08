@@ -1350,3 +1350,24 @@ body.sincuenta #app { padding-bottom: calc(env(safe-area-inset-bottom) + 24px); 
 .rer b { display: block; font-size: 14px; } .rer small { color: var(--tx3); font-size: 12px; }
 
 .flist.fscroll { max-height: 260px; overflow-y: auto; }
+
+/* ===== Bankroll Kelly ===== */
+.khero { margin-top: 12px; padding: 18px; border-radius: 22px; background: radial-gradient(120% 120% at 100% 0%, #1f7a48 0%, #0f3d24 45%, #08140d 100%); color: #fff; box-shadow: 0 0 0 1px rgba(57,255,122,.3), 0 14px 34px rgba(0,80,40,.3); }
+.khero small { font-size: 11.5px; font-weight: 800; letter-spacing: 1px; color: #bfe9cf; } .khero > b { display: block; font-size: 38px; font-weight: 800; letter-spacing: -1px; margin-top: 4px; }
+.khero > span { display: block; font-weight: 800; font-size: 15px; } .khero > span.g { color: #5dff95; } .khero > span.r { color: #ff8a8a; }
+.khero em { display: block; font-style: normal; font-size: 12.5px; color: #bfe9cf; margin-top: 6px; }
+.kchart { width: 100%; height: 90px; margin-top: 12px; } .kchart polyline { fill: none; stroke-width: 2.5; vector-effect: non-scaling-stroke; } .kchart .kup { stroke: #5dff95; } .kchart .kdn { stroke: #ff8a8a; }
+.kchart .kbase { stroke: rgba(255,255,255,.3); stroke-dasharray: 4 4; vector-effect: non-scaling-stroke; }
+.tile .v small { font-size: 10.5px; font-weight: 600; color: var(--tx3); margin-left: 5px; }
+.cntb { font-size: 12px; font-weight: 800; padding: 3px 10px; border-radius: 99px; background: var(--card2); color: var(--tx2); }
+.krow { display: flex; align-items: center; gap: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 12px; margin-bottom: 8px; box-shadow: var(--glow); }
+.kic { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--asoft); color: var(--atx); } .kic svg { width: 17px; height: 17px; }
+.kic.ok { background: rgba(34,197,94,.16); color: #22c55e; } .kic.no { background: var(--nosoft); color: var(--no); } .kic.nu { background: rgba(127,127,127,.16); color: var(--tx2); }
+.kwho { flex: 1; min-width: 0; } .kwho b { display: block; font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .kwho small { color: var(--tx3); font-size: 12px; }
+.kamt { text-align: right; font-weight: 800; font-size: 15px; flex: none; } .kamt small { display: block; font-weight: 600; font-size: 11px; color: var(--tx3); }
+.kamt.ok { color: #22c55e; } .kamt.no { color: var(--no); } .kamt.nu { color: var(--tx3); font-size: 13px; }
+.kdet { margin-top: 16px; } .kdet summary { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 800; color: var(--tx2); list-style: none; padding: 10px 2px; } .kdet summary svg { width: 16px; height: 16px; }
+.kriesgo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; } .kriesgo button { padding: 10px 6px; border-radius: 12px; background: var(--card2); border: 1px solid var(--line); text-align: center; }
+.kriesgo button b { display: block; font-size: 14px; } .kriesgo button small { font-size: 11px; color: var(--tx3); } .kriesgo button.on { border-color: var(--p); background: var(--psoft); }
+.sgq.lock { background: rgba(0,0,0,.45); }
+.tiles .tile .v { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

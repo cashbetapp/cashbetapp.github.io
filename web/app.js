@@ -528,6 +528,7 @@ function act(a, el) {
   if (typeof actSeguidos === "function" && actSeguidos(a, el)) return;
   if (typeof actInicio2 === "function" && actInicio2(a)) return;
   if (typeof actRes === "function" && actRes(a, el)) return;
+  if (typeof actBank === "function" && actBank(a, el)) return;
   if (typeof actMatchPick === "function" && a.startsWith("mp") && actMatchPick(a, el)) return;
   if (typeof actVistas === "function" && actVistas(a, el)) return;
   if (typeof actPick === "function" && actPick(a, el)) return;
@@ -540,16 +541,19 @@ function act(a, el) {
   if (a === "pn") { sheetState.n = +k; const i = sheetState.prop; closeSheet(true); return openProp(i); }
   if (a === "seg") {
     const s = store.get("seg", {}), g = D.byId[sheetState.id];
+    if (s[g.id] && !puedeQuitar(s[g.id])) { toast("El partido ya empezó: este pick queda en tus Seguidos y en tu Bankroll"); return; }
     if (s[g.id]) delete s[g.id];
     else s[g.id] = { at: g.at, liga: g.liga, lg: g.lg, dep: g.dep, h: g.h.n, a: g.a.n, hl: g.h.logo, al: g.a.logo, hab: g.h.ab, aab: g.a.ab, txt: g.pick.txt, pill: g.pick.txt, up: isUp(g.pick.m),
-      p: g.pick.tipo === "valor" ? g.pick.pv : g.pick.p, m: g.pick.m, cuota: g.pick.cuota || g.pick.justa, tipo: "Partido", nom: `${g.h.n} vs ${g.a.n}` };
+      p: g.pick.tipo === "valor" ? g.pick.pv : g.pick.p, m: g.pick.m, cuota: g.pick.cuota || g.pick.justa, oc: g.pick.tipo === "valor" ? g.pick.cuota : g.pick.minima || vale(g.pick.justa), tipo: "Partido", nom: `${g.h.n} vs ${g.a.n}` };
     store.set("seg", s); toast(s[g.id] ? "Siguiendo este pick" : "Dejaste de seguirlo");
     return openGame(g.id, sheetState.tab);
   }
   if (a === "tobank") {
-    const g = D.byId[sheetState.id];
-    ui.prefill = { q: `${g.pick.txt} (${g.h.n} vs ${g.a.n})`, c: g.pick.cuota ? Number(g.pick.cuota).toFixed(2) : "" };
-    closeSheet(true); location.hash = "bankroll"; return rerender();
+    const g = D.byId[sheetState.id], s = store.get("seg", {});
+    if (!s[g.id] && !g.pick.bajo) { s[g.id] = { at: g.at, liga: g.liga, lg: g.lg, dep: g.dep, h: g.h.n, a: g.a.n, hl: g.h.logo, al: g.a.logo, hab: g.h.ab, aab: g.a.ab, txt: g.pick.txt, pill: g.pick.txt, up: isUp(g.pick.m),
+      p: g.pick.tipo === "valor" ? g.pick.pv : g.pick.p, m: g.pick.m, cuota: g.pick.cuota || g.pick.justa, oc: g.pick.tipo === "valor" ? g.pick.cuota : g.pick.minima || vale(g.pick.justa), tipo: "Partido", nom: `${g.h.n} vs ${g.a.n}` };
+      store.set("seg", s); toast("Siguiendo: ya está en tu Bankroll"); }
+    closeSheet(true); location.hash = "bankroll"; return;
   }
   if (a === "tema") { store.set("tema", k); applyTheme(); return rerender(); }
   if (a === "nom") { store.set("nombre", $("#nom").value.trim().slice(0, 24)); return toast("Guardado"); }
