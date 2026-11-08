@@ -125,7 +125,7 @@ function route() {
   const dentro = typeof cuentaActiva !== "function" || cuentaActiva();
   document.body.classList.toggle("sincuenta", !dentro);
   if (!dentro && !libre) { tab = "cuenta"; arg = typeof cuentaPendiente === "function" && cuentaPendiente() ? "verificar" : ""; }
-  const views = { inicio: (a) => inicio(a), calendario: (a) => calendario(a), picks: (a) => picks(a), seguidos, bankroll, ajustes: (a) => ajustes(a), historial: (a) => historial(a), cuenta: (a) => cuentaVista(a) };
+  const views = { inicio: (a) => inicio(a), calendario: (a) => calendario(a), picks: (a) => picks(a), seguidos, bankroll, ajustes: (a) => ajustes(a), historial: (a) => historial(a), cuenta: (a) => cuentaVista(a), notificaciones: () => notificaciones() };
   const v = views[tab] || inicio;
   const clave = tab + "/" + (arg || "");
   if ($("#app").dataset.tab !== clave) {
@@ -173,7 +173,7 @@ document.addEventListener("click", (e) => {
 // ------------------------------------------------------------ cabecera
 function header(title, sub) {
   return `<div class="top"><div class="logo">CASH<b>BET</b></div><div class="ic">
-    <button class="icb" data-act="novedades" aria-label="Novedades">${ic("bell")}</button>
+    <button class="icb" data-go="notificaciones" aria-label="Notificaciones">${ic("bell")}${typeof campana === "function" ? campana() : ""}</button>
     <button class="icb" data-go="ajustes" aria-label="Ajustes">${ic("user")}</button></div></div>
     <h1>${title}</h1>${sub ? `<div class="sub">${sub}</div>` : ""}`;
 }
@@ -525,6 +525,7 @@ function act(a, el) {
   if (typeof actPriv === "function" && actPriv(a, el)) return;
   if (typeof actCuentaSync === "function" && actCuentaSync(a)) return;
   if (typeof actSeguidos === "function" && actSeguidos(a, el)) return;
+  if (typeof actInicio2 === "function" && actInicio2(a)) return;
   if (typeof actMatchPick === "function" && a.startsWith("mp") && actMatchPick(a, el)) return;
   if (typeof actVistas === "function" && actVistas(a, el)) return;
   if (typeof actPick === "function" && actPick(a, el)) return;

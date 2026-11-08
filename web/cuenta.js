@@ -125,10 +125,18 @@ function cuentaVista(arg) {
 }
 
 function tarjetaCuenta() {
-  if (USER) return `<div class="ajcard cuser"><span class="av">${esc(((USER.displayName || USER.email || "C")[0]).toUpperCase())}</span><div><b>${esc(USER.displayName || store.get("nombre", "") || "Tu cuenta")}</b><small>${esc(USER.email || "")} · sincronizado en la nube</small></div></div>
-    <div class="ajlist"><button class="ajrow" data-act="c_salir"><span class="oi">${ic("left")}</span><div><b>Cerrar sesión</b><small>Tus datos quedan guardados en tu cuenta</small></div>${ic("right")}</button>
-    <button class="ajrow" data-act="c_borrar"><span class="oi">${ic("x")}</span><div><b>Eliminar mi cuenta</b><small>Borra la cuenta y sus datos de la nube</small></div>${ic("right")}</button></div>`;
+  if (USER) return `<div class="ajcard cuser"><span class="av">${esc(((USER.displayName || USER.email || "C")[0]).toUpperCase())}</span><div><b>${esc(USER.displayName || store.get("nombre", "") || "Tu cuenta")}</b><small>${esc(USER.email || "")}</small><small>Plan gratuito · Miembro desde ${esc(miembroDesde())}</small></div></div>`;
   return `<button class="ccard" data-go="cuenta"><span class="cico sm">${ic("shieldOk")}</span><div><b>Crea tu cuenta gratis</b><small>Guarda tus picks y tu bankroll en la nube</small></div>${ic("right")}</button>`;
+}
+function miembroDesde() {
+  const d = new Date((USER && USER.metadata && USER.metadata.creationTime) || Date.now());
+  return `${d.toLocaleDateString("es-CO", { month: "short" }).replace(".", "")}. ${d.getFullYear()}`;
+}
+// cerrar sesión y eliminar cuenta van al final del Perfil (como IABET)
+function cuentaAcciones() {
+  if (!USER) return "";
+  return `<div class="ajsec">CUENTA</div><div class="ajlist"><button class="ajrow" data-act="c_salir"><span class="oi">${ic("left")}</span><div><b>Cerrar sesión</b><small>Tus datos quedan guardados en tu cuenta</small></div>${ic("right")}</button>
+    <button class="ajrow" data-act="c_borrar"><span class="oi">${ic("x")}</span><div><b>Eliminar mi cuenta</b><small>Borra la cuenta y sus datos de la nube</small></div>${ic("right")}</button></div>`;
 }
 
 const val = (id) => (document.getElementById(id) || {}).value || "";

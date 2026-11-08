@@ -85,7 +85,7 @@ function inicio() {
   const dia = new Date().toLocaleDateString("es-CO", { weekday: "long" });
   const nom = store.get("nombre", "");
   return `<div class="top"><div class="logo">CASH<b>BET</b></div><div class="ic">
-      <button class="icb" data-act="novedades" aria-label="Novedades">${ic("bell")}</button><button class="icb" data-go="ajustes" aria-label="Perfil">${ic("user")}</button></div></div>
+      <button class="icb" data-go="notificaciones" aria-label="Notificaciones">${ic("bell")}${typeof campana === "function" ? campana() : ""}</button><button class="icb" data-go="ajustes" aria-label="Perfil">${ic("user")}</button></div></div>
     <h1>Buen ${esc(dia)}${nom ? `, ${esc(nom)}` : ""}</h1><div class="sub2">${fmtD.format(new Date())} · ${its.length} mejores picks</div>
     <div class="ban">${ic("star")}<div>${sem.n ? `<b>CASHBET acertó ${sem.g}/${sem.n}</b><span>Últimos 7 días · picks reales</span>` : `<b>Registro real en marcha</b><span>Cada pick se califica al terminar el partido</span>`}</div><button data-go="historial">Historial ${ic("right")}</button></div>
     <div class="tiles t2">
@@ -95,7 +95,8 @@ function inicio() {
     ${top.length ? `<div class="sec"><h2 class="ih">${ic("bolt")}Picks destacados (${top.length})</h2><button class="pill dk" data-go="picks">Top picks</button></div>
       <div class="car">${top.map(heroPick).join("")}</div><div class="dots">${top.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</div>` : ""}
     <div class="sec"><h2 class="ih">${ic("trend")}Picks principales</h2><button class="pill dk" data-go="picks">Ver todo ${ic("right")}</button></div>
-    <div class="pclist">${resto.map(pcCard).join("") || `<div class="empty">Hoy ya no quedan partidos. Los de mañana aparecen aquí desde mañana; puedes verlos antes en el Calendario.</div>`}</div>`;
+    <div class="pclist">${resto.map(pcCard).join("") || `<div class="empty">Hoy ya no quedan partidos. Los de mañana aparecen aquí desde mañana; puedes verlos antes en el Calendario.</div>`}</div>
+    ${typeof noticiasSec === "function" ? noticiasSec() : ""}`;
 }
 function heroPick(e) {
   let chip, small, big, sub, pick, cuota, img, attr, up, lk;
@@ -273,6 +274,7 @@ function ajustes(arg) {
       ${row("responsable", "heartP", "Juego responsable", "Apuesta solo lo que puedas perder")}
       ${row("privacidad", "shield", "Privacidad", "Qué datos usamos")}
       ${row("ayuda", "help", "Ayuda y soporte", "Preguntas frecuentes")}</div>
+    ${typeof cuentaAcciones === "function" ? cuentaAcciones() : ""}
     <div class="small" style="text-align:center;margin:16px 0">Datos actualizados: ${new Date(D.generado.replace("Z", ":00Z")).toLocaleString("es-CO")}</div>`;
   if (arg === "tema") return subTop("Tema") + heroAj("moon", "Tema", "Elige cómo se ve CASHBET") +
     `<div class="ajsec">SELECCIONAR TEMA <em>${TEMA[tema].toUpperCase()}</em></div>

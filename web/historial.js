@@ -10,7 +10,7 @@ async function cargarHist() {
     HIST = await r.json();
   } catch (e) { HIST = { error: true }; }
   HIST_CARGANDO = false;
-  if (location.hash.startsWith("#historial") || location.hash.startsWith("#seguidos")) { $("#app").dataset.tab = ""; route(); }
+  if (/^#(historial|seguidos|notificaciones)/.test(location.hash)) { $("#app").dataset.tab = ""; route(); }
 }
 
 const ESTADO = { acierto: ["Acierto", "ok"], fallo: ["Fallo", "no"], push: ["Push", "nu"], nulo: ["Nulo", "nu"], retirado: ["Retirado", "nu"] };

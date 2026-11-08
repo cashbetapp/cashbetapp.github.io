@@ -56,6 +56,10 @@ jobs:
         working-directory: robot
         run: python predict.py
 
+      - name: Noticias (ESPN en español)
+        working-directory: robot
+        run: python noticias.py || echo "noticias falló, se sigue"
+
       - name: Sellar el registro (rama sellos, CON historial) y verificarlo contra todos los sellos anteriores
         run: |
           URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
@@ -91,7 +95,7 @@ jobs:
           cp -r web/* _site/
           rm -rf _site/data/*
           cp data/picks.json _site/data/
-          cp data/historial.json data/ledger.json data/sello.json _site/data/ 2>/dev/null || true
+          cp data/historial.json data/ledger.json data/sello.json data/noticias.json _site/data/ 2>/dev/null || true
           cp -r data/img _site/data/ 2>/dev/null || true
           touch _site/.nojekyll
 
