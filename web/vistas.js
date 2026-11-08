@@ -89,34 +89,34 @@ function inicio() {
     <h1>Buen ${esc(dia)}${nom ? `, ${esc(nom)}` : ""}</h1><div class="sub2">${fmtD.format(new Date())} · ${its.length} mejores picks</div>
     <div class="ban">${ic("star")}<div>${sem.n ? `<b>CASHBET acertó ${sem.g}/${sem.n}</b><span>Últimos 7 días · picks reales</span>` : `<b>Registro real en marcha</b><span>Cada pick se califica al terminar el partido</span>`}</div><button data-go="picks">Ver picks ${ic("right")}</button></div>
     <div class="tiles t2">
-      <div class="tile"><div class="k">Efectividad</div><div class="v">${real ? Math.round(rec.ef) : Math.round(efPrueba)}%</div><div class="n">${real ? `${rec.n} picks reales` : "en la prueba"}</div></div>
-      <div class="tile"><div class="k">Racha</div><div class="v">${rec.n ? rec.racha.replace(" ", "") : "—"}</div><div class="n">${rec.n ? "picks calificados" : "empieza hoy"}</div></div>
-      <div class="tile"><div class="k">Cuota prom.</div><div class="v">${cprom ? odd(cprom) : "—"}</div><div class="n">picks de hoy</div></div></div>
+      <div class="tile"><div class="k">Efectividad</div><div class="v">${real ? Math.round(rec.ef) : Math.round(efPrueba)}%<small>${real ? "real" : "prueba"}</small></div></div>
+      <div class="tile"><div class="k">Racha</div><div class="v">${rec.n ? rec.racha.replace(" ", "") : "—"}</div></div>
+      <div class="tile"><div class="k">Cuota prom.</div><div class="v">${cprom ? odd(cprom) : "—"}</div></div></div>
     ${top.length ? `<div class="sec"><h2 class="ih">${ic("bolt")}Picks destacados (${top.length})</h2><button class="pill dk" data-go="picks">Top picks</button></div>
       <div class="car">${top.map(heroPick).join("")}</div><div class="dots">${top.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</div>` : ""}
     <div class="sec"><h2 class="ih">${ic("trend")}Picks principales</h2><button class="pill dk" data-go="picks">Ver todo ${ic("right")}</button></div>
     <div class="pclist">${resto.map(pcCard).join("") || `<div class="empty">Hoy ya no quedan partidos. Los de mañana aparecen aquí desde mañana; puedes verlos antes en el Calendario.</div>`}</div>`;
 }
 function heroPick(e) {
-  let chip, small, big, sub, pick, cuota, img, attr, up;
+  let chip, small, big, sub, pick, cuota, img, attr, up, lk;
   if (e.k === "g") {
     const g = e.g; up = isUp(g.pick.m);
-    chip = g.liga; small = "Pick del partido"; big = `${g.h.n} vs ${g.a.n}`; sub = `${abT(g.h)} vs ${abT(g.a)} · ${hora(g.at)}`;
+    chip = g.liga; lk = g.lg; small = "Pick del partido"; big = `${g.h.n} vs ${g.a.n}`; sub = `${abT(g.h)} vs ${abT(g.a)} · ${hora(g.at)}`;
     pick = g.pick.txt; cuota = g.pick.cuota || g.pick.justa; img = `<div class="hpimg dos">${crest(g.h, 84)}${crest(g.a, 84)}</div>`; attr = `data-g="${g.id}"`;
   } else if (e.k === "x") {
     const g = e.g, x = e.x, P = pkFind(g.id, x.m), tm = pkTeam(P); up = P.lado === "mas";
-    chip = g.liga; small = P.sc === "j" ? tm.n : P.sc === "t" ? "Total del partido" : "Total equipo";
+    chip = g.liga; lk = g.lg; small = P.sc === "j" ? tm.n : P.sc === "t" ? "Total del partido" : "Total equipo";
     big = P.sc === "j" ? x.jugador : P.sc === "t" ? `${g.h.n} vs ${g.a.n}` : tm.n; sub = `${abT(g.h)} vs ${abT(g.a)} · ${hora(g.at)}`;
     pick = pkPill(P); cuota = x.justa; attr = `data-pk="${g.id}" data-m="${esc(x.m)}"`;
     img = P.sc === "j" ? (x.foto ? `<img class="hpimg foto" src="${esc(x.foto)}" alt="">` : sinFoto(x.jugador, tm, 120, "hpimg")) : P.sc === "t" ? `<div class="hpimg dos">${crest(g.h, 84)}${crest(g.a, 84)}</div>` : `<div class="hpimg">${crest(tm, 130)}</div>`;
   } else {
     const x = e.x; up = x.lado === "mas";
-    chip = "NBA"; small = x.eq ? x.eq.n : "NBA"; big = x.jugador; sub = `${x.partido || ""} · ${hora(x.at)}`;
+    chip = "NBA"; lk = "nba"; small = x.eq ? x.eq.n : "NBA"; big = x.jugador; sub = `${x.partido || ""} · ${hora(x.at)}`;
     pick = `${up ? "Más" : "Menos"} de ${x.linea} ${x.tipo.toLowerCase()}`; cuota = x.cuota; attr = `data-pr="${D.props.indexOf(x)}"`;
     img = x.foto ? `<img class="hpimg foto" src="${esc(x.foto)}" alt="">` : "";
   }
   const pk = esc(pick).replace(/(\d+(?:\.\d+)?)/, "<em>$1</em>");
-  return `<button class="hp" ${attr}><span class="hpchip">${esc(chip)}</span><div class="hpt"><small>${esc(small)}</small><h3>${esc(big)}</h3><span>${esc(sub)}</span>
+  return `<button class="hp" ${attr}><span class="hpchip">${lk ? lgLogo(lk, 16) : ""}${esc(chip)}</span><div class="hpt"><small>${esc(small)}</small><h3>${esc(big)}</h3><span>${esc(sub)}</span>
       <div class="hpk">${pk}</div><div class="hpb"><span class="hc">cuota ${odd(cuota)}</span><span class="ha">${pct(e.p)} · Análisis ${ic("right")}</span></div></div>${img}</button>`;
 }
 
