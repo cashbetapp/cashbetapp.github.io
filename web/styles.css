@@ -821,3 +821,6 @@ img.pcimg.foto { height: 74px; margin: -4px 0; border-radius: 12px; }
 .pcard.jg .pcl { display: flex; align-items: center; gap: 6px; font-size: 12px; letter-spacing: .4px; }
 .pcard.jg .pcl img, .pcard.jg .pcl .crest-f { width: 16px !important; height: 16px !important; flex: none; }
 .pcard.jg .pct { font-size: 19px; }
+
+/* escudos: nítidos y sin deformarse */
+img.crest, .pjl img, .lglogo { object-fit: contain !important; image-rendering: auto; }

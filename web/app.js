@@ -62,7 +62,8 @@ function toast(t) {
 const sigla = (t) => ((t && (t.ab || t.n)) || "?").replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ0-9 ]/g, "").split(" ").filter(Boolean).map((w, i, a) => a.length > 1 ? w[0] : w.slice(0, 3)).join("").slice(0, 3).toUpperCase();
 function crest(team, size = 40) {
   const f = `<span class="crest-f" style="width:${size}px;height:${size}px;font-size:${Math.max(9, size / 3.6)}px">${esc(sigla(team))}</span>`;
-  if (team && team.logo) return `<img class="crest nb" src="${esc(team.logo)}" alt="" width="${size}" height="${size}" loading="lazy" data-fb="${esc(f)}">`;
+  const src = team && (team.ld && !document.documentElement.classList.contains("light") ? team.ld : team.logo);
+  if (src) return `<img class="crest nb" src="${esc(src)}"${team.ld ? ` data-ll="${esc(team.logo)}" data-ld="${esc(team.ld)}"` : ""} alt="" width="${size}" height="${size}" loading="lazy" data-fb="${esc(f)}">`;
   return f;
 }
 // si una imagen no carga, se reemplaza por la sigla (escudos) o se oculta (fotos)
@@ -78,6 +79,7 @@ function applyTheme() {
   const t = store.get("tema", "auto");
   const light = t === "claro" || (t === "auto" && matchMedia("(prefers-color-scheme: light)").matches);
   document.documentElement.classList.toggle("light", light);
+  document.querySelectorAll("img[data-ld]").forEach((i) => (i.src = light ? i.dataset.ll : i.dataset.ld));
   $('meta[name="theme-color"]').setAttribute("content", light ? "#f2f4f2" : "#060807");
 }
 matchMedia("(prefers-color-scheme: light)").addEventListener?.("change", applyTheme);

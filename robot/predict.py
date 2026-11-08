@@ -513,22 +513,29 @@ def images(partidos, props_):
     jobs = {}
     def team(t):
         if t and t.get("logo") and not t["logo"].startswith("data/"):
-            rel = f"img/t/{_h(t['logo'])}.png"
-            jobs[rel] = (t["logo"], 128)
+            u = t["logo"]
+            rel = f"img/e/{_h(u)}.png"
+            jobs[rel] = (u, 320)
             t["logo"] = "data/" + rel
+            # versión oficial para fondo oscuro (escudos negros se ven en blanco)
+            ud = u.replace("/500/scoreboard/", "/500-dark/").replace("/500/", "/500-dark/")
+            if ud != u:
+                reld = f"img/e/{_h(u)}d.png"
+                jobs[reld] = (ud, 320)
+                t["ld"] = "data/" + reld
     for g in partidos:
         team(g["h"]); team(g["a"])
         lg = (g.get("extra") or {}).get("lg") or {}
         for ab, u in list(lg.items()):
             if u and not u.startswith("data/"):
-                rel = f"img/t/{_h(u)}.png"
-                jobs.setdefault(rel, (u, 128))
+                rel = f"img/e/{_h(u)}.png"
+                jobs.setdefault(rel, (u, 320))
                 lg[ab] = "data/" + rel
         for s in ("h", "a"):
             for r in (g.get("forma") or {}).get(s, []):
                 if r.get("logo") and not r["logo"].startswith("data/"):
-                    rel = f"img/t/{_h(r['logo'])}.png"
-                    jobs.setdefault(rel, (r["logo"], 128))
+                    rel = f"img/e/{_h(r['logo'])}.png"
+                    jobs.setdefault(rel, (r["logo"], 320))
                     r["logo"] = "data/" + rel
     # futbolistas: solo partidos de las próximas 36 h; las que no existen se recuerdan
     nofoto_p = os.path.join(DATA, "img", "nofoto.json")
@@ -579,6 +586,8 @@ def images(partidos, props_):
         for s in ("h", "a"):
             if (g[s].get("logo") or "")[5:] in bad:
                 g[s]["logo"] = None
+            if (g[s].get("ld") or "")[5:] in bad:
+                g[s].pop("ld", None)
             for r in (g.get("forma") or {}).get(s, []):
                 if (r.get("logo") or "")[5:] in bad:
                     r["logo"] = None
@@ -595,13 +604,13 @@ def liga_logos():
     """Logo de cada liga (se baja una sola vez a data/img/l/)."""
     out = {}
     for key, (sp, code, name) in LEAGUES.items():
-        rel = f"img/l/{key}.png"
+        rel = f"img/l2/{key}.png"
         path = os.path.join(DATA, rel)
         if not os.path.exists(path):
             d = get(f"https://site.api.espn.com/apis/site/v2/sports/{sp}/{code}/scoreboard") or {}
             try:
                 href = d["leagues"][0]["logos"][0]["href"]
-                _img(href, path, 96)
+                _img(href, path, 200)
             except Exception:
                 pass
         out[key] = {"n": name, "logo": ("data/" + rel) if os.path.exists(path) else None}
@@ -631,7 +640,7 @@ def main():
     teams = {}
     for g in nb:
         for s in ("h", "a"):
-            teams[g[s]["id"]] = {"ab": g[s]["ab"], "logo": g[s]["logo"], "n": g[s]["n"]}
+            teams[g[s]["id"]] = {"ab": g[s]["ab"], "logo": g[s]["logo"], "ld": g[s].get("ld"), "n": g[s]["n"]}
     for x in pr:
         x["eq"] = teams.get(x["equipo"])
     from venues import completar
