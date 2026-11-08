@@ -399,6 +399,8 @@ const ordenar = (xs) => xs.sort((a, b) => (b.val != null) - (a.val != null) || (
 const vale = (justa) => Math.round(justa * (D.margen || 1.05) * 100) / 100;
 const valorCasa = (e) => e.val || 0;
 const valTxt = (v) => `+${Math.round(v * 100)}%`;
+// nivel de confianza: Alta >= 70 %, Media 60-70 %, Baja < 60 % (los de valor llevan además su etiqueta)
+const nivel = (e) => (e.p >= 0.7 ? "ALTA" : e.p >= 0.6 ? "MEDIA" : "BAJA");
 // pick "fuerte": puede acompañar al mejor del mismo partido
 const fuerte = (e) => valorCasa(e) >= (D.valor_min || 0.05) || (e.k !== "pr" && e.p >= 0.65 && e.pr >= 61);
 const tipoMk = (e) => (e.k === "x" ? e.x.s + "|" + (e.x.sc === "j" ? "j" : "e") : e.mk);
@@ -461,7 +463,7 @@ function pcCard(e) {
   }
   return `<button class="pcard ${jug ? "jg" : ""}" ${attr}>${img}<div class="pcm"><div class="pcl">${jug ? lab : esc(lab)}</div><div class="pct">${esc(tit)}</div><div class="pcs">${esc(sub)}</div>
     <span class="pcpill ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(pill)}</span></span></div>
-    <div class="pcr"><span class="pcp"><i></i>${pct(e.p)}</span>${e.val != null ? `<span class="pcval">VALOR ${valTxt(e.val)}</span><span class="pcc">casa ${odd(e.casa)}</span>` : `<span class="pcc">vale desde ${odd(e.min || cuota)}</span>`}</div></button>`;
+    <div class="pcr"><span class="pcp"><i></i>${pct(e.p)}<em>${nivel(e)}</em></span>${e.val != null ? `<span class="pcval">VALOR ${valTxt(e.val)}</span><span class="pcc">casa ${odd(e.casa)}</span>` : `<span class="pcc">vale desde ${odd(e.min || cuota)}</span>`}</div></button>`;
 }
 function openFiltros() {
   openSheet(`<h2 class="pkh2" style="margin-top:4px">Filtros</h2>

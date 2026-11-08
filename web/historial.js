@@ -1,6 +1,6 @@
 // CASHBET · Historial público: registro inalterable de todos los picks (aciertos y fallos)
 let HIST = null, HIST_CARGANDO = false;
-ui.hst = "todos"; ui.hdep = "todos"; ui.hn = 60; ui.hmk = "todos";
+ui.hst = "todos"; ui.hdep = "todos"; ui.hn = 60; ui.hmk = "todos"; ui.hdia = "todos";
 
 async function cargarHist() {
   if (HIST || HIST_CARGANDO) return;
@@ -61,6 +61,15 @@ function historial() {
   const H = HIST, s = H.sello;
   let f = H.filas;
   if (ui.hdep !== "todos") f = f.filter((r) => r.d === ui.hdep);
+  if (ui.hmk !== "todos") f = f.filter((r) => r.mk === ui.hmk);
+  if (ui.hdia !== "todos") {
+    const loc = (iso) => new Date(iso).toLocaleDateString("en-CA"), hoy = new Date();
+    const dd = (n) => { const x = new Date(hoy); x.setDate(x.getDate() - n); return x.toLocaleDateString("en-CA"); };
+    if (ui.hdia === "hoy") f = f.filter((r) => loc(r.at) === dd(0));
+    else if (ui.hdia === "ayer") f = f.filter((r) => loc(r.at) === dd(1));
+    else if (ui.hdia === "7") f = f.filter((r) => loc(r.at) >= dd(7) && loc(r.at) <= dd(0));
+    else if (ui.hdia === "prox") f = f.filter((r) => loc(r.at) > dd(0));
+  }
   if (ui.hst === "pend") f = f.filter((r) => !r.st && !r.rt);
   else if (ui.hst === "ret") f = f.filter((r) => r.st === "retirado" || (!r.st && r.rt));
   else if (ui.hst !== "todos") f = f.filter((r) => r.st === ui.hst);
@@ -85,7 +94,9 @@ function historial() {
     <div class="sec"><h2>Por mercado</h2></div>${tablaM(H.mercado)}
     <div class="sec"><h2>Todos los picks</h2></div>
     <div class="hchips">${chip("hst", "todos", "Todos")}${chip("hst", "acierto", "Aciertos")}${chip("hst", "fallo", "Fallos")}${chip("hst", "pend", "Pendientes")}${chip("hst", "nulo", "Nulos")}${chip("hst", "push", "Push")}${chip("hst", "ret", "Retirados")}</div>
+    <div class="hchips">${chip("hdia", "todos", "Todas las fechas")}${chip("hdia", "hoy", "Hoy")}${chip("hdia", "ayer", "Ayer")}${chip("hdia", "7", "Últimos 7 días")}${chip("hdia", "prox", "Próximos")}</div>
     <div class="hchips">${chip("hdep", "todos", "Todos los deportes")}${chip("hdep", "futbol", "Fútbol")}${chip("hdep", "nba", "NBA")}</div>
+    <div class="hchips">${chip("hmk", "todos", "Todos los mercados")}${Object.keys(H.mercado).map((k) => chip("hmk", k, esc(k))).join("")}</div>
     <div class="small" style="margin:4px 2px 8px">${n0(total)} picks de los últimos 14 días${ui.hst === "todos" ? " (sin retirados)" : ""}. El registro completo está en <a href="data/ledger.json" target="_blank">ledger.json</a>.</div>
     ${lista || `<div class="empty">No hay picks con este filtro.</div>`}
     ${total > ui.hn ? `<button class="bigbtn" data-act="hmore" style="margin-top:12px">Ver más (${n0(total - ui.hn)})</button>` : ""}`;
@@ -93,7 +104,7 @@ function historial() {
 
 function actHist(a, el) {
   const k = el.dataset.k;
-  if (a === "hst" || a === "hdep") { ui[a] = k; ui.hn = 60; rerender(); return true; }
+  if (a === "hst" || a === "hdep" || a === "hmk" || a === "hdia") { ui[a] = k; ui.hn = 60; rerender(); return true; }
   if (a === "hmore") { ui.hn += 100; rerender(); return true; }
   return false;
 }
