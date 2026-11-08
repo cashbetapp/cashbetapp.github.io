@@ -489,7 +489,12 @@ function actPick(a, el) {
   if (a === "pkfollow") {
     const P = pkFind(sheetState.pk.gid, sheetState.pk.m), s = store.get("seg", {}), id = `pk|${P.g.id}|${P.x.m}`;
     if (s[id]) delete s[id];
-    else s[id] = { at: P.g.at, liga: P.g.liga, dep: P.g.dep, h: P.g.h.n, a: P.g.a.n, hl: P.g.h.logo, al: P.g.a.logo, txt: P.x.txt, p: P.x.p, cuota: P.x.justa };
+    else { const tm = pkTeam(P);
+      s[id] = { at: P.g.at, liga: P.g.liga, lg: P.g.lg, dep: P.g.dep, h: P.g.h.n, a: P.g.a.n, hl: P.g.h.logo, al: P.g.a.logo, hab: abT(P.g.h), aab: abT(P.g.a),
+        txt: P.x.txt, pill: pkPill(P), up: P.lado === "mas", p: P.x.p, cuota: P.x.justa, ln: P.ln,
+        tipo: P.sc === "j" ? "Jugador" : P.sc === "t" ? "Total del partido" : "Total del equipo",
+        nom: P.sc === "j" ? P.x.jugador : P.sc === "t" ? `${P.g.h.n} vs ${P.g.a.n}` : tm.n, foto: P.sc === "j" ? P.x.foto || null : null,
+        tl: tm ? tm.logo : null }; }
     store.set("seg", s); toast(s[id] ? "Siguiendo esta predicción" : "Dejaste de seguirla");
     openPick(P.g.id, P.x.m, true); return true;
   }

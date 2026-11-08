@@ -536,7 +536,8 @@ function act(a, el) {
   if (a === "seg") {
     const s = store.get("seg", {}), g = D.byId[sheetState.id];
     if (s[g.id]) delete s[g.id];
-    else s[g.id] = { at: g.at, liga: g.liga, dep: g.dep, h: g.h.n, a: g.a.n, hl: g.h.logo, al: g.a.logo, txt: g.pick.txt, p: g.pick.p, m: g.pick.m, cuota: g.pick.cuota || g.pick.justa };
+    else s[g.id] = { at: g.at, liga: g.liga, lg: g.lg, dep: g.dep, h: g.h.n, a: g.a.n, hl: g.h.logo, al: g.a.logo, hab: g.h.ab, aab: g.a.ab, txt: g.pick.txt, pill: g.pick.txt, up: isUp(g.pick.m),
+      p: g.pick.tipo === "valor" ? g.pick.pv : g.pick.p, m: g.pick.m, cuota: g.pick.cuota || g.pick.justa, tipo: "Partido", nom: `${g.h.n} vs ${g.a.n}` };
     store.set("seg", s); toast(s[g.id] ? "Siguiendo este pick" : "Dejaste de seguirlo");
     return openGame(g.id, sheetState.tab);
   }

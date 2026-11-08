@@ -760,11 +760,11 @@ def images(partidos, props_):
     fjobs = {}
     for g in partidos:
         for x in (g.get("extra") or {}).get("jug", []):
-            rel = f"img/f/{x['pid']}.png"
+            rel = f"img/f2/{x['pid']}.png"
             if os.path.exists(os.path.join(DATA, rel)):
                 x["foto"] = "data/" + rel
             elif g["at"] <= limite and x["pid"] not in nofoto:
-                fjobs[rel] = (f"https://a.espncdn.com/i/headshots/soccer/players/full/{x['pid']}.png", 200)
+                fjobs[rel] = (f"https://a.espncdn.com/i/headshots/soccer/players/full/{x['pid']}.png", 400)
     for x in props_:
         rel = f"img/p2/{x['pl']}.png"   # 400 px: la foto llena el alto de la ficha y debe verse nítida
         jobs[rel] = (f"https://a.espncdn.com/i/headshots/nba/players/full/{x['pl']}.png", 400)
@@ -783,8 +783,8 @@ def images(partidos, props_):
     json.dump(sorted(nofoto), open(nofoto_p, "w"))
     for g in partidos:
         for x in (g.get("extra") or {}).get("jug", []):
-            if os.path.exists(os.path.join(DATA, f"img/f/{x['pid']}.png")):
-                x["foto"] = f"data/img/f/{x['pid']}.png"
+            if os.path.exists(os.path.join(DATA, f"img/f2/{x['pid']}.png")):
+                x["foto"] = f"data/img/f2/{x['pid']}.png"
     # los que ESPN no tiene: foto recortada de FotMob (nombre y equipo deben coincidir)
     try:
         import fotos

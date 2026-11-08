@@ -80,6 +80,19 @@ def bajar(fid, ruta):
     return True
 
 
+def nitida(rel):
+    """FotMob solo da 192 px: se agranda al doble con filtro de nitidez (img/m2/) para la ficha grande."""
+    rel2 = rel.replace("img/m/", "img/m2/")
+    p2 = os.path.join(DATA, rel2)
+    if not os.path.exists(p2):
+        from PIL import Image, ImageFilter
+        im = Image.open(os.path.join(DATA, rel)).convert("RGBA")
+        im = im.resize((im.width * 2, im.height * 2), Image.LANCZOS).filter(ImageFilter.UnsharpMask(radius=1.6, percent=70, threshold=2))
+        os.makedirs(os.path.dirname(p2), exist_ok=True)
+        im.save(p2, optimize=True)
+    return rel2
+
+
 def uno(pid, nombre, equipo):
     """(pid, ruta) si hay foto; (pid, None) si de verdad no hay; (pid, False) si falló la red."""
     rel = f"img/m/{pid}.png"
@@ -116,5 +129,11 @@ def completar(jugadores):
             if rel is not False:
                 cache[pid] = {"f": rel, "q": hoy.isoformat(), "v": V}
     json.dump(cache, open(CACHE, "w", encoding="utf-8"))
-    return {p: c["f"] for p, c in cache.items()
-            if c.get("v") == V and c.get("f") and os.path.exists(os.path.join(DATA, c["f"]))}
+    out = {}
+    for p, c in cache.items():
+        if c.get("v") == V and c.get("f") and os.path.exists(os.path.join(DATA, c["f"])):
+            try:
+                out[p] = nitida(c["f"])
+            except Exception:
+                out[p] = c["f"]
+    return out

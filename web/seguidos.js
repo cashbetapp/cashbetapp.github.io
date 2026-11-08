@@ -49,13 +49,41 @@ function seguidos() {
   const cuotas = xs.map(({ v, e }) => e.cu || v.cuota).filter(Boolean);
   const cprom = cuotas.length ? odd(cuotas.reduce((s, c) => s + c, 0) / cuotas.length) : "—";
   const fil = ui.sgDep !== "todos" || ui.sgEst !== "todos";
-  const fila = ({ id, v, e }) => {
+  const lgDe = (v) => v.lg || (Object.entries(D.ligas || {}).find(([, L]) => L.n === v.liga) || [])[0] || (v.liga === "NBA" ? "nba" : null);
+  // seguidos guardados antes de las tarjetas nuevas: se completan con los datos del partido si siguen disponibles
+  const completar = (id, v) => {
+    if (v.nom) return v;
+    const pk = id.startsWith("pk|") ? id.slice(3) : null;
+    if (pk) {
+      const gid = pk.slice(0, pk.indexOf("|")), P = D.byId[gid] && pkFind(gid, pk.slice(pk.indexOf("|") + 1));
+      if (P) { const tm = pkTeam(P); return Object.assign({}, v, { lg: P.g.lg, hab: abT(P.g.h), aab: abT(P.g.a), pill: pkPill(P), up: P.lado === "mas",
+        tipo: P.sc === "j" ? "Jugador" : P.sc === "t" ? "Total del partido" : "Total del equipo", nom: P.sc === "j" ? P.x.jugador : P.sc === "t" ? `${P.g.h.n} vs ${P.g.a.n}` : tm.n,
+        foto: P.sc === "j" ? P.x.foto || null : null, tl: tm ? tm.logo : null }); }
+      return Object.assign({}, v, { tipo: "Pick", nom: v.txt });
+    }
+    return Object.assign({}, v, { tipo: "Partido", nom: `${v.h} vs ${v.a}`, pill: v.txt });
+  };
+  const fila = ({ id, v: v0, e }) => {
+    const v = completar(id, v0);
     const [lab, cls] = e.st ? ESTADO[e.st] : ["Pendiente", "pe"];
     const pk = id.startsWith("pk|") ? id.slice(3) : null, gid = pk ? pk.slice(0, pk.indexOf("|")) : id;
     const at = pk ? (D.byId[gid] ? `data-pk="${gid}" data-m="${esc(pk.slice(pk.indexOf("|") + 1))}"` : "") : (D.byId[id] ? `data-g="${id}"` : "");
-    return `<button class="sgc ${cls}" ${at}><div class="sgi">${crest({ logo: v.hl, n: v.h }, 30)}${crest({ logo: v.al, n: v.a }, 30)}</div>
-      <div class="sgm"><div class="sgl">${esc(v.liga || "")} · ${new Date(v.at).toLocaleDateString("es-CO", { weekday: "short", day: "numeric", month: "short" }).replace(/\./g, "")} · ${hora(v.at)}</div><b>${esc(v.txt || "")}</b><span>${esc(v.h)} vs ${esc(v.a)}</span></div>
-      <div class="sgr"><span class="st ${cls}">${lab}</span><em>${pct(v.p)}</em>${e.r != null ? `<small>Final ${esc(String(e.r))}</small>` : ""}</div></button>`;
+    const img = v.foto ? `<img class="sgf" src="${esc(v.foto)}" alt="" loading="lazy">`
+      : v.tl ? `<div class="sgx1">${crest({ logo: v.tl, n: v.nom }, 92)}</div>`
+      : `<div class="sgx2">${crest({ logo: v.hl, n: v.h }, 64)}${crest({ logo: v.al, n: v.a }, 64)}</div>`;
+    const icono = e.st === "acierto" ? ic("check") : e.st === "fallo" ? ic("x") : e.st ? "" : "–";
+    const lg = lgDe(v);
+    const up = v.up != null ? v.up : !/^menos/i.test(v.txt || "");
+    const bar = e.st === "acierto" ? 100 : e.st === "fallo" ? 100 : Math.round((v.p || 0) * 100);
+    return `<div class="sgt ${cls}" ${at} role="button">
+      <div class="sgtop">${img}<button class="sgq" data-act="sgx" data-k="${esc(id)}" aria-label="Dejar de seguir">${ic("x")}</button><span class="sgs ${cls}">${icono}</span></div>
+      <div class="sgbody"><div class="sgty"><span>${esc(v.tipo || "Pick")}</span>${lg ? lgLogo(lg, 26) : ""}</div>
+        <b class="sgn">${esc(v.nom || v.txt || "")}</b>
+        <small>${esc(v.hab || (v.h || "").slice(0, 3).toUpperCase())} @ ${esc(v.aab || (v.a || "").slice(0, 3).toUpperCase())}</small>
+        <small>${new Date(v.at).toLocaleDateString("es-CO", { month: "short", day: "numeric" }).replace(".", "")} · ${hora(v.at)}</small>
+        <span class="sgp ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc((v.pill || v.txt || "").toUpperCase())}</span></span>
+        <i class="sgbar ${cls}"><s style="width:${bar}%"></s></i>
+        <div class="sgv"><span>${e.r != null ? `Final ${esc(String(e.r))}` : lab}</span><em>${pct(v.p)}</em></div></div></div>`;
   };
   return `<div class="top"><div class="logo">CASH<b>BET</b></div><div class="ic"><button class="icb" data-go="ajustes" aria-label="Perfil">${ic("user")}</button></div></div>
     <div class="sgh"><div><h1>Seguidos</h1><div class="sub2"><i class="sgdot"></i>${activos} ${activos === 1 ? "activo" : "activos"}</div></div>
@@ -64,7 +92,7 @@ function seguidos() {
     <div class="tiles t2"><div class="tile"><div class="k">Efectividad</div><div class="v">${cal.length ? Math.round((100 * g) / cal.length) + "%" : "—"}</div></div>
       <div class="tile"><div class="k">Racha</div><div class="v">${racha}</div></div>
       <div class="tile"><div class="k">Cuota prom.</div><div class="v">${cprom}</div></div></div>
-    ${xs.length ? `<div class="sgl2">${xs.map(fila).join("")}</div>` : `<div class="sgvac"><span>${ic("bookX")}</span><b>Sin seguimientos en este rango</b><p>Sigue predicciones desde el panel o prueba un rango de fechas diferente.</p></div>`}`;
+    ${xs.length ? `<div class="sggrid">${xs.map(fila).join("")}</div>` : `<div class="sgvac"><span>${ic("bookX")}</span><b>Sin seguimientos en este rango</b><p>Sigue predicciones desde el panel o prueba un rango de fechas diferente.</p></div>`}`;
 }
 
 function openSgFiltros() {
@@ -82,6 +110,7 @@ function openSgRango() {
 function actSeguidos(a, el) {
   const k = el.dataset.k;
   if (a === "sgfil") { openSgFiltros(); return true; }
+  if (a === "sgx") { const s = store.get("seg", {}); delete s[k]; store.set("seg", s); toast("Dejaste de seguirlo"); rerender(); return true; }
   if (a === "sgrango") { openSgRango(); return true; }
   if (a === "sgDep" || a === "sgEst" || a === "sgR") { ui[a] = k; closeSheet(true); rerender(); return true; }
   return false;
