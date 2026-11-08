@@ -97,7 +97,7 @@ async function load() {
 
 // ------------------------------------------------------------ navegación
 const TABS = [["inicio", "Inicio", "home"], ["calendario", "Calendario", "cal"], ["picks", "Picks", "trend"], ["seguidos", "Seguidos", "heart"], ["bankroll", "Bankroll", "wallet"]];
-let ui = { cal: 0, calDep: "todos", pf: "todos" };
+let ui = { cal: 0, calDep: "todos", pf: "todos", calOrd: store.get("calOrd", "conf") };
 function nav(cur) {
   $("#nav").innerHTML = `<div class="in">${TABS.map(([k, t, i]) =>
     `<button class="${k === cur ? "on" : ""}" data-go="${k}">${ic(k === cur && k === "inicio" ? "homeF" : i)}${t}</button>`).join("")}</div>`;
@@ -161,7 +161,7 @@ function inicio() {
   const cuotas = hoy.map((g) => g.pick.cuota || g.pick.justa);
   const cprom = cuotas.length ? cuotas.reduce((s, x) => s + x, 0) / cuotas.length : 0;
   const top = [...hoy].filter((g) => ["1", "2"].includes(g.pick.m)).sort((x, y) => y.pick.p - x.pick.p).slice(0, 3);
-  const lista = [...hoy].sort((x, y) => new Date(x.at) - new Date(y.at)).slice(0, 12);
+  const lista = [...hoy].sort((x, y) => y.pick.p - x.pick.p).slice(0, 12);
   return header(saludo(), `${cap(fmtD.format(new Date()))} · ${hoy.length} picks listos`) + `
   <div class="tiles">
     <div class="tile"><div class="k">Efectividad</div><div class="v g">${real ? Math.round(rec.ef) : Math.round(efPrueba)}%</div><div class="n">${real ? `${rec.n} picks reales` : `prueba · ${nPrueba.toLocaleString("es-CO")} partidos`}</div></div>
@@ -201,12 +201,15 @@ function calendario() {
   const sel = dkey(dias[ui.cal]);
   let gs = D.partidos.filter((g) => dkey(new Date(g.at)) === sel);
   if (ui.calDep !== "todos") gs = gs.filter((g) => g.dep === ui.calDep);
+  const porLiga = ui.calOrd === "liga";
   const ligas = {};
-  gs.sort((a, b) => new Date(a.at) - new Date(b.at)).forEach((g) => (ligas[g.liga] = ligas[g.liga] || []).push(g));
+  if (porLiga) gs.sort((a, b) => new Date(a.at) - new Date(b.at)).forEach((g) => (ligas[g.liga] = ligas[g.liga] || []).push(g));
+  else gs.sort((a, b) => b.pick.p - a.pick.p);
   return header("Calendario", `${gs.length} partidos · ${cap(fmtD.format(dias[ui.cal]))}`) + `
   <div class="chips" style="margin-top:14px">${dias.map((d, i) => `<button class="chip ${i === ui.cal ? "on" : ""}" data-act="cal" data-i="${i}">${i === 0 ? "Hoy" : i === 1 ? "Mañana" : cap(fmtS.format(d))}</button>`).join("")}</div>
   <div class="chips">${[["todos", "Todos"], ["futbol", "Fútbol"], ["nba", "NBA"]].map(([k, t]) => `<button class="chip ${ui.calDep === k ? "on" : ""}" data-act="caldep" data-k="${k}">${t}</button>`).join("")}</div>
-  ${Object.entries(ligas).map(([l, xs]) => `<div class="day">${esc(l)}</div>${xs.map(rowCard).join("")}`).join("") || `<div class="empty">No hay partidos este día en las ligas que seguimos.</div>`}`;
+  <div class="chips">${[["conf", "Mayor confianza"], ["liga", "Por liga"]].map(([k, t]) => `<button class="chip ${ui.calOrd === k ? "on" : ""}" data-act="calord" data-k="${k}">${t}</button>`).join("")}</div>
+  ${!porLiga ? gs.map(rowCard).join("") || `<div class="empty">No hay partidos este día en las ligas que seguimos.</div>` : Object.entries(ligas).map(([l, xs]) => `<div class="day">${esc(l)}</div>${xs.map(rowCard).join("")}`).join("") || `<div class="empty">No hay partidos este día en las ligas que seguimos.</div>`}`;
 }
 
 // ------------------------------------------------------------ PICKS
@@ -443,6 +446,7 @@ function act(a, el) {
   if (a === "close") return closeSheet();
   if (a === "cal") { ui.cal = +el.dataset.i; return rerender(); }
   if (a === "caldep") { ui.calDep = k; return rerender(); }
+  if (a === "calord") { ui.calOrd = k; store.set("calOrd", k); return rerender(); }
   if (a === "pf") { ui.pf = k; return rerender(); }
   if (a === "gtab") { sheetState.tab = k; const s = $(".sheet.on"); const y = s.scrollTop; openGame(sheetState.id, k); $(".sheet.on").scrollTop = y; return; }
   if (a === "pn") { sheetState.n = +k; const i = sheetState.prop; closeSheet(true); return openProp(i); }
