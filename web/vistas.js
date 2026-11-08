@@ -241,7 +241,7 @@ function gEquipos(g) {
     if (!isNaN(hw) && !isNaN(aw)) add("% de victorias", hw / Math.max(hw + hl, 1) * 100, aw / Math.max(aw + al, 1) * 100, true, (v) => Math.round(v) + "%");
     add("Puntos por partido (últ. 5)", pts("h", 0), pts("a", 0)); add("Puntos recibidos (últ. 5)", pts("h", 1), pts("a", 1), false);
   }
-  return `<h4 class="pksub">Comparación de equipos <small>${g.dep === "futbol" ? "Promedio últimos 10" : "Temporada"}</small></h4>
+  return (typeof prevEquipos === "function" ? prevEquipos(g) : "") + `<h4 class="pksub">Comparación de equipos <small>${g.dep === "futbol" ? "Promedio últimos 10" : "Temporada"}</small></h4>
     <div class="pkcard cmpc"><div class="rr hd">${crest(g.h, 24)}<b>${esc(abT(g.h))}</b><span></span><b>${esc(abT(g.a))}</b>${crest(g.a, 24)}</div>
     ${rows.map((r) => { const hb = r.mm ? r.a >= r.b : r.a <= r.b, tot = Math.abs(r.a) + Math.abs(r.b) || 1;
       return `<div class="cmp"><b class="${hb ? "g" : ""}">${r.fmt(r.a)}</b><span>${esc(r.lab)}</span><b class="${!hb ? "g" : ""}">${r.fmt(r.b)}</b></div><div class="cmpb"><i class="${hb ? "on" : ""}" style="width:${50 * Math.abs(r.a) / tot}%"></i><u class="${!hb ? "on" : ""}" style="width:${50 * Math.abs(r.b) / tot}%"></u></div>`; }).join("") || `<div class="small">Sin datos suficientes.</div>`}</div>`;
@@ -250,7 +250,7 @@ function gJugadores(g) {
   if (g.dep === "nba") {
     const pr = D.props.filter((x) => x.ev === g.id);
     const ok = pr.filter((x) => D.propsOk.includes(x));
-    return `<h4 class="pksub">Picks de jugadores</h4>${ok.length ? `<div class="pkcard">${ok.map((x) => `<div class="mk" data-pr="${D.props.indexOf(x)}"><div class="l">${esc(x.jugador)}<span>${x.lado === "mas" ? "Más" : "Menos"} de ${x.linea} ${esc(x.tipo.toLowerCase())} · casa ${odd(x.cuota)} · ${x.prueba ? "en prueba" : `valor ${valTxt(x.valor)}`}</span></div><div class="pb"><b>${pct(x.p)}</b><div class="tr"><i style="width:${x.p * 100}%"></i></div></div></div>`).join("")}</div>` : `<div class="pkcard"><div class="small">Todavía no hay líneas de jugadores para este partido.</div></div>`}
+    return (typeof prevRot === "function" ? prevRot(g) : "") + `<h4 class="pksub">Picks de jugadores</h4>${ok.length ? `<div class="pkcard">${ok.map((x) => `<div class="mk" data-pr="${D.props.indexOf(x)}"><div class="l">${esc(x.jugador)}<span>${x.lado === "mas" ? "Más" : "Menos"} de ${x.linea} ${esc(x.tipo.toLowerCase())} · casa ${odd(x.cuota)} · ${x.prueba ? "en prueba" : `valor ${valTxt(x.valor)}`}</span></div><div class="pb"><b>${pct(x.p)}</b><div class="tr"><i style="width:${x.p * 100}%"></i></div></div></div>`).join("")}</div>` : `<div class="pkcard"><div class="small">Todavía no hay líneas de jugadores para este partido.</div></div>`}
       <h4 class="pksub">Bajas</h4><div class="pkcard">${["h", "a"].map((s) => `<div class="fo">${crest(g[s], 22)}<b>${esc(g[s].n)}</b></div>${(g.bajas?.[s] || []).map((b) => `<div class="les"><b>${esc(b.n)}</b><em class="${b.s === "Out" ? "out" : "dd"}">${b.s === "Out" ? "Fuera" : esc(b.s)}</em></div>`).join("") || `<div class="small">Sin lesionados reportados.</div>`}`).join("")}</div>`;
   }
   const J = (g.extra && g.extra.jug) || [];

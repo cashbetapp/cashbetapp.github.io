@@ -1371,3 +1371,16 @@ body.sincuenta #app { padding-bottom: calc(env(safe-area-inset-bottom) + 24px); 
 .kriesgo button b { display: block; font-size: 14px; } .kriesgo button small { font-size: 11px; color: var(--tx3); } .kriesgo button.on { border-color: var(--p); background: var(--psoft); }
 .sgq.lock { background: rgba(0,0,0,.45); }
 .tiles .tile .v { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ===== Equipos / Plantel (previa como IABET) ===== */
+.pvh { display: grid; grid-template-columns: 24px auto 1fr auto 24px; gap: 8px; align-items: center; font-size: 13px; color: var(--tx2); padding-bottom: 8px; border-bottom: 1px solid var(--pkl); margin-bottom: 4px; }
+.pvh b:nth-of-type(2) { text-align: right; }
+.pv3 { display: grid; grid-template-columns: 1fr 1.6fr 1fr; align-items: center; padding: 9px 0; border-top: 1px solid var(--pkl); font-size: 14px; }
+.pv3:nth-child(2) { border-top: 0; } .pv3 span { text-align: center; color: var(--tx2); font-size: 13px; } .pv3 b:last-child { text-align: right; } .pv3 b.g { color: var(--p); }
+.pvmas { width: 100%; margin-top: 8px; padding: 9px; border-radius: 12px; background: var(--card2); font-weight: 800; font-size: 13px; color: var(--tx2); }
+.pvl { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; padding: 10px 0; border-top: 1px solid var(--pkl); } .pvl:first-child { border-top: 0; }
+.pvl b { display: block; font-size: 18px; } .pvl small { font-size: 12px; color: var(--tx2); } .pvl span { font-size: 12px; color: var(--tx3); text-align: center; } .pvl .r { text-align: right; }
+.pvr2 { display: flex; gap: 12px; padding: 10px 0; border-top: 1px solid var(--pkl); } .pvr2:first-child { border-top: 0; }
+.pvp { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; flex: none; background: var(--card2); font-weight: 800; font-size: 12px; color: var(--tx2); }
+.pvr2 b { font-size: 15px; } .pvr2 small { margin-left: 6px; color: var(--tx3); font-size: 12px; } .pvr2 p { margin: 4px 0 0; color: var(--tx3); font-size: 12px; line-height: 1.4; }
+.pvr2 em { font-style: normal; font-size: 10.5px; font-weight: 800; padding: 2px 7px; border-radius: 6px; margin-left: 8px; } .pvr2 em.out { background: rgba(239,68,68,.14); color: #ef4444; } .pvr2 em.dd { background: rgba(240,138,28,.14); color: #f08a1c; }
