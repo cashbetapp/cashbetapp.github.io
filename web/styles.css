@@ -837,3 +837,7 @@ img.crest, .pjl img, .lglogo { object-fit: contain !important; image-rendering: 
 .hpimg.dos { display: block; }
 .hpimg.dos img, .hpimg.dos .crest-f { position: absolute; width: 76px !important; height: 76px !important; margin: 0 !important; }
 .hpimg.dos > :first-child { left: 12%; top: 22%; } .hpimg.dos > :last-child { left: 46%; top: 46%; }
+
+/* pares de escudos en listas (seguidos, registro, ranking): completos, uno al lado del otro */
+.pair { gap: 4px; }
+.pair > * + * { margin-left: 0 !important; }
