@@ -437,7 +437,7 @@ function pcCard(e) {
   } else if (e.k === "x") {
     const g = e.g, x = e.x, P = pkFind(g.id, x.m); up = P.lado === "mas" || pkPill(P) === "Recibe tarjeta";
     const tm = pkTeam(P);
-    img = P.sc === "j" ? (x.foto ? `<img class="pcimg foto" src="${esc(x.foto)}" alt="" loading="lazy">` : sinFoto(x.jugador, tm, 74, "pcimg"))
+    img = P.sc === "j" ? (x.foto ? `<img class="pcimg foto" src="${esc(x.foto)}" alt="" loading="lazy">` : sinFoto(x.jugador, tm, 60, "pcimg"))
       : P.sc === "t" ? `<div class="pcimg dos">${crest(g.h, 46)}${crest(g.a, 46)}</div>` : `<div class="pcimg">${crest(tm, 74)}</div>`;
     lab = P.sc === "j" ? `JUGADOR · ${abT(tm)}` : P.sc === "t" ? "TOTAL DEL PARTIDO" : "TOTAL EQUIPO";
     tit = P.sc === "j" ? x.jugador : P.sc === "t" ? `Total de ${UN[P.s]}` : tm.n;

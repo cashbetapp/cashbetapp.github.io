@@ -130,9 +130,21 @@ function after(tab) {
   if (tab === "inicio" || !tab) {
     const car = $(".car"); if (!car) return;
     car.addEventListener("scroll", () => {
-      const i = Math.round(car.scrollLeft / car.clientWidth);
+      const paso = car.children[1] ? car.children[1].offsetLeft - car.children[0].offsetLeft : car.clientWidth;
+      const i = Math.round(car.scrollLeft / paso);
       document.querySelectorAll(".dots i").forEach((d, j) => d.classList.toggle("on", i === j));
     }, { passive: true });
+    // picks destacados: se deslizan solos; si la persona toca, se pausa un rato
+    clearInterval(window._carT); let quieto = 0;
+    const pausa = () => (quieto = Date.now() + 9000);
+    ["touchstart", "pointerdown", "wheel"].forEach((ev) => car.addEventListener(ev, pausa, { passive: true }));
+    window._carT = setInterval(() => {
+      if (!document.body.contains(car)) return clearInterval(window._carT);
+      if (Date.now() < quieto || document.hidden || car.children.length < 2) return;
+      const n = car.children.length, paso = car.children[1].offsetLeft - car.children[0].offsetLeft;
+      const i = Math.round(car.scrollLeft / paso);
+      car.scrollTo({ left: ((i + 1) % n) * paso, behavior: "smooth" });
+    }, 4000);
   }
 }
 window.addEventListener("hashchange", route);

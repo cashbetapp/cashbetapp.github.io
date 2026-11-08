@@ -795,3 +795,13 @@ img.hpimg.foto { width: 48%; height: 100%; object-fit: cover; object-position: t
 .sfj .sfe { position: absolute; right: calc(50% - var(--s) / 2 - 4px); bottom: -2px; }
 .sfj .sfe img, .sfj .sfe span { width: calc(var(--s) * .34) !important; height: calc(var(--s) * .34) !important; filter: drop-shadow(0 2px 4px rgba(0,0,0,.5)); }
 .hpimg.sfj .sfi, .pkbig.sfj .sfi { box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+
+/* fichas de picks un poco más pequeñas */
+.pcard { gap: 12px; padding: 11px 12px 11px 9px; margin-bottom: 9px; border-radius: 18px; }
+.pcimg { width: 66px; height: 66px; } .pcimg img { width: 60px; height: 60px; }
+.pcimg.dos img { width: 38px; height: 38px; } .pcimg.dos img:last-child { margin-top: 22px; }
+img.pcimg.foto { height: 74px; margin: -4px 0; border-radius: 12px; }
+.pcl { font-size: 10.5px; } .pct { font-size: 18px; } .pcs { font-size: 12px; margin-top: 2px; }
+.pcpill { font-size: 11.5px; padding: 5px 10px; margin-top: 7px; }
+.pcp { font-size: 12px; padding: 3px 9px; }
+.hp { min-height: 196px; }
