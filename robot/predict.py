@@ -766,8 +766,8 @@ def images(partidos, props_):
             elif g["at"] <= limite and x["pid"] not in nofoto:
                 fjobs[rel] = (f"https://a.espncdn.com/i/headshots/soccer/players/full/{x['pid']}.png", 200)
     for x in props_:
-        rel = f"img/p/{x['pl']}.png"
-        jobs[rel] = (f"https://a.espncdn.com/i/headshots/nba/players/full/{x['pl']}.png", 160)
+        rel = f"img/p2/{x['pl']}.png"   # 400 px: la foto llena el alto de la ficha y debe verse nítida
+        jobs[rel] = (f"https://a.espncdn.com/i/headshots/nba/players/full/{x['pl']}.png", 400)
         x["foto"] = "data/" + rel
         if x.get("eq"):
             team(dict(x["eq"]))

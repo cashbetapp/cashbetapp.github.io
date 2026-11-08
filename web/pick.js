@@ -463,7 +463,8 @@ function pcCard(e) {
   }
   return `<button class="pcard ${jug ? "jg" : ""}" ${attr}>${img}<div class="pcm"><div class="pcl">${jug ? lab : esc(lab)}</div><div class="pct">${esc(tit)}</div><div class="pcs">${esc(sub)}</div>
     <span class="pcpill ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(pill)}</span></span></div>
-    <div class="pcr"><span class="pcp"><i></i>${pct(e.p)}<em>${nivel(e)}</em></span>${e.val != null ? `<span class="pcval">VALOR ${valTxt(e.val)}</span><span class="pcc">casa ${odd(e.casa)}</span>` : e.prueba ? `<span class="pcpru">EN PRUEBA</span><span class="pcc">casa ${odd(e.casa)}</span>` : `<span class="pcc">vale desde ${odd(e.min || cuota)}</span>`}</div></button>`;
+    <div class="pcr"><span class="pcp"><i></i>${pct(e.p)}</span></div>
+    <div class="pcb">${e.val != null ? `<span class="pcval">+${Math.round(e.val * 100)}%</span><span class="pcc">${odd(e.casa)}</span>` : e.prueba ? `<span class="pcc" title="Cuota de la casa (en prueba)">${odd(e.casa)}</span>` : `<span class="pcc" title="Vale la pena desde esta cuota">≥${odd(e.min || cuota)}</span>`}</div></button>`;
 }
 function openFiltros() {
   openSheet(`<h2 class="pkh2" style="margin-top:4px">Filtros</h2>
