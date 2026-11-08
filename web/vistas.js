@@ -312,6 +312,6 @@ function actVistas(a, el) {
   if (a === "cfreset") { ui.calDep = "todos"; ui.calLg = "todas"; closeSheet(true); rerender(); return true; }
   if (a === "fmt") { store.set("fmt", k); rerender(); return true; }
   if (a === "noop") return true;
-  if (a === "gtab") { const s = $(".sheet.on"), y = s ? s.scrollTop : 0; openGame(sheetState.id, k); const s2 = $(".sheet.on"); if (s2) s2.scrollTop = y; return true; }
+  if (a === "gtab") { const s = $(".sheet.on"), y = s ? s.scrollTop : 0; openGame(sheetState.id, k); const s2 = $(".sheet.on"); if (s2) s2.scrollTop = y; alTab(); return true; }
   return false;
 }

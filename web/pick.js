@@ -389,10 +389,16 @@ function openFiltros() {
   $(".sheet").classList.add("pk");
 }
 
+// al cambiar de pestaña, la ficha sube hasta las pestañas: lo primero de la
+// pestaña (por ejemplo "El partido" en Contexto) queda justo debajo
+function alTab() {
+  const sh = $(".sheet.on"), t = sh && sh.querySelector(".pktabs");
+  if (sh && t && sh.scrollTop > t.offsetTop - 12) sh.scrollTo({ top: Math.max(t.offsetTop - 12, 0), behavior: "smooth" });
+}
 // acciones de esta parte (las llama act() de app.js)
 function actPick(a, el) {
   const k = el.dataset.k;
-  if (a === "pktab") { sheetState.tab = k; openPick(sheetState.pk.gid, sheetState.pk.m, true); return true; }
+  if (a === "pktab") { sheetState.tab = k; openPick(sheetState.pk.gid, sheetState.pk.m, true); alTab(); return true; }
   if (a === "pkn") { sheetState.n = +k; openPick(sheetState.pk.gid, sheetState.pk.m, true); return true; }
   if (a === "pkside") { sheetState.side = k; openPick(sheetState.pk.gid, sheetState.pk.m, true); return true; }
   if (a === "pkfollow") {
