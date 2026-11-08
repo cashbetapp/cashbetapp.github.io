@@ -119,7 +119,12 @@ function nav(cur) {
 }
 function route() {
   if (!D) return;
-  const [tab, arg] = (location.hash.slice(1) || "inicio").split("/");
+  let [tab, arg] = (location.hash.slice(1) || "inicio").split("/");
+  // puerta: sin cuenta solo se ve la pantalla de cuenta y la de privacidad
+  const libre = tab === "cuenta" || (tab === "ajustes" && arg === "privacidad");
+  const dentro = typeof cuentaActiva !== "function" || cuentaActiva();
+  document.body.classList.toggle("sincuenta", !dentro);
+  if (!dentro && !libre) { tab = "cuenta"; arg = typeof cuentaPendiente === "function" && cuentaPendiente() ? "verificar" : ""; }
   const views = { inicio: (a) => inicio(a), calendario: (a) => calendario(a), picks: (a) => picks(a), seguidos, bankroll, ajustes: (a) => ajustes(a), historial: (a) => historial(a), cuenta: (a) => cuenta(a) };
   const v = views[tab] || inicio;
   const clave = tab + "/" + (arg || "");

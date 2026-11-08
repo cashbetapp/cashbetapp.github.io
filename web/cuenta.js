@@ -11,7 +11,10 @@ const FB_CFG = {
 };
 const FB_VER = "10.12.2";
 const SYNC = ["seg", "bank", "nombre", "fmt", "tema"];
-let FB = null, USER = null, fbCargando = null;
+let FB = null, USER = null, fbCargando = null, AUTH_LISTO = false;
+// la app exige cuenta: hasta saber si hay sesión se muestra "cargando"
+const cuentaActiva = () => !!USER;
+const cuentaPendiente = () => !!(FB && FB.auth.currentUser && !USER);
 I.mail = '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>';
 I.shieldOk = '<path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z"/><path d="m8.5 12 2.5 2.5 4.5-5"/>';
 I.goog = '<path fill="#4285F4" stroke="none" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3z"/><path fill="#34A853" stroke="none" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22z"/><path fill="#FBBC05" stroke="none" d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 0 0 0 9.2z"/><path fill="#EA4335" stroke="none" d="M12 6c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 0 0 3.1 7.4L6.4 10C7.2 7.7 9.4 6 12 6z"/>';
@@ -28,7 +31,7 @@ async function fb() {
     firebase.initializeApp(FB_CFG);
     const auth = firebase.auth(); auth.languageCode = "es";
     FB = { auth, db: firebase.firestore() };
-    auth.onAuthStateChanged(alCambiarUsuario);
+    auth.onAuthStateChanged((u) => { AUTH_LISTO = true; alCambiarUsuario(u); });
     try { await auth.getRedirectResult(); } catch (e) { toast(errTxt(e)); }
     return FB;
   })();
@@ -58,8 +61,8 @@ async function alCambiarUsuario(u) {
       if (cambio && !sessionStorage.getItem("cb_sync")) { sessionStorage.setItem("cb_sync", "1"); location.reload(); return; }
     } catch (e) { console.warn("sync", e); }
   }
-  if (location.hash.startsWith("#cuenta") && USER) location.hash = "#ajustes";
-  else if (location.hash.startsWith("#ajustes")) { $("#app").dataset.tab = ""; route(); }
+  if (USER && location.hash.startsWith("#cuenta")) { location.hash = "#inicio"; return; }
+  $("#app").dataset.tab = ""; route();
 }
 let subirT = null;
 async function subir() {
@@ -90,7 +93,8 @@ const errTxt = (e) => ERR[e && e.code] || "No se pudo completar. Intenta otra ve
 
 // ---------------------------------------------------------------- pantallas
 function cuenta(arg) {
-  if (!FB) fb().then(() => { $("#app").dataset.tab = ""; route(); }).catch(() => toast("No se pudo conectar. Revisa tu internet."));
+  if (!FB) fb().then(() => { $("#app").dataset.tab = ""; route(); }).catch(() => { $("#app").innerHTML = `<div class="cta cini"><h1 class="cth">Sin conexión</h1><p class="ctp">Para entrar a CASHBET necesitas internet. Revisa tu conexión y vuelve a abrir la app.</p><button class="cbtn" onclick="location.reload()">Reintentar</button></div>`; });
+  if (!AUTH_LISTO) return `<div class="cta cini"><div class="cload"></div></div>`;
   const atras = (go) => `<div class="ctop"><button class="cback" data-go="${go}" aria-label="Atrás">${ic("left")}</button></div>`;
   const pie = `<div class="cpie">Al continuar aceptas el uso de tus datos descrito en <a data-go="ajustes/privacidad">Privacidad</a>.</div>`;
   if (arg === "crear") return `<div class="cta">${atras("cuenta")}
@@ -111,10 +115,10 @@ function cuenta(arg) {
       <p class="ctp">Te enviamos un enlace a <b>${esc((FB && FB.auth.currentUser && FB.auth.currentUser.email) || "tu correo")}</b>. Ábrelo para confirmar tu cuenta y vuelve aquí. Si no aparece, mira en Spam.</p>
       <button class="cbtn" data-act="c_listo">${ic("check")}Ya lo confirmé</button>
       <button class="cbtn2" data-act="c_reenviar">Reenviar el enlace</button></div>`;
-  return `<div class="cta cini">${atras("ajustes")}
+  return `<div class="cta cini">${USER ? atras("ajustes") : `<div class="clogo">CASH<b>BET</b></div>`}
       <span class="cico">${ic("shieldOk")}</span>
       <h1 class="cth big">Crea tu<br><em>cuenta CASHBET.</em></h1>
-      <p class="ctp">Gratis. Guarda tus picks seguidos y tu bankroll en la nube y míralos en cualquier celular o computador.</p>
+      <p class="ctp">Gratis. Crea tu cuenta para ver los picks, el análisis y el historial. Tus picks seguidos y tu bankroll quedan guardados en cualquier equipo.</p>
       <button class="cbtn" data-go="cuenta/crear">${ic("mail")}Continuar con Email</button>
       <button class="cbtn2" data-act="c_google">${ic("goog")}Continuar con Google</button>
       <button class="cya" data-go="cuenta/entrar">Ya tengo una cuenta</button>${pie}</div>`;
@@ -165,11 +169,11 @@ async function actCuenta(a) {
       if (auth.currentUser.emailVerified) { await alCambiarUsuario(auth.currentUser); toast("¡Cuenta confirmada!"); }
       else toast("Todavía no aparece confirmada. Abre el enlace del correo.");
     } else if (a === "c_salir") {
-      await auth.signOut(); USER = null; store.set("cuenta", 0); toast("Sesión cerrada"); $("#app").dataset.tab = ""; route();
+      await auth.signOut(); USER = null; store.set("cuenta", 0); toast("Sesión cerrada"); location.hash = "#cuenta";
     } else if (a === "c_borrar") {
       if (!confirm("¿Eliminar tu cuenta y los datos guardados en la nube? En este celular quedan tus datos locales.")) return true;
       await docUsuario().delete(); await auth.currentUser.delete();
-      USER = null; store.set("cuenta", 0); toast("Cuenta eliminada"); $("#app").dataset.tab = ""; route();
+      USER = null; store.set("cuenta", 0); toast("Cuenta eliminada"); location.hash = "#cuenta";
     }
   } catch (e) {
     if (e && e.code === "auth/requires-recent-login") toast("Por seguridad, cierra sesión, vuelve a entrar e inténtalo de nuevo.");
@@ -179,5 +183,5 @@ async function actCuenta(a) {
   return true;
 }
 
-// si ya tenía cuenta en este celular, se reconecta al abrir (sin cuenta no se descarga Firebase)
-if (store.get("cuenta", 0)) fb().catch(() => {});
+// la app exige cuenta: Firebase se conecta siempre al abrir
+fb().catch(() => {});
