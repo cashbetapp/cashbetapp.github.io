@@ -232,10 +232,21 @@ function pruebaDe(e) {
   return b ? b.paso : 0;
 }
 const ordenar = (xs) => xs.sort((a, b) => b.p - a.p || b.pr - a.pr);
-// los mejores: como máximo 'n' picks por partido (el resto se ve en la ficha)
+// valor contra la casa (solo cuando hay cuota real de la casa)
+const valorCasa = (e) => (e.k === "g" && e.g.pick.cuota ? e.p * e.g.pick.cuota - 1 : 0);
+// pick "fuerte": puede acompañar al mejor del mismo partido
+const fuerte = (e) => e.k !== "pr" && ((e.p >= 0.65 && e.pr >= 61) || valorCasa(e) >= 0.05);
+const tipoMk = (e) => (e.k === "x" ? e.x.s + "|" + (e.x.sc === "j" ? "j" : "e") : e.mk);
+// los mejores: el mejor de cada partido siempre; hasta 'n' por partido si los
+// siguientes son fuertes y de otro mercado (el resto se ve en la ficha)
 function mejores(xs, n) {
-  const c = {};
-  return ordenar(xs).filter((e) => { c[e.gid] = (c[e.gid] || 0) + 1; return c[e.gid] <= n; });
+  const c = {}, mk = {};
+  return ordenar(xs).filter((e) => {
+    const k = e.gid, t = tipoMk(e);
+    if (!c[k]) { c[k] = 1; mk[k] = new Set([t]); return true; }
+    if (c[k] >= n || mk[k].has(t) || !fuerte(e)) return false;
+    c[k]++; mk[k].add(t); return true;
+  });
 }
 function picks() {
   let it = pickItems();
@@ -244,8 +255,8 @@ function picks() {
   if (ui.pdep !== "todos") it = it.filter((e) => e.dep === ui.pdep);
   if (ui.pmk !== "todos") it = it.filter((e) => e.mk === ui.pmk);
   // Todos: 1 por partido y sin jugadores NBA en prueba; Jugadores/Equipos o con filtro: 2 por partido
-  if (ui.pseg === "todos" && ui.pmk === "todos") it = mejores(it.filter((e) => e.k !== "pr"), 1);
-  else it = mejores(it, 2);
+  if (ui.pseg === "todos" && ui.pmk === "todos") it = mejores(it.filter((e) => e.k !== "pr"), 3);
+  else it = mejores(it, 3);
   const total = it.length;
   it = it.slice(0, 80);
   const fil = ui.pdep !== "todos" || ui.pmk !== "todos";
@@ -254,7 +265,7 @@ function picks() {
       <button class="pkfil ${fil ? "on" : ""}" data-act="pfil" aria-label="Filtros">${ic(fil ? "filtro" : "ball")}</button></div>
     ${fil ? `<div class="small" style="margin:-2px 2px 10px">Filtro: ${ui.pdep === "todos" ? "todos los deportes" : ui.pdep === "nba" ? "NBA" : "Fútbol"} · ${esc(MK.find(([k]) => k === ui.pmk)?.[1] || "")}</div>` : ""}
     <div class="pclist">${it.map(pcCard).join("") || `<div class="empty">Hoy ya no quedan picks con este filtro. Los de mañana aparecen aquí desde mañana; puedes verlos antes en el Calendario.</div>`}</div>
-    <div class="small" style="text-align:center;margin:14px 0">${ui.pseg === "todos" && ui.pmk === "todos" ? "El mejor pick de cada partido" : "Hasta 2 picks por partido"} · cuota ${odd(D.cuota_min || 1.5)} o más · ordenados por confianza.<br>Todos los mercados de cada partido están en su ficha.</div>`;
+    <div class="small" style="text-align:center;margin:14px 0">El mejor pick de cada partido (hasta 3 si los otros son fuertes) · cuota ${odd(D.cuota_min || 1.5)} o más · ordenados por confianza.<br>Todos los mercados de cada partido están en su ficha.</div>`;
 }
 function pcCard(e) {
   let img, lab, tit, sub, pill, up, attr, cuota, liga;

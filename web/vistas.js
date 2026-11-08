@@ -71,7 +71,7 @@ function openCalFiltros() {
 
 // ------------------------------------------------------------ INICIO
 function inicio() {
-  const its = mejores(pickItems().filter((e) => e.k !== "pr"), 1);   // el mejor pick de cada partido
+  const its = mejores(pickItems().filter((e) => e.k !== "pr"), 3);   // el mejor de cada partido (+ fuertes)
   const rec = (D.registro && D.registro.partidos) || { n: 0 }, sem = (D.registro && D.registro.semana) || { n: 0 };
   const a = D.acierto, nPrueba = a.futbol_partidos + a.nba_partidos;
   const efPrueba = (a.futbol_1x2 * a.futbol_partidos + a.nba_ganador * a.nba_partidos) / nPrueba;
@@ -80,7 +80,7 @@ function inicio() {
   const cuotas = its.slice(0, 30).map((e) => e.k === "g" ? (e.g.pick.cuota || e.g.pick.justa) : e.k === "x" ? e.x.justa : e.x.cuota);
   const cprom = cuotas.length ? cuotas.reduce((s, x) => s + x, 0) / cuotas.length : 0;
   // destacados: el mejor de partido, el mejor de equipo (estadística) y el mejor jugador
-  const top = its.slice(0, 3);
+  const top = its.filter((e, i, a) => a.findIndex((y) => y.gid === e.gid) === i).slice(0, 3);   // destacados de partidos distintos
   const resto = its.filter((e) => !top.includes(e)).slice(0, 10);
   const dia = new Date().toLocaleDateString("es-CO", { weekday: "long" });
   const nom = store.get("nombre", "");
