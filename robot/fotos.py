@@ -8,21 +8,40 @@ DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data")
 CACHE = os.path.join(DATA, "fotos.json")
 UA = {"User-Agent": "CASHBET/1.0 (https://cashbetapp.github.io)"}
 FUTBOLISTA = "Q937857"
-MAX = 120          # búsquedas por corrida
+MAX = 200          # búsquedas por corrida
 REINTENTO = 7      # días para volver a buscar a quien no tenía foto
 
 
+class Falla(Exception):
+    """Error pasajero (límite de peticiones, red): se vuelve a intentar en la próxima corrida."""
+
+
+def _abrir(url, timeout=20):
+    import time, urllib.error
+    for i in range(4):
+        try:
+            with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=timeout) as r:
+                return r.read()
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                raise
+            time.sleep(2 + 3 * i)
+        except Exception:
+            time.sleep(2 + 3 * i)
+    raise Falla(url)
+
+
 def _json(url):
-    with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=20) as r:
-        return json.load(r)
+    return json.loads(_abrir(url))
 
 
 def nacimiento(pid):
+    import urllib.error
     try:
         d = _json(f"https://sports.core.api.espn.com/v2/sports/soccer/leagues/eng.1/athletes/{pid}")
-        return (d.get("dateOfBirth") or "")[:10] or None
-    except Exception:
+    except urllib.error.HTTPError:
         return None
+    return (d.get("dateOfBirth") or "")[:10] or None
 
 
 def _fecha(c):
@@ -35,12 +54,9 @@ def _fecha(c):
 def buscar(nombre, nac):
     ids = []
     for lang in ("en", "es"):
-        try:
-            q = urllib.parse.urlencode({"action": "wbsearchentities", "search": nombre, "language": lang,
-                                        "type": "item", "limit": 7, "format": "json"})
-            ids += [e["id"] for e in _json("https://www.wikidata.org/w/api.php?" + q).get("search", [])]
-        except Exception:
-            pass
+        q = urllib.parse.urlencode({"action": "wbsearchentities", "search": nombre, "language": lang,
+                                    "type": "item", "limit": 7, "format": "json"})
+        ids += [e["id"] for e in _json("https://www.wikidata.org/w/api.php?" + q).get("search", [])]
         if ids:
             break
     ids = list(dict.fromkeys(ids))
@@ -73,8 +89,7 @@ def buscar(nombre, nac):
 def bajar(archivo, ruta):
     from PIL import Image
     url = "https://commons.wikimedia.org/wiki/Special:FilePath/" + urllib.parse.quote(archivo.replace(" ", "_")) + "?width=400"
-    with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=30) as r:
-        im = Image.open(io.BytesIO(r.read())).convert("RGB")
+    im = Image.open(io.BytesIO(_abrir(url, 30))).convert("RGB")
     w, h = im.size
     lado = min(w, h)
     x0 = (w - lado) // 2
@@ -85,15 +100,16 @@ def bajar(archivo, ruta):
 
 
 def uno(pid, nombre):
+    """(pid, ruta) si hay foto; (pid, None) si de verdad no hay; (pid, False) si falló la red."""
     rel = f"img/w/{pid}.jpg"
     try:
         img = buscar(nombre, nacimiento(pid))
-        if img:
-            bajar(img, os.path.join(DATA, rel))
-            return pid, rel
+        if not img:
+            return pid, None
+        bajar(img, os.path.join(DATA, rel))
+        return pid, rel
     except Exception:
-        pass
-    return pid, None
+        return pid, False
 
 
 def completar(jugadores):
@@ -109,11 +125,12 @@ def completar(jugadores):
         c = cache.get(pid)
         if c and c.get("f") and os.path.exists(os.path.join(DATA, c["f"])):
             continue
-        if c and not c.get("f") and (hoy - dt.date.fromisoformat(c["q"])).days < REINTENTO:
+        if c and c.get("v") == 2 and not c.get("f") and (hoy - dt.date.fromisoformat(c["q"])).days < REINTENTO:
             continue
         pend.append((pid, nombre))
-    with ThreadPoolExecutor(4) as ex:
+    with ThreadPoolExecutor(2) as ex:
         for pid, rel in ex.map(lambda a: uno(*a), pend[:MAX]):
-            cache[pid] = {"f": rel, "q": hoy.isoformat()}
+            if rel is not False:
+                cache[pid] = {"f": rel, "q": hoy.isoformat(), "v": 2}
     json.dump(cache, open(CACHE, "w", encoding="utf-8"))
     return {p: c["f"] for p, c in cache.items() if c.get("f") and os.path.exists(os.path.join(DATA, c["f"]))}
