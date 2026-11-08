@@ -71,7 +71,7 @@ function openCalFiltros() {
 
 // ------------------------------------------------------------ INICIO
 function inicio() {
-  const its = pickItems().sort((a, b) => b.p - a.p);
+  const its = mejores(pickItems().filter((e) => e.k !== "pr"), 1);   // el mejor pick de cada partido
   const rec = (D.registro && D.registro.partidos) || { n: 0 }, sem = (D.registro && D.registro.semana) || { n: 0 };
   const a = D.acierto, nPrueba = a.futbol_partidos + a.nba_partidos;
   const efPrueba = (a.futbol_1x2 * a.futbol_partidos + a.nba_ganador * a.nba_partidos) / nPrueba;
@@ -80,13 +80,13 @@ function inicio() {
   const cuotas = its.slice(0, 30).map((e) => e.k === "g" ? (e.g.pick.cuota || e.g.pick.justa) : e.k === "x" ? e.x.justa : e.x.cuota);
   const cprom = cuotas.length ? cuotas.reduce((s, x) => s + x, 0) / cuotas.length : 0;
   // destacados: el mejor de partido, el mejor de equipo (estadística) y el mejor jugador
-  const top = [its.find((e) => e.k === "g"), its.find((e) => e.k === "x" && e.eq), its.find((e) => !e.eq)].filter(Boolean);
+  const top = its.slice(0, 3);
   const resto = its.filter((e) => !top.includes(e)).slice(0, 10);
   const dia = new Date().toLocaleDateString("es-CO", { weekday: "long" });
   const nom = store.get("nombre", "");
   return `<div class="top"><div class="logo">CASH<b>BET</b></div><div class="ic">
       <button class="icb" data-act="novedades" aria-label="Novedades">${ic("bell")}</button><button class="icb" data-go="ajustes" aria-label="Perfil">${ic("user")}</button></div></div>
-    <h1>Buen ${esc(dia)}${nom ? `, ${esc(nom)}` : ""}</h1><div class="sub2">${fmtD.format(new Date())} · ${its.length} picks listos</div>
+    <h1>Buen ${esc(dia)}${nom ? `, ${esc(nom)}` : ""}</h1><div class="sub2">${fmtD.format(new Date())} · ${its.length} mejores picks</div>
     <div class="ban">${ic("star")}<div>${sem.n ? `<b>CASHBET acertó ${sem.g}/${sem.n}</b><span>Últimos 7 días · picks reales</span>` : `<b>Registro real en marcha</b><span>Cada pick se califica al terminar el partido</span>`}</div><button data-go="picks">Ver picks ${ic("right")}</button></div>
     <div class="tiles t2">
       <div class="tile"><div class="k">Efectividad</div><div class="v">${real ? Math.round(rec.ef) : Math.round(efPrueba)}%</div><div class="n">${real ? `${rec.n} picks reales` : "en la prueba"}</div></div>

@@ -212,8 +212,30 @@ function pickItems() {
       g.extra.jug.forEach((x) => it.push({ k: "x", g, x, p: x.p, mk: x.s, dep: "futbol", eq: 0 }));
     }
   }
-  D.propsOk.filter((x) => esHoy(x.at)).forEach((x) => it.push({ k: "pr", x, p: x.p, mk: "nbaj", dep: "nba", eq: 0 }));
+  // jugadores NBA (en prueba): cuota mínima, 1 por jugador y 3 por partido
+  const vistoJ = new Set(), porEv = {};
+  D.propsOk.filter((x) => esHoy(x.at) && x.cuota >= (D.cuota_min || 1.5) && x.p >= 0.5).sort((a, b) => b.p - a.p).forEach((x) => {
+    if (vistoJ.has(x.pl) || (porEv[x.ev] || 0) >= 3) return;
+    vistoJ.add(x.pl); porEv[x.ev] = (porEv[x.ev] || 0) + 1;
+    it.push({ k: "pr", x, p: x.p, mk: "nbaj", dep: "nba", eq: 0 });
+  });
+  it.forEach((e) => { e.gid = e.g ? e.g.id : e.x.ev; e.pr = pruebaDe(e); });
   return it;
+}
+// acierto en la prueba del tipo de pick (para desempatar picks con el mismo %)
+function pruebaDe(e) {
+  if (e.k === "x") return e.x.prueba || 0;
+  if (e.k === "pr") return 0;   // en prueba: sin acierto comprobado
+  const cal = e.g.dep === "nba" ? D.acierto.calibracion_nba : D.acierto.calibracion_futbol;
+  const q = e.p >= 0.5 ? e.p : 1 - e.p;
+  const b = (cal || []).find((r) => { const [lo, hi] = r.rango.replace("%", "").split("-").map(Number); return q * 100 >= lo && q * 100 < (hi === 100 ? 101 : hi); });
+  return b ? b.paso : 0;
+}
+const ordenar = (xs) => xs.sort((a, b) => b.p - a.p || b.pr - a.pr);
+// los mejores: como máximo 'n' picks por partido (el resto se ve en la ficha)
+function mejores(xs, n) {
+  const c = {};
+  return ordenar(xs).filter((e) => { c[e.gid] = (c[e.gid] || 0) + 1; return c[e.gid] <= n; });
 }
 function picks() {
   let it = pickItems();
@@ -221,16 +243,18 @@ function picks() {
   if (ui.pseg === "equipos") it = it.filter((e) => e.eq);
   if (ui.pdep !== "todos") it = it.filter((e) => e.dep === ui.pdep);
   if (ui.pmk !== "todos") it = it.filter((e) => e.mk === ui.pmk);
-  it.sort((a, b) => b.p - a.p || (b.x && b.x.prueba || 0) - (a.x && a.x.prueba || 0));
+  // Todos: 1 por partido y sin jugadores NBA en prueba; Jugadores/Equipos o con filtro: 2 por partido
+  if (ui.pseg === "todos" && ui.pmk === "todos") it = mejores(it.filter((e) => e.k !== "pr"), 1);
+  else it = mejores(it, 2);
   const total = it.length;
-  it = it.slice(0, 120);
+  it = it.slice(0, 80);
   const fil = ui.pdep !== "todos" || ui.pmk !== "todos";
-  return header("Predicciones", `${total} picks · ${fmtD.format(new Date())}`) + `
+  return header("Predicciones", `${total} mejores picks · ${fmtD.format(new Date())}`) + `
     <div class="pkbar"><div class="pktabs dark">${[["todos", "Todos"], ["jugadores", "Jugadores"], ["equipos", "Equipos"]].map(([k, l]) => `<button class="${ui.pseg === k ? "on" : ""}" data-act="pseg" data-k="${k}">${l}</button>`).join("")}</div>
       <button class="pkfil ${fil ? "on" : ""}" data-act="pfil" aria-label="Filtros">${ic(fil ? "filtro" : "ball")}</button></div>
     ${fil ? `<div class="small" style="margin:-2px 2px 10px">Filtro: ${ui.pdep === "todos" ? "todos los deportes" : ui.pdep === "nba" ? "NBA" : "Fútbol"} · ${esc(MK.find(([k]) => k === ui.pmk)?.[1] || "")}</div>` : ""}
     <div class="pclist">${it.map(pcCard).join("") || `<div class="empty">Hoy ya no quedan picks con este filtro. Los de mañana aparecen aquí desde mañana; puedes verlos antes en el Calendario.</div>`}</div>
-    <div class="small" style="text-align:center;margin:14px 0">Solo picks con cuota de ${odd(D.cuota_min || 1.3)} o más · ordenados por confianza</div>`;
+    <div class="small" style="text-align:center;margin:14px 0">${ui.pseg === "todos" && ui.pmk === "todos" ? "El mejor pick de cada partido" : "Hasta 2 picks por partido"} · cuota ${odd(D.cuota_min || 1.5)} o más · ordenados por confianza.<br>Todos los mercados de cada partido están en su ficha.</div>`;
 }
 function pcCard(e) {
   let img, lab, tit, sub, pill, up, attr, cuota, liga;
