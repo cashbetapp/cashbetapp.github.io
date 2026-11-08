@@ -81,8 +81,22 @@ def _pagina(lang, t):
                 except Exception:
                     cap = None
             if img or cap:
-                return {"img": img, "cap": cap, "t": t}
+                return {"img": img, "cap": cap, "t": t, "qid": qid}
             return None
+
+
+IV = 1   # versión de la búsqueda de fotos interiores (subirla vuelve a buscar todas)
+
+
+def es_logo(path):
+    """Un logo (fondo plano de un solo color) no es una foto del estadio."""
+    try:
+        from PIL import Image
+        im = Image.open(path).convert("RGB").resize((80, 50)).quantize(16)
+        cnt = sorted(im.getcolors() or [], reverse=True)
+        return bool(cnt) and cnt[0][0] / (80 * 50) > 0.42
+    except Exception:
+        return False
 
 
 def foto(url, nombre):
@@ -97,7 +111,7 @@ def foto(url, nombre):
     try:
         from PIL import Image
         im = Image.open(io.BytesIO(b)).convert("RGB")
-        im.thumbnail((900, 900))
+        im.thumbnail((1200, 1200))
         os.makedirs(os.path.dirname(path), exist_ok=True)
         im.save(path, quality=78, optimize=True)
         return "data/" + rel
@@ -108,7 +122,7 @@ def foto(url, nombre):
 def completar(partidos):
     """Agrega g["vimg"] (foto) y g["cap"] (capacidad) a cada partido con estadio."""
     db = json.load(open(CACHE, encoding="utf-8")) if os.path.exists(CACHE) else {}
-    nuevos = 0
+    nuevos = nint = 0
     for g in partidos:
         v = g.get("ven")
         if not v:
@@ -126,7 +140,28 @@ def completar(partidos):
             db[v] = info
             nuevos += 1
         info = db.get(v) or {}
-        if info.get("foto") and os.path.exists(os.path.join(DATA, info["foto"][5:])):
+        # foto POR DENTRO (cancha y tribunas): NBA -> la de ESPN; fútbol -> Commons con césped
+        reciente = info.get("ivq") and (_dt.date.today() - _dt.date.fromisoformat(info["ivq"])).days < 3
+        if info and info.get("iv") != IV and not reciente and nint < 45:
+            nint += 1
+            url = g.get("vimg_espn") if g.get("dep") == "nba" else None
+            if not url and g.get("dep") != "nba":
+                qid = info.get("qid")
+                if not qid and info.get("t"):
+                    s = _json(f"https://en.wikipedia.org/api/rest_v1/page/summary/{urllib.parse.quote(info['t'].replace(' ', '_'))}") or {}
+                    qid = info["qid"] = s.get("wikibase_item")
+                try:
+                    import interior
+                    url = interior.buscar(qid, info.get("t") or v)
+                except Exception as e:
+                    print("interior:", v, e)
+            fi = foto(url, v + "#interior") if url else None
+            if fi:
+                info["foto"], info["img"], info["iv"] = fi, url, IV
+            else:
+                info["ivq"] = _dt.date.today().isoformat()   # se vuelve a intentar en 3 días
+            db[v] = info
+        if info.get("foto") and os.path.exists(os.path.join(DATA, info["foto"][5:])) and not es_logo(os.path.join(DATA, info["foto"][5:])):
             g["vimg"] = info["foto"]
         if info.get("cap"):
             g["cap"] = info["cap"]
