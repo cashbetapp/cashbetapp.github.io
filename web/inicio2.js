@@ -88,3 +88,26 @@ function actInicio2(a) {
 }
 // punto rojo en la campana si hay avisos nuevos
 function campana() { try { return sinLeer() ? `<i class="bdot"></i>` : ""; } catch (e) { return ""; } }
+
+// ---------------------------------------------------------------- Perfil: invitar y calificar (como IABET)
+async function invitar() {
+  const d = { title: "CASHBET", text: "Mira CASHBET: pronósticos de fútbol y NBA con IA, gratis y con historial público verificable.", url: "https://cashbetapp.github.io" };
+  try { if (navigator.share) { await navigator.share(d); return; } } catch (e) { return; }
+  try { await navigator.clipboard.writeText(d.text + " " + d.url); toast("Enlace copiado: pégalo donde quieras"); }
+  catch (e) { toast("Comparte este enlace: cashbetapp.github.io"); }
+}
+async function enviarOpinion() {
+  const n = ui.estrellas || 0, t = (document.getElementById("cidea") || {}).value || "";
+  if (!n) return toast("Elige de 1 a 5 estrellas");
+  if (typeof USER === "undefined" || !USER || !FB) return toast("Entra a tu cuenta para enviar tu opinión");
+  try {
+    await FB.db.collection("opiniones").doc(USER.uid).set({ estrellas: n, idea: t.slice(0, 1000), email: USER.email || null, nombre: USER.displayName || store.get("nombre", "") || null, at: firebase.firestore.FieldValue.serverTimestamp() });
+    toast("¡Gracias! Recibimos tu opinión"); location.hash = "#ajustes";
+  } catch (e) { toast("No se pudo enviar. Intenta más tarde."); }
+}
+function actPerfil2(a, el) {
+  if (a === "invitar") { invitar(); return true; }
+  if (a === "estrella") { ui.estrellas = +el.dataset.k; document.querySelectorAll(".cstars button").forEach((b, i) => b.classList.toggle("on", i < ui.estrellas)); return true; }
+  if (a === "enviarop") { enviarOpinion(); return true; }
+  return false;
+}

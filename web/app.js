@@ -530,6 +530,7 @@ function act(a, el) {
   if (typeof actRes === "function" && actRes(a, el)) return;
   if (typeof actBank === "function" && actBank(a, el)) return;
   if (typeof actPrev === "function" && actPrev(a, el)) return;
+  if (typeof actPerfil2 === "function" && actPerfil2(a, el)) return;
   if (typeof actMatchPick === "function" && a.startsWith("mp") && actMatchPick(a, el)) return;
   if (typeof actVistas === "function" && actVistas(a, el)) return;
   if (typeof actPick === "function" && actPick(a, el)) return;

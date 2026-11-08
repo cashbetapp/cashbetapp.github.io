@@ -280,7 +280,9 @@ function ajustes(arg) {
       <button class="ajrow" data-go="historial"><span class="oi">${ic("shield")}</span><div><b>Historial público</b><small>Todos los picks, sellados y verificables</small></div>${ic("right")}</button>
       ${row("responsable", "heartP", "Juego responsable", "Apuesta solo lo que puedas perder")}
       ${row("privacidad", "shield", "Privacidad", "Qué datos usamos")}
-      ${row("ayuda", "help", "Ayuda y soporte", "Preguntas frecuentes")}</div>
+      ${row("ayuda", "help", "Ayuda y soporte", "Preguntas frecuentes")}
+      ${row("califica", "star", "Califica CASHBET", "Cuéntanos qué te parece")}
+      <button class="ajrow" data-act="invitar"><span class="oi">${ic("heart")}</span><div><b>Invita a tus amigos</b><small>Comparte CASHBET por WhatsApp o donde quieras</small></div>${ic("right")}</button></div>
     ${typeof cuentaAcciones === "function" ? cuentaAcciones() : ""}
     <div class="small" style="text-align:center;margin:16px 0">Datos actualizados: ${new Date(D.generado.replace("Z", ":00Z")).toLocaleString("es-CO")}</div>`;
   if (arg === "tema") return subTop("Tema") + heroAj("moon", "Tema", "Elige cómo se ve CASHBET") +
@@ -312,6 +314,11 @@ function ajustes(arg) {
   if (arg === "responsable") return subTop("Juego responsable") + heroAj("heartP", "Juego responsable", "Solo para mayores de 18 años") + `<div class="pkcard"><div class="small">${esc(D.aviso)}<br><br>Ningún modelo acierta siempre: incluso un pick de 75 % falla 1 de cada 4 veces. Apuesta solo lo que puedas perder, pon un límite a tu bankroll y nunca persigas pérdidas.</div></div>`;
   if (arg === "privacidad" && typeof privPagina === "function") return privPagina();
   if (arg === "privacidad") return subTop("Privacidad") + heroAj("shield", "Privacidad", "Qué datos usamos") + `<div class="pkcard"><div class="small"><b>Sin cuenta ni registro.</b> CASHBET no te pide correo ni contraseña.<br><br><b>Tus datos se quedan en tu celular.</b> Tu nombre, tus picks seguidos y tu bankroll se guardan solo en este dispositivo. No se envían a ningún servidor.<br><br><b>Sin anuncios ni rastreo.</b> No usamos publicidad ni herramientas de seguimiento.<br><br><b>De dónde salen los datos.</b> Resultados, estadísticas y cuotas públicas de partidos; el robot los procesa cada 2 horas.</div></div>`;
+  if (arg === "califica") return subTop("Califica CASHBET") + heroAj("star", "Tu opinión", "Nos ayuda a mejorar") + `<div class="pkcard"><div class="small">¿Qué tan útil te parece CASHBET?</div>
+      <div class="cstars">${[1, 2, 3, 4, 5].map((n) => `<button class="${(ui.estrellas || 0) >= n ? "on" : ""}" data-act="estrella" data-k="${n}" aria-label="${n} estrellas">${ic("star")}</button>`).join("")}</div>
+      <label class="lbl">Ideas o errores (opcional)</label><textarea class="inp" id="cidea" rows="4" placeholder="¿Qué mejorarías? ¿Viste algún error?"></textarea>
+      <button class="bigbtn" data-act="enviarop" style="margin-top:12px">Enviar</button>
+      <div class="small" style="margin-top:10px">Se guarda con tu cuenta para que el equipo de CASHBET la lea. No se publica.</div></div>`;
   if (arg === "ayuda") return subTop("Ayuda y soporte") + heroAj("help", "Ayuda", "Preguntas frecuentes") + `<div class="pkcard"><div class="small"><b>¿Qué es la cuota justa?</b><br>Lo que debería pagar un pick según el modelo. Si tu casa paga más, el pick tiene valor.<br><br><b>¿Por qué no hay picks de cuota menor a ${odd(D.cuota_min || 1.5)}?</b><br>Porque pagan muy poco para el riesgo que tienen.<br><br><b>¿Cada cuánto se actualiza?</b><br>Cada 2 horas, automáticamente.<br><br><b>¿Cómo instalo la app?</b><br>En el navegador del celular, elige "Agregar a pantalla de inicio".</div></div>`;
   return ajustes();
 }
