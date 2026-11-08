@@ -260,7 +260,8 @@ function ajustes(arg) {
   const tema = store.get("tema", "auto"), fmt = store.get("fmt", "dec"), nom = store.get("nombre", ""), a = D.acierto;
   const row = (go, icon, t, s) => `<button class="ajrow" data-go="ajustes/${go}"><span class="oi">${ic(icon)}</span><div><b>${t}</b><small>${s}</small></div>${ic("right")}</button>`;
   if (!arg) return `${subTop("Perfil").replace('data-go="ajustes"', 'data-go="inicio"')}
-    <div class="ajcard"><span class="av">${esc((nom || "C")[0].toUpperCase())}</span><div><b>${esc(nom || "Tu perfil")}</b><small>Todo gratis · sin cuenta · tus datos se quedan en tu celular</small></div></div>
+    ${typeof USER !== "undefined" && USER ? "" : `<div class="ajcard"><span class="av">${esc((nom || "C")[0].toUpperCase())}</span><div><b>${esc(nom || "Tu perfil")}</b><small>Todo gratis · sin cuenta, tus datos se quedan en este celular</small></div></div>`}
+    ${typeof tarjetaCuenta === "function" ? tarjetaCuenta() : ""}
     <div class="ajsec">AJUSTES</div><div class="ajlist">
       ${row("nombre", "pen", "Tu nombre", nom ? esc(nom) : "Para el saludo de Inicio")}
       ${row("notificaciones", "bellR", "Notificaciones", "Alertas de picks")}

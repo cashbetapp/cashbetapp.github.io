@@ -120,7 +120,7 @@ function nav(cur) {
 function route() {
   if (!D) return;
   const [tab, arg] = (location.hash.slice(1) || "inicio").split("/");
-  const views = { inicio: (a) => inicio(a), calendario: (a) => calendario(a), picks: (a) => picks(a), seguidos, bankroll, ajustes: (a) => ajustes(a), historial: (a) => historial(a) };
+  const views = { inicio: (a) => inicio(a), calendario: (a) => calendario(a), picks: (a) => picks(a), seguidos, bankroll, ajustes: (a) => ajustes(a), historial: (a) => historial(a), cuenta: (a) => cuenta(a) };
   const v = views[tab] || inicio;
   const clave = tab + "/" + (arg || "");
   if ($("#app").dataset.tab !== clave) {
@@ -517,6 +517,7 @@ function act(a, el) {
   const k = el.dataset.k;
   if (typeof actHist === "function" && actHist(a, el)) return;
   if (typeof actPriv === "function" && actPriv(a, el)) return;
+  if (typeof actCuentaSync === "function" && actCuentaSync(a)) return;
   if (typeof actVistas === "function" && actVistas(a, el)) return;
   if (typeof actPick === "function" && actPick(a, el)) return;
   if (a === "close") return closeSheet();

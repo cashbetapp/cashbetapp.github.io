@@ -1152,3 +1152,34 @@ body { font-variant-numeric: tabular-nums; }
 .prv_pvh > p, .prv_pvr p { font-weight: 400; }
 .prv_pvt > div { min-width: 0; flex: 1; }
 .prv_pvi span { width: 46px !important; }
+
+/* ===== Cuenta (Crea tu cuenta CASHBET) ===== */
+.cta { min-height: calc(100vh - 140px); display: flex; flex-direction: column; padding-bottom: 20px; animation: cbIn .3s ease both; }
+.cini { justify-content: center; }
+.ctop { display: flex; justify-content: flex-end; margin-bottom: 18px; }
+.cini .ctop { position: absolute; top: calc(env(safe-area-inset-top) + 14px); right: 20px; }
+.cback { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: var(--card2); border: 1px solid var(--line); }
+.cback svg { width: 22px; height: 22px; }
+.cico { width: 64px; height: 64px; border-radius: 18px; display: grid; place-items: center; background: var(--card); border: 1px solid var(--line); color: var(--p); box-shadow: var(--glow); margin-bottom: 22px; }
+.cico svg { width: 30px; height: 30px; } .cico.sm { width: 44px; height: 44px; border-radius: 13px; margin: 0; flex: none; } .cico.sm svg { width: 22px; height: 22px; }
+.cth { font-size: 34px; line-height: 1.05; letter-spacing: -1px; margin: 0; font-weight: 800; }
+.cth.big { font-size: 42px; }
+.cth em { font-style: normal; color: var(--p); text-shadow: 0 0 18px rgba(57,255,122,.45); }
+.light .cth em { text-shadow: none; }
+.ctp { color: var(--tx2); font-size: 16px; line-height: 1.45; margin: 12px 0 26px; }
+.clab { font-size: 14px; font-weight: 700; color: var(--tx2); margin: 4px 0 8px; }
+.cin { width: 100%; font: inherit; font-size: 17px; color: var(--tx); background: var(--card); border: 1.5px solid var(--line); border-radius: 16px; padding: 16px 18px; margin-bottom: 14px; outline: none; }
+.cin:focus { border-color: var(--p); box-shadow: 0 0 0 3px var(--psoft); }
+.cbtn, .cbtn2 { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 17px; border-radius: 99px; font-size: 17px; font-weight: 800; margin-top: 10px; }
+.cbtn { background: var(--p); color: #04130a; box-shadow: 0 0 20px rgba(57,255,122,.35); }
+.light .cbtn { color: #fff; box-shadow: none; }
+.cbtn2 { background: var(--card2); border: 1px solid var(--line); color: var(--tx); }
+.cbtn svg, .cbtn2 svg { width: 20px; height: 20px; }
+.cya { margin: 28px auto 0; font-size: 16px; font-weight: 800; color: var(--tx); }
+.clink { align-self: flex-end; font-size: 14px; font-weight: 700; color: var(--ptx); margin: -4px 0 12px; }
+.cpie { text-align: center; font-size: 12.5px; color: var(--tx3); margin-top: auto; padding-top: 26px; }
+.cpie a { color: var(--ptx); font-weight: 700; cursor: pointer; }
+.ccard { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; margin: 12px 0 4px; padding: 14px; border-radius: 18px;
+  background: linear-gradient(110deg, rgba(57,255,122,.12), rgba(57,255,122,.03)); border: 1px solid rgba(57,255,122,.35); box-shadow: var(--glow); }
+.ccard > div { flex: 1; } .ccard b { display: block; font-size: 16px; } .ccard small { color: var(--tx2); font-size: 13px; }
+.ccard > svg { width: 18px; height: 18px; color: var(--tx3); }
