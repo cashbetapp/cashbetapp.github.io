@@ -11,10 +11,31 @@ import numpy as np
 from scipy.stats import norm
 from sklearn.linear_model import LogisticRegression
 from fetch import get, LEAGUES
+from extra import predict as extra_predict, outcome as extra_outcome
 from model import (DATA, SOCCER, Poi, load, soccer_markets, nba_teams, is_preseason,
                    nba_walk, STATS, stat_val)
 
 DIAS = 8  # cuántos días hacia adelante
+CUOTA_MIN = 1.30  # el usuario no quiere picks que paguen menos de 1.30
+
+
+def cuota_ef(s):
+    """Cuota real de la casa si existe; si no, la cuota justa del modelo."""
+    return s.get("cuota") or s["justa"]
+
+
+def elegir(sels, prefer=None):
+    """Pick principal: el más probable que pague >= CUOTA_MIN. Si 'prefer' tiene
+    alguno apto con >= 50 %, se usa ese grupo primero (p. ej. ganador)."""
+    apt = [s for s in sels if cuota_ef(s) >= CUOTA_MIN and s["p"] >= 0.5]
+    if prefer:
+        pa = [s for s in prefer if s in apt]
+        if pa:
+            return max(pa, key=lambda s: s["p"])
+    if apt:
+        return max(apt, key=lambda s: s["p"])
+    ok = [s for s in sels if cuota_ef(s) >= CUOTA_MIN]
+    return max(ok or sels, key=lambda s: s["p"])
 
 
 def now():
@@ -90,15 +111,10 @@ def soccer(par, report):
                 sels += [sel(f"mas_{ln}", pm[f"o{ln}"]), sel(f"menos_{ln}", 1 - pm[f"o{ln}"])]
             # pick principal: el resultado si es claro (>=50%); si no, doble
             # oportunidad fuerte; si no, el mercado de goles más seguro
+            # (siempre con cuota >= 1.30; si el favorito paga menos, se busca
+            # el mercado más probable que sí pague eso)
             by = {s["m"]: s for s in sels}
-            r1 = max((by["1"], by["X"], by["2"]), key=lambda s: s["p"])
-            dc = max((by["1X"], by["X2"]), key=lambda s: s["p"])
-            if r1["p"] >= 0.50:
-                pick = r1
-            elif dc["p"] >= 0.72:
-                pick = dc
-            else:
-                pick = max((by["mas_2.5"], by["menos_2.5"], by["btts_si"], by["btts_no"]), key=lambda s: s["p"])
+            pick = elegir(sels, prefer=[by["1"], by["X"], by["2"]])
             # diferencia con la casa: AÚN SIN PROBAR (no hay cuotas históricas)
             val = [s for s in sels if s.get("valor", -1) > 0.05 and s["p"] >= 0.30]
             out.append({
@@ -211,7 +227,7 @@ def nba(par):
         if od.get("ou"):
             p = 1 - norm.cdf((od["ou"] - tot) / sd_t)
             sels += [sel(f"mas_{od['ou']}", p), sel(f"menos_{od['ou']}", 1 - p)]
-        pick = max(sels[:2], key=lambda s: s["p"])
+        pick = elegir(sels, prefer=sels[:2])
         val = [s for s in sels[:2] if s.get("valor", -1) > 0.03]
         out.append({
             "id": g["id"], "dep": "nba", "lg": "nba", "liga": "NBA", "at": g["at"],
@@ -370,12 +386,22 @@ def outcome(m, hs, as_):
     return None
 
 
-def ledger(partidos, props_):
+def ledger(partidos, props_, extras=None):
     """Anota cada pick ANTES de empezar el partido y lo califica después.
     Así la efectividad que muestra la app es real (no de prueba)."""
     p = os.path.join(DATA, "ledger.json")
     L = json.load(open(p, encoding="utf-8")) if os.path.exists(p) else {"partidos": {}, "props": {}}
+    L.setdefault("extra", {})
     ahora = now().strftime("%Y-%m-%dT%H:%MZ")
+    # mercados de estadísticas (córners, tiros, faltas, tarjetas; equipo y jugador)
+    for g in partidos:
+        ex = g.get("extra")
+        if not ex or g["at"] <= ahora:
+            continue
+        for x in ex["picks"] + ex["jug"]:
+            L["extra"][f"{g['id']}|{x['m']}"] = {"at": g["at"], "ev": g["id"], "lg": g["lg"], "hid": g["h"]["id"],
+                                                 "aid": g["a"]["id"], "m": x["m"], "s": x["s"], "sc": x["sc"],
+                                                 "txt": x["txt"], "p": x["p"], "cuota": x["justa"]}
     for g in partidos:
         if g["at"] > ahora and g.get("pick"):
             pk = g["pick"]
@@ -407,6 +433,10 @@ def ledger(partidos, props_):
         tot = sum(stat_val(v, kk) or 0 for kk in PROP_TYPES[e["t"]])
         e["real"] = tot
         e["ok"] = (tot > e["linea"]) if e["lado"] == "mas" else (tot < e["linea"])
+    for k, e in L["extra"].items():
+        if "ok" in e or e["ev"] not in res or not res[e["ev"]][2]:
+            continue
+        e["ok"], e["real"] = extra_outcome(e["m"], res[e["ev"]][2], e["hid"], e["aid"])
     with open(p, "w", encoding="utf-8") as f:
         json.dump(L, f, ensure_ascii=False, separators=(",", ":"))
 
@@ -427,7 +457,11 @@ def ledger(partidos, props_):
                 "unidades": round(gan, 2)}
     hist = sorted([dict(e, id=k) for k, e in L["partidos"].items() if e.get("ok") is not None],
                   key=lambda e: e["at"], reverse=True)[:60]
-    return {"partidos": stats(L["partidos"].values()), "props": stats(L["props"].values()), "ultimos": hist}
+    por = {}
+    for e in L["extra"].values():
+        por.setdefault(e["s"] + "_" + ("j" if e["sc"] == "j" else "t" if e["sc"] == "t" else "e"), []).append(e)
+    return {"partidos": stats(L["partidos"].values()), "props": stats(L["props"].values()), "ultimos": hist,
+            "extra": stats(L["extra"].values()), "extra_por": {k: stats(v) for k, v in por.items()}}
 
 
 def _img(url, path, size):
@@ -501,6 +535,12 @@ def main():
     r = rep()
     par = r["parametros"]
     f = soccer(par["futbol"], r)
+    ex = extra_predict(soon, now().date().toordinal())
+    for g in f:
+        x = ex.get(g["id"])
+        if x:
+            x["jug"] = x["jug"][:30]
+            g["extra"] = x
     nb, injured = nba(par["nba"])
     pr = props(injured)
     tab = form_table()
@@ -518,6 +558,7 @@ def main():
     for x in pr:
         x["eq"] = teams.get(x["equipo"])
     rec = ledger(f + nb, pr)
+    xrep = json.load(open(os.path.join(DATA, "model", "extra.json"), encoding="utf-8"))
     images(f + nb, pr)
     res = {
         "generado": now().strftime("%Y-%m-%dT%H:%MZ"),
@@ -527,7 +568,10 @@ def main():
             "nba_ganador": r["nba"]["ganador"]["acierto_con_ausencias_y_cansancio"],
             "nba_partidos": r["nba"]["partidos_prueba"], "calibracion_futbol": r["futbol"]["calibracion"],
             "calibracion_nba": r["nba"]["calibracion_ganador"],
+            "extra": {k: {"titulo": v["titulo"], "picks": v["picks"], "acierto": v["acierto_picks"],
+                          "dijo": v["dijo_picks"], "publicar": v["publicar"]} for k, v in xrep["mercados"].items()},
         },
+        "cuota_min": CUOTA_MIN,
         "registro": rec,
         "partidos": sorted(f + nb, key=lambda x: x["at"]),
         "props": pr[:300],

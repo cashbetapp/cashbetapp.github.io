@@ -251,3 +251,13 @@ nav button.on { color: var(--gtx); }
 .toast.on { opacity: 1; }
 .skel { height: 120px; border-radius: 18px; background: var(--card); margin: 10px 0; animation: pl 1.2s infinite; }
 @keyframes pl { 50% { opacity: .5; } }
+
+/* tablas de estadísticas */
+.box .sub { font-size: 13px; font-weight: 700; color: var(--tx2); margin: 12px 0 6px; }
+.box .sub:first-of-type { margin-top: 2px; }
+.tbl.st td, .tbl.st th { text-align: center; }
+.tbl.st td.ok { color: var(--gtx); font-weight: 800; }
+.tbl.st td.dim { color: var(--tx2); opacity: .55; }
+.head.crest-f { background: var(--gsoft); color: var(--gtx); font-size: 14px; }
+.bar2 .el { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar2 .nw { white-space: nowrap; flex: none; }

@@ -50,6 +50,7 @@ jobs:
         working-directory: robot
         run: |
           if [ ! -f ../data/model/report.json ] || [ "$(date -u +%H)" = "08" ]; then python model.py > /dev/null; fi
+          if [ ! -f ../data/model/extra.json ] || [ "$(date -u +%H)" = "08" ]; then python -W ignore extra.py; fi
 
       - name: Pronósticos
         working-directory: robot

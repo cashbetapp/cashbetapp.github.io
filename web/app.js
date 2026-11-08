@@ -130,7 +130,7 @@ document.addEventListener("click", (e) => {
   const t = e.target.closest("[data-go],[data-g],[data-pr],[data-act]");
   if (!t) return;
   if (t.dataset.go) { location.hash = t.dataset.go; }
-  else if (t.dataset.g) openGame(t.dataset.g);
+  else if (t.dataset.g) openGame(t.dataset.g, t.dataset.t || "resumen");
   else if (t.dataset.pr) openProp(+t.dataset.pr);
   else act(t.dataset.act, t);
 });
@@ -219,7 +219,16 @@ function calendario() {
 function picks() {
   const f = ui.pf;
   let body = "";
-  if (f === "jugadores") {
+  const STAT = { cor: "Córners", sot: "Tiros a puerta", tir: "Tiros", fal: "Faltas", tar: "Tarjetas" };
+  const hoyF = D.partidos.filter((g) => g.dep === "futbol" && g.extra && esHoy(g.at) && new Date(g.at) > Date.now());
+  if (STAT[f]) {
+    const xs = hoyF.flatMap((g) => g.extra.picks.filter((x) => x.s === f).map((x) => ({ g, x }))).sort((a, b) => b.x.p - a.x.p).slice(0, 60);
+    body = xs.map(({ g, x }, i) => xCard(g, x, i)).join("") || `<div class="empty">Hoy no quedan partidos de fútbol con este mercado.</div>`;
+  } else if (f === "jugfut") {
+    const xs = hoyF.flatMap((g) => g.extra.jug.map((x) => ({ g, x }))).sort((a, b) => b.x.p - a.x.p).slice(0, 80);
+    body = `<div class="note">${ic("warn")}<div><b>Titulares probables.</b> Se calculan con quienes fueron titulares en sus últimos partidos. Si el jugador no juega, la apuesta normalmente se anula.</div></div>` +
+      (xs.map(({ g, x }, i) => xCard(g, x, i)).join("") || `<div class="empty">Hoy no quedan partidos de fútbol con jugadores.</div>`);
+  } else if (f === "jugadores") {
     body = `<div class="note">${ic("warn")}<div><b>En prueba.</b> Las ventajas contra la casa en jugadores todavía no se han comprobado con resultados reales. El robot las está calificando todos los días; cuando haya suficientes, verás aquí su acierto.</div></div>` +
       (D.propsOk.filter((x) => esHoy(x.at)).slice(0, 40).map(propCard).join("") || `<div class="empty">Todavía no hay líneas de jugadores para los partidos de hoy.</div>`);
   } else {
@@ -228,8 +237,8 @@ function picks() {
     gs = gs.filter((g) => esHoy(g.at)).sort((a, b) => b.pick.p - a.pick.p);
     body = gs.map((g, i) => vCard(g, i)).join("") || `<div class="empty">Hoy ya no quedan picks. Los de mañana aparecen aquí desde mañana; puedes verlos antes en el Calendario.</div>`;
   }
-  return header("Picks", f === "jugadores" ? `Jugadores de hoy donde el modelo ve ventaja · ${D.propsOk.filter((x) => esHoy(x.at)).length}` : "Partidos de hoy · ordenados por confianza") + `
-  <div class="chips" style="margin-top:14px">${[["todos", "Todos"], ["jugadores", "Jugadores"], ["futbol", "Fútbol"], ["nba", "NBA"]].map(([k, t]) => `<button class="chip ${f === k ? "on" : ""}" data-act="pf" data-k="${k}">${t}</button>`).join("")}</div>${body}`;
+  return header("Picks", f === "jugadores" ? `Jugadores NBA de hoy donde el modelo ve ventaja · ${D.propsOk.filter((x) => esHoy(x.at)).length}` : `Hoy · ordenados por confianza · cuota ${odd(D.cuota_min || 1.3)} o más`) + `
+  <div class="chips" style="margin-top:14px">${[["todos", "Todos"], ["futbol", "Fútbol"], ["nba", "NBA"], ["cor", "Córners"], ["sot", "Tiros a puerta"], ["tir", "Tiros"], ["fal", "Faltas"], ["tar", "Tarjetas"], ["jugfut", "Jugadores fútbol"], ["jugadores", "Jugadores NBA"]].map(([k, t]) => `<button class="chip ${f === k ? "on" : ""}" data-act="pf" data-k="${k}">${t}</button>`).join("")}</div>${body}`;
 }
 function vCard(g, i) {
   const up = isUp(g.pick.m), c = g.pick.cuota, casa = c ? 1 / c : null;
@@ -237,6 +246,15 @@ function vCard(g, i) {
     <div style="min-width:0;flex:1"><div class="nm">${esc(g.h.n)} vs ${esc(g.a.n)}</div><div class="pk ${up ? "" : "bad"}">${ic(up ? "up" : "down")}${esc(g.pick.txt)}</div></div>
     <div class="ed"><b>${pct(g.pick.p)}</b><span>${esc(g.liga.split(" ")[0])} · ${odd(c || g.pick.justa)}</span></div></div>
     <div class="bar2">${casa ? `Casa <b>${pct(casa)}</b>` : `<span>${cuando(g.at)}</span>`}<span class="tr"><i style="width:${g.pick.p * 100}%"></i>${casa ? `<u style="left:${casa * 100}%"></u>` : ""}</span>Modelo <b>${pct(g.pick.p)}</b></div></button>`;
+}
+function xCard(g, x, i) {
+  const t = x.txt.toLowerCase(), up = t.includes("más de") || (t.endsWith("recibe tarjeta") && !t.endsWith("no recibe tarjeta"));
+  const quien = x.sc === "j" ? `<span class="head crest-f">${esc(sigla({ n: x.jugador }))}</span>` : `<span class="pair">${crest(g.h, 38)}${crest(g.a, 38)}</span>`;
+  const sub = x.sc === "j" ? `${esc(g[x.side].n)} · ${esc(g.h.n)} vs ${esc(g.a.n)}` : `${esc(g.h.n)} vs ${esc(g.a.n)}`;
+  return `<button class="vrow" data-g="${g.id}" data-t="${x.sc === "j" ? "jugadores" : "mercados"}"><div class="r1"><span class="rank">${i + 1}</span>${quien}
+    <div style="min-width:0;flex:1"><div class="nm">${x.sc === "j" ? esc(x.jugador) : sub}</div><div class="pk ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(x.sc === "j" ? x.txt.split(": ")[1] : x.txt)}</span></div></div>
+    <div class="ed"><b>${pct(x.p)}</b><span>${esc(g.liga.split(" ")[0])} · ${odd(x.justa)}</span></div></div>
+    <div class="bar2"><span class="el">${x.sc === "j" ? `${esc(g[x.side].n)} · ${cuando(g.at)}` : cuando(g.at)}</span>${x.prueba ? `<span class="nw">Acertó en prueba <b>${Math.round(x.prueba)}%</b></span>` : ""}</div></button>`;
 }
 function propCard(x, n) {
   const i = D.props.indexOf(x), up = x.lado === "mas", ed = x.p - x.casa;
@@ -326,7 +344,8 @@ function ajustes() {
     <b>Fútbol</b> (${a.futbol_partidos.toLocaleString("es-CO")} partidos): acertó el resultado (local, empate o visitante) el <b>${a.futbol_1x2}%</b> de las veces.<br>
     <b>NBA</b> (${a.nba_partidos.toLocaleString("es-CO")} partidos): acertó el ganador el <b>${a.nba_ganador}%</b>.</div>
     <h4 style="margin-top:14px">Fútbol: ¿se cumplen los porcentajes?</h4>${cal(a.calibracion_futbol)}
-    ${a.calibracion_nba ? `<h4 style="margin-top:14px">NBA: ¿se cumplen los porcentajes?</h4>${cal(a.calibracion_nba)}` : ""}</div>
+    ${a.calibracion_nba ? `<h4 style="margin-top:14px">NBA: ¿se cumplen los porcentajes?</h4>${cal(a.calibracion_nba)}` : ""}
+    ${a.extra ? `<h4 style="margin-top:14px">Estadísticas de fútbol (picks de ${odd(D.cuota_min || 1.3)} o más)</h4><table class="tbl"><tr><th>Mercado</th><th>Dijo</th><th>Acertó</th></tr>${Object.values(a.extra).filter((m) => m.publicar).map((m) => `<tr><td>${esc(m.titulo)}<br><span class="small">${m.picks.toLocaleString("es-CO")} picks</span></td><td>${m.dijo}%</td><td><b>${m.acierto}%</b></td></tr>`).join("")}</table>` : ""}</div>
   <div class="box"><h4>Juego responsable</h4><div class="small">${esc(D.aviso)} Ningún modelo acierta siempre: incluso un pick de 75 % falla 1 de cada 4 veces. Apuesta solo lo que puedas perder y nunca persigas pérdidas. Solo para mayores de 18 años.</div></div>
   <div class="small" style="text-align:center;margin-top:16px">Datos actualizados: ${new Date(D.generado.replace("Z", ":00Z")).toLocaleString("es-CO")}</div>`;
 }
@@ -378,7 +397,15 @@ function openGame(id, tab = "resumen") {
   } else if (tab === "mercados") {
     body = `<div class="box">${g.mercados.map((s) => `<div class="mk"><div class="l">${esc(s.txt)}<span>cuota justa ${odd(s.justa)}${s.cuota ? ` · casa ${odd(s.cuota)}` : ""}</span></div>
       <div class="pb"><b>${pct(s.p)}</b><div class="tr"><i style="width:${s.p * 100}%"></i></div></div></div>`).join("")}</div>
-      <div class="small" style="margin:10px 2px">Cuota justa = lo que debería pagar según el modelo. Si la casa paga más, hay valor (siempre con riesgo).</div>`;
+      <div class="small" style="margin:10px 2px">Cuota justa = lo que debería pagar según el modelo. Si la casa paga más, hay valor (siempre con riesgo).</div>` + statsHtml(g);
+  } else if (tab === "jugadores") {
+    const J = (g.extra && g.extra.jug) || [];
+    body = J.length ? ["h", "a"].map((sd) => {
+      const xs = J.filter((x) => x.side === sd);
+      return xs.length ? `<div class="box"><h4><span style="display:flex;gap:8px;align-items:center">${crest(g[sd], 24)}${esc(g[sd].n)}</span></h4>${xs.map((x) => `<div class="mk"><div class="l">${esc(x.jugador)}<span>${esc(x.txt.split(": ")[1])} · cuota justa ${odd(x.justa)}</span></div>
+        <div class="pb"><b>${pct(x.p)}</b><div class="tr"><i style="width:${x.p * 100}%"></i></div></div></div>`).join("")}</div>` : "";
+    }).join("") + `<div class="small" style="margin:10px 2px">Titulares probables según sus últimos partidos. Solo picks con cuota justa de ${odd(D.cuota_min || 1.3)} o más.</div>`
+      : `<div class="empty">No hay picks de jugadores para este partido.</div>`;
   } else {
     const fr = (t, f) => `<div class="box"><h4><span style="display:flex;gap:8px;align-items:center">${crest(t, 24)}${esc(t.n)}</span><span class="wls">${forms(t, f)}</span></h4>
       ${(f || []).map((r) => `<div class="fr"><span class="wl ${r.r}">${r.r}</span>${r.loc ? "vs" : "@"} ${crest({ logo: r.logo, n: r.vs }, 22)} ${esc(r.vs)}<span class="s">${esc(r.m)}</span><span class="d">${new Date(r.at).toLocaleDateString("es-CO", { day: "numeric", month: "short" })}</span></div>`).join("") || `<div class="small">Sin partidos recientes.</div>`}</div>`;
@@ -392,13 +419,26 @@ function openGame(id, tab = "resumen") {
       <div class="t">${crest(g.a, 58).replace("<img", '<img style="margin:0 auto"')}<b>${esc(g.a.n)}</b><span>${esc(g.a.rec || "Visitante")}</span></div></div>
     <div class="meta">${cuando(g.at)}</div>
     <span class="bigtag ${up ? "" : "bad"}">${ic(up ? "up" : "down")}${esc(g.pick.txt)} · ${pct(g.pick.p)}</span></div>
-    <div class="seg">${[["resumen", "Resumen"], ["mercados", "Mercados"], ["forma", "Forma"]].map(([k, l]) => `<button class="${tab === k ? "on" : ""}" data-act="gtab" data-k="${k}">${l}</button>`).join("")}</div>
+    <div class="seg">${[["resumen", "Resumen"], ["mercados", "Mercados"], ...(g.extra && g.extra.jug.length ? [["jugadores", "Jugadores"]] : []), ["forma", "Forma"]].map(([k, l]) => `<button class="${tab === k ? "on" : ""}" data-act="gtab" data-k="${k}">${l}</button>`).join("")}</div>
     ${body}
     <div class="acts"><button class="${seg[id] ? "on" : ""}" data-act="seg">${ic(seg[id] ? "heartF" : "heart")}${seg[id] ? "Siguiendo" : "Seguir"}</button>
       <button data-act="tobank">${ic("plus")}Al bankroll</button></div>`;
   const cur = $(".sheet.on");
   if (cur && sheetState.id === id && cur.dataset.id === id) { cur.innerHTML = `<div class="grab"></div><button class="x" data-act="close" aria-label="Cerrar">${ic("x")}</button>` + html; }
   else { openSheet(html); $(".sheet").dataset.id = id; }
+}
+function statsHtml(g) {
+  const X = g.extra;
+  if (!X) return "";
+  const mx = 1 / (D.cuota_min || 1.3);
+  const celda = (p) => `<td class="${p >= 0.5 && p <= mx ? "ok" : p > mx ? "dim" : ""}">${pct(p)}</td>`;
+  const tabla = (rows, nom) => rows ? `<div class="sub">${esc(nom)}</div><table class="tbl st"><tr><th>Línea</th><th>Más</th><th>Menos</th></tr>${rows.map(([ln, p]) => `<tr><td>${ln}</td>${celda(p)}${celda(1 - p)}</tr>`).join("")}</table>` : "";
+  const top = X.picks.slice(0, 8);
+  return (top.length ? `<div class="box"><h4>Mejores picks de estadísticas</h4>${top.map((x) => `<div class="mk"><div class="l">${esc(x.txt)}<span>cuota justa ${odd(x.justa)}${x.prueba ? ` · en prueba acertó ${x.prueba}%` : ""}</span></div>
+      <div class="pb"><b>${pct(x.p)}</b><div class="tr"><i style="width:${x.p * 100}%"></i></div></div></div>`).join("")}</div>` : "") +
+    X.grupos.map((gr) => `<div class="box"><h4>${esc(gr.titulo)} <small>esperados ${gr.esp[0]} - ${gr.esp[1]}</small></h4>
+      ${tabla(gr.t, "Total del partido")}${tabla(gr.h, g.h.n)}${tabla(gr.a, g.a.n)}</div>`).join("") +
+    `<div class="small" style="margin:10px 2px">En verde, las opciones probables que pagan ${odd(D.cuota_min || 1.3)} o más. En gris, las que pagarían menos de ${odd(D.cuota_min || 1.3)}.</div>`;
 }
 function why(g) {
   const out = [], f = g.forma || {};
