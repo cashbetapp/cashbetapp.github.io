@@ -30,9 +30,10 @@ function gCard(g) {
   const o1 = od.h || (pm["1"] && pm["1"].justa), oX = g.dep === "futbol" ? (od.d || (pm["X"] && pm["X"].justa)) : null, o2 = od.a || (pm["2"] && pm["2"].justa);
   const up = isUp(g.pick.m);
   const t = (s) => `<div class="tm">${crest(g[s], 48)}<b>${esc(abT(g[s]))}</b><span>${esc(g[s].rec || "")}</span></div>`;
-  return `<button class="gc" data-g="${g.id}"><div class="gt">${t("h")}
-      <div class="mid"><b>${hora(g.at)}</b><span class="lg">${esc(g.liga)}</span><div class="fm">${dotsF(f.h)}<i>FORMA</i>${dotsF(f.a)}</div><span class="det">Detalles</span></div>${t("a")}</div>
-    <div class="godds"><span><em>${esc(abT(g.h))}</em><b>${odd(o1)}</b></span>${oX ? `<span><em>X</em><b>${odd(oX)}</b></span>` : ""}<span><em>${esc(abT(g.a))}</em><b>${odd(o2)}</b></span></div>
+  const nba = g.dep === "nba", L = nba ? "a" : "h", R = nba ? "h" : "a";   // NBA: visitante a la izquierda (como IABET)
+  return `<button class="gc" data-g="${g.id}"><div class="gt">${t(L)}
+      <div class="mid"><b>${hora(g.at)}</b><span class="lg">${esc((g.tv && g.tv.length ? [].concat(g.tv)[0] : "") || g.liga)}</span><div class="fm">${dotsF(f[L])}<i>FORMA</i>${dotsF(f[R])}</div><span class="det">Detalles</span></div>${t(R)}</div>
+    <div class="godds">${nba ? `<span><em>${esc(abT(g.a))}</em><b>${odd(o2)}</b></span><span><em>${esc(abT(g.h))}</em><b>${odd(o1)}</b></span>` : `<span><em>${esc(abT(g.h))}</em><b>${odd(o1)}</b></span>${oX ? `<span><em>X</em><b>${odd(oX)}</b></span>` : ""}<span><em>${esc(abT(g.a))}</em><b>${odd(o2)}</b></span>`}</div>
     ${g.pick.bajo ? `<div class="gpk low"><span>Sin pick: ${g.pick.p > 0.75 ? `favorito muy claro (${esc(g.pick.txt)})` : "la casa ya paga lo justo"}</span></div>` : `<div class="gpk ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(g.pick.txt)}</span><b>${pct(g.pick.p)}</b></div>`}</button>`;
 }
 function calendario() {
@@ -144,7 +145,7 @@ function openGame(id, tab) {
   const tabs = [["previa", "Previa"], ["cuotas", "Cuotas"], ["equipos", "Equipos"], ...(tieneJ ? [["jugadores", g.dep === "nba" ? "Plantel" : "Jugadores"]] : [])];
   const up = isUp(g.pick.m);
   const html = `<div class="gh"><div class="ghtop"><span class="ghp"><i></i>${hora(g.at)}</span><small>${lgLogo(g.lg, 16)}${esc(g.liga)} · ${esc(cap(fmtS.format(new Date(g.at))))}</small></div>
-      <div class="ghteams">${tm("h", "LOCAL")}<div class="vs">VS</div>${tm("a", "VISITANTE")}</div>
+      <div class="ghteams">${g.dep === "nba" ? `${tm("a", "VISITANTE")}<div class="vs">@</div>${tm("h", "LOCAL")}` : `${tm("h", "LOCAL")}<div class="vs">VS</div>${tm("a", "VISITANTE")}`}</div>
       ${g.ven ? `<div class="ghven">${ic("pin")}<span><b>${esc(g.ven)}</b>${g.city ? `<br>${esc(g.city)}` : ""}</span></div>` : ""}
       <div class="ghc">${c1 ? `<span>${c1}</span>` : ""}<b>${c2}</b></div></div>
     ${g.pick.bajo ? `<div class="ajnote">${g.pick.p > 0.75 ? `Favorito muy claro (${esc(g.pick.txt)}, ${pct(g.pick.p)}): paga demasiado poco para valer la pena.` : "La casa ya paga lo justo en este partido: no encontramos un error de cuota."} Mira Jugadores y Cuotas para otros mercados.</div>` : ""}

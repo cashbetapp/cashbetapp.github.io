@@ -54,9 +54,10 @@ const estadoTxt = (r) => (r.st === "in" ? `EN VIVO · ${r.det || ""}` : "FINAL")
 function gCardRes(r, gid) {
   const t = (s) => `<div class="tm">${crest(r[s], 48)}<b>${esc(r[s].ab || abT(r[s]))}</b><span>${esc(r[s].rec || "")}</span></div>`;
   const pr = pickRes(gid), [lab, cls] = pr && pr.st ? ESTADO[pr.st] : ["Pendiente", "pe"];
-  return `<button class="gc res ${r.st}" data-res="${gid}"><div class="gt">${t("h")}
+  const L = r.dep === "nba" ? "a" : "h", R = r.dep === "nba" ? "h" : "a";
+  return `<button class="gc res ${r.st}" data-res="${gid}"><div class="gt">${t(L)}
       <div class="mid"><span class="rst ${r.st}">${r.st === "in" ? `<i></i>${esc(r.det || "En vivo")}` : "FINAL"}</span>
-        <div class="rsc"><b>${esc(r.h.s ?? "-")}</b><em>-</em><b>${esc(r.a.s ?? "-")}</b></div><span class="det">Detalles</span></div>${t("a")}</div>
+        <div class="rsc"><b>${esc(r[L].s ?? "-")}</b><em>-</em><b>${esc(r[R].s ?? "-")}</b></div><span class="det">Detalles</span></div>${t(R)}</div>
     ${pr ? `<div class="gpk rp ${cls}"><span>Pick: ${esc(pr.sel)}</span><b class="st ${cls}">${lab}</b></div>` : ""}</button>`;
 }
 
@@ -72,7 +73,7 @@ function openResultado(gid, keep) {
   const html = `<div class="rhero ${r.st}">
       <div class="rpill ${r.st}">${r.st === "in" ? `<i></i>EN VIVO · ${esc(r.det || "")}` : "FINAL DEL PARTIDO"}</div>
       <div class="rlg">${lgLogo(r.lg, 18)}${esc(r.liga)} · ${new Date(r.at).toLocaleDateString("es-CO", { weekday: "short", day: "numeric", month: "short" }).replace(/\./g, "")}</div>
-      <div class="rrow">${tm("h", "LOCAL")}<div class="rbig"><b>${esc(r.h.s ?? "-")}</b><em>-</em><b>${esc(r.a.s ?? "-")}</b>${ht}</div>${tm("a", "VISITANTE")}</div>
+      <div class="rrow">${r.dep === "nba" ? `${tm("a", "VISITANTE")}<div class="rbig"><b>${esc(r.a.s ?? "-")}</b><em>-</em><b>${esc(r.h.s ?? "-")}</b></div>${tm("h", "LOCAL")}` : `${tm("h", "LOCAL")}<div class="rbig"><b>${esc(r.h.s ?? "-")}</b><em>-</em><b>${esc(r.a.s ?? "-")}</b>${ht}</div>${tm("a", "VISITANTE")}`}</div>
       ${r.dep === "futbol" ? `<div class="rgol"><div>${goles("h")}</div><div>${goles("a")}</div></div>` : ""}
       ${r.ven || (r.tv && r.tv.length) ? `<div class="rven">${r.tv && r.tv.length ? `${ic("tv")}${esc(r.tv.join(", "))} · ` : ""}${r.ven ? `${ic("pin")}${esc(r.ven)}` : ""}</div>` : ""}</div>
     ${r.video ? `<h4 class="pksub">Destacados</h4><a class="rvid" href="${esc(r.video.url)}" target="_blank" rel="noopener"><div class="rvi"><img src="${esc(r.video.img)}" alt="" loading="lazy"><span class="nwp">${ic("play")}</span>${r.video.dur ? `<em>${dur(r.video.dur)}</em>` : ""}</div><b>${esc(r.video.tit || "")}</b></a>` : ""}
