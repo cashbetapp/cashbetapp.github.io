@@ -523,6 +523,7 @@ function act(a, el) {
   if (typeof actHist === "function" && actHist(a, el)) return;
   if (typeof actPriv === "function" && actPriv(a, el)) return;
   if (typeof actCuentaSync === "function" && actCuentaSync(a)) return;
+  if (typeof actSeguidos === "function" && actSeguidos(a, el)) return;
   if (typeof actVistas === "function" && actVistas(a, el)) return;
   if (typeof actPick === "function" && actPick(a, el)) return;
   if (a === "close") return closeSheet();
@@ -535,7 +536,7 @@ function act(a, el) {
   if (a === "seg") {
     const s = store.get("seg", {}), g = D.byId[sheetState.id];
     if (s[g.id]) delete s[g.id];
-    else s[g.id] = { at: g.at, liga: g.liga, h: g.h.n, a: g.a.n, hl: g.h.logo, al: g.a.logo, txt: g.pick.txt, p: g.pick.p };
+    else s[g.id] = { at: g.at, liga: g.liga, dep: g.dep, h: g.h.n, a: g.a.n, hl: g.h.logo, al: g.a.logo, txt: g.pick.txt, p: g.pick.p, m: g.pick.m, cuota: g.pick.cuota || g.pick.justa };
     store.set("seg", s); toast(s[g.id] ? "Siguiendo este pick" : "Dejaste de seguirlo");
     return openGame(g.id, sheetState.tab);
   }

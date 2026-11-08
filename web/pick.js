@@ -488,7 +488,7 @@ function actPick(a, el) {
   if (a === "pkfollow") {
     const P = pkFind(sheetState.pk.gid, sheetState.pk.m), s = store.get("seg", {}), id = `pk|${P.g.id}|${P.x.m}`;
     if (s[id]) delete s[id];
-    else s[id] = { at: P.g.at, liga: P.g.liga, h: P.g.h.n, a: P.g.a.n, hl: P.g.h.logo, al: P.g.a.logo, txt: P.x.txt, p: P.x.p };
+    else s[id] = { at: P.g.at, liga: P.g.liga, dep: P.g.dep, h: P.g.h.n, a: P.g.a.n, hl: P.g.h.logo, al: P.g.a.logo, txt: P.x.txt, p: P.x.p, cuota: P.x.justa };
     store.set("seg", s); toast(s[id] ? "Siguiendo esta predicción" : "Dejaste de seguirla");
     openPick(P.g.id, P.x.m, true); return true;
   }

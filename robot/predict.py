@@ -678,7 +678,7 @@ def historial(L, ahora, n, h):
     for c, k, e in todos:
         if e["at"] < desde:
             continue
-        filas.append({"c": c[0], "k": k, "at": e["at"], "pub": e.get("pub"), "d": dep(c, e), "lg": e.get("liga") or e.get("lg"),
+        filas.append({"c": {"partidos": "g", "extra": "x", "props": "n"}[c], "k": k, "at": e["at"], "pub": e.get("pub"), "d": dep(c, e), "lg": e.get("liga") or e.get("lg"),
                       "pt": e.get("partido") or (f"{e['h']} vs {e['a']}" if e.get("h") else None),
                       "mk": _mercado(c, e), "sel": e.get("txt") or f"{e.get('jugador')}: {'más' if e.get('lado') == 'mas' else 'menos'} de {e.get('linea')} {(e.get('tipo') or '').lower()}",
                       "p": e["p"], "cu": e.get("cuota"), "cr": bool(e.get("cuota_casa")), "cq": e.get("cq"),
