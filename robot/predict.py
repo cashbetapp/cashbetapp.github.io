@@ -457,11 +457,14 @@ def ledger(partidos, props_, extras=None):
                 "unidades": round(gan, 2)}
     hist = sorted([dict(e, id=k) for k, e in L["partidos"].items() if e.get("ok") is not None],
                   key=lambda e: e["at"], reverse=True)[:60]
+    hace7 = (now() - dt.timedelta(days=7)).strftime("%Y-%m-%dT%H:%MZ")
+    sem = [e for e in list(L["partidos"].values()) + list(L["extra"].values()) if e["at"] >= hace7 and e.get("ok") is not None]
+    semana = {"n": len(sem), "g": sum(1 for e in sem if e["ok"])}
     por = {}
     for e in L["extra"].values():
         por.setdefault(e["s"] + "_" + ("j" if e["sc"] == "j" else "t" if e["sc"] == "t" else "e"), []).append(e)
     return {"partidos": stats(L["partidos"].values()), "props": stats(L["props"].values()), "ultimos": hist,
-            "extra": stats(L["extra"].values()), "extra_por": {k: stats(v) for k, v in por.items()}}
+            "extra": stats(L["extra"].values()), "extra_por": {k: stats(v) for k, v in por.items()}, "semana": semana}
 
 
 def _img(url, path, size):
@@ -564,6 +567,23 @@ def images(partidos, props_):
             x["foto"] = None
 
 
+def liga_logos():
+    """Logo de cada liga (se baja una sola vez a data/img/l/)."""
+    out = {}
+    for key, (sp, code, name) in LEAGUES.items():
+        rel = f"img/l/{key}.png"
+        path = os.path.join(DATA, rel)
+        if not os.path.exists(path):
+            d = get(f"https://site.api.espn.com/apis/site/v2/sports/{sp}/{code}/scoreboard") or {}
+            try:
+                href = d["leagues"][0]["logos"][0]["href"]
+                _img(href, path, 96)
+            except Exception:
+                pass
+        out[key] = {"n": name, "logo": ("data/" + rel) if os.path.exists(path) else None}
+    return out
+
+
 def main():
     r = rep()
     par = r["parametros"]
@@ -606,6 +626,7 @@ def main():
         },
         "cuota_min": CUOTA_MIN,
         "registro": rec,
+        "ligas": liga_logos(),
         "partidos": sorted(f + nb, key=lambda x: x["at"]),
         "props": pr[:300],
         "props_en_prueba": True,

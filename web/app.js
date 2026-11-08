@@ -29,7 +29,16 @@ const ic = (n, cls = "") => `<svg class="${cls}" viewBox="0 0 24 24" fill="none"
 const $ = (s, r = document) => r.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const pct = (p, d = 0) => (p * 100).toFixed(d) + "%";
-const odd = (x) => (x ? Number(x).toFixed(2) : "—");
+// cuotas en el formato elegido en Perfil (decimal, americano o fraccional)
+function frac(v) { let best = [1, 1], err = 9; for (let d = 1; d <= 20; d++) { const n = Math.round(v * d), e = Math.abs(n / d - v); if (n > 0 && e < err - 1e-9) { err = e; best = [n, d]; } } return `${best[0]}/${best[1]}`; }
+const odd = (x) => {
+  if (!x) return "—";
+  x = Number(x);
+  const f = (typeof store !== "undefined" && store.get("fmt", "dec")) || "dec";
+  if (f === "us") return x >= 2 ? "+" + Math.round((x - 1) * 100) : "-" + Math.round(100 / (x - 1));
+  if (f === "fr") return frac(x - 1);
+  return x.toFixed(2);
+};
 const store = {
   get(k, d) { try { const v = localStorage.getItem("cb_" + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
   set(k, v) { try { localStorage.setItem("cb_" + k, JSON.stringify(v)); } catch {} },
@@ -105,11 +114,12 @@ function nav(cur) {
 function route() {
   if (!D) return;
   const [tab, arg] = (location.hash.slice(1) || "inicio").split("/");
-  const views = { inicio, calendario, picks, seguidos, bankroll, ajustes };
+  const views = { inicio: (a) => inicio(a), calendario: (a) => calendario(a), picks: (a) => picks(a), seguidos, bankroll, ajustes: (a) => ajustes(a) };
   const v = views[tab] || inicio;
-  if (!$("#app").dataset.tab || $("#app").dataset.tab !== tab || !arg) {
-    $("#app").innerHTML = v();
-    $("#app").dataset.tab = tab;
+  const clave = tab + "/" + (arg || "");
+  if ($("#app").dataset.tab !== clave) {
+    $("#app").innerHTML = v(arg);
+    $("#app").dataset.tab = clave;
     window.scrollTo(0, 0);
     after(tab);
   }
@@ -155,7 +165,7 @@ const esHoy = (at) => dkey(new Date(at)) === dkey(new Date());
 const delDia = () => D.partidos.filter((g) => esHoy(g.at) && new Date(g.at) > Date.now() - 2 * 3600e3);
 
 // ------------------------------------------------------------ INICIO
-function inicio() {
+function inicioViejo() {
   const hoy = delDia();
   const rec = (D.registro && D.registro.partidos) || { n: 0 };
   const a = D.acierto;
@@ -199,7 +209,7 @@ function rowCard(g) {
 }
 
 // ------------------------------------------------------------ CALENDARIO
-function calendario() {
+function calendarioViejo() {
   const dias = [];
   for (let i = 0; i < 8; i++) { const d = new Date(); d.setDate(d.getDate() + i); dias.push(d); }
   const sel = dkey(dias[ui.cal]);
@@ -334,7 +344,7 @@ function spark(pts) {
 }
 
 // ------------------------------------------------------------ AJUSTES
-function ajustes() {
+function ajustesViejo() {
   const t = store.get("tema", "auto"), a = D.acierto;
   const cal = (rows) => `<table class="tbl"><tr><th>Cuando dice</th><th>Picks</th><th>Acertó</th></tr>${rows.map((r) => `<tr><td>${r.rango}</td><td>${r.n.toLocaleString("es-CO")}</td><td><b>${r.paso}%</b></td></tr>`).join("")}</table>`;
   return header("Ajustes", "") + `
@@ -375,7 +385,7 @@ function conf(p) {
   const n = p >= 0.75 ? 5 : p >= 0.68 ? 4 : p >= 0.6 ? 3 : p >= 0.54 ? 2 : 1;
   return [n, ["", "Baja", "Media-baja", "Media", "Alta", "Muy alta"][n]];
 }
-function openGame(id, tab = "resumen") {
+function openGameViejo(id, tab = "resumen") {
   const g = D.byId[id]; if (!g) return;
   sheetState = { id, tab };
   const seg = store.get("seg", {});
@@ -487,6 +497,7 @@ function openProp(i) {
 // ------------------------------------------------------------ acciones
 function act(a, el) {
   const k = el.dataset.k;
+  if (typeof actVistas === "function" && actVistas(a, el)) return;
   if (typeof actPick === "function" && actPick(a, el)) return;
   if (a === "close") return closeSheet();
   if (a === "cal") { ui.cal = +el.dataset.i; return rerender(); }
@@ -504,7 +515,7 @@ function act(a, el) {
   }
   if (a === "tobank") {
     const g = D.byId[sheetState.id];
-    ui.prefill = { q: `${g.pick.txt} (${g.h.n} vs ${g.a.n})`, c: g.pick.cuota ? odd(g.pick.cuota) : "" };
+    ui.prefill = { q: `${g.pick.txt} (${g.h.n} vs ${g.a.n})`, c: g.pick.cuota ? Number(g.pick.cuota).toFixed(2) : "" };
     closeSheet(true); location.hash = "bankroll"; return rerender();
   }
   if (a === "tema") { store.set("tema", k); applyTheme(); return rerender(); }
