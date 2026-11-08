@@ -107,6 +107,7 @@ async function load() {
     .sort((a, b) => b.valor - a.valor || b.p - a.p);
   D.propsOk.forEach((x) => (x.prueba = !(x.valor >= (D.valor_min || 0.05))));
   route();
+  if (typeof avisoPriv === "function") setTimeout(avisoPriv, 600);
 }
 
 // ------------------------------------------------------------ navegación
@@ -515,6 +516,7 @@ function openProp(i) {
 function act(a, el) {
   const k = el.dataset.k;
   if (typeof actHist === "function" && actHist(a, el)) return;
+  if (typeof actPriv === "function" && actPriv(a, el)) return;
   if (typeof actVistas === "function" && actVistas(a, el)) return;
   if (typeof actPick === "function" && actPick(a, el)) return;
   if (a === "close") return closeSheet();
