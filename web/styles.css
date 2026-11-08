@@ -760,3 +760,27 @@ img.hpimg.foto { width: 48%; height: 100%; object-fit: cover; object-position: t
 .chips2 { gap: 8px; } .chips2 span { font-size: 13px; padding: 7px 11px; gap: 6px; } .chips2 svg { width: 14px; height: 14px; }
 .mch span { white-space: nowrap; }
 .mcc .iah b { white-space: normal; line-height: 1.15; }
+
+/* ============ Neón: verde y morado más vivos ============ */
+:root { --neg: #39ff7a; --neg2: #00e676; --nep: #c56bff; --nep2: #9d4dff;
+  --iabg: linear-gradient(180deg, #06331b 0%, #04190e 45%, #050a07 100%); --iabd: #1d6b3e;
+  --mcbg: linear-gradient(180deg, #2d0f5c 0%, #1c0a3d 40%, #110627 75%, #0a0612 100%); --mcbd: #5b2bb8; --mcp: #c56bff; }
+:root.light { --neg: #00c853; --neg2: #00a844; --nep: #9d00ff; --nep2: #7c3aed; --iabd: #7ee2a6; --mcbd: #c9a4ff; --mcp: #9d00ff; }
+.iac { box-shadow: 0 0 0 1px rgba(57,255,122,.25), 0 0 28px rgba(57,255,122,.18); }
+.mcc { box-shadow: 0 0 0 1px rgba(197,107,255,.3), 0 0 28px rgba(157,77,255,.25); }
+.iaic { color: var(--neg); background: rgba(57,255,122,.14); border-color: var(--neg); box-shadow: 0 0 14px rgba(57,255,122,.45); }
+.iaic.mc { color: var(--nep); background: rgba(197,107,255,.16); border-color: var(--nep); box-shadow: 0 0 14px rgba(197,107,255,.5); }
+.iah em { color: var(--neg); border-color: var(--neg); background: rgba(57,255,122,.12); text-shadow: 0 0 8px rgba(57,255,122,.6); }
+.iah em i { background: var(--neg); box-shadow: 0 0 8px var(--neg); }
+.iah em.mc { color: var(--nep); border-color: var(--nep); background: rgba(197,107,255,.14); text-shadow: 0 0 8px rgba(197,107,255,.6); }
+.iaconf b { color: var(--neg); text-shadow: 0 0 18px rgba(57,255,122,.55); }
+.iabar s { background: linear-gradient(90deg, var(--neg2), var(--neg)); box-shadow: 0 0 12px rgba(57,255,122,.7); }
+.chips2 span { border-color: rgba(57,255,122,.45); background: rgba(57,255,122,.1); }
+.chips2 svg { color: var(--neg); }
+.mcpp b, .mcr b { color: var(--nep); text-shadow: 0 0 18px rgba(197,107,255,.55); }
+.mcbar s { background: linear-gradient(90deg, var(--nep2), var(--nep)); box-shadow: 0 0 12px rgba(197,107,255,.75); }
+.mcr s { background: var(--nep); opacity: 1; box-shadow: 0 0 8px rgba(197,107,255,.6); }
+.mcr.lo s { box-shadow: none; }
+.mci { background: rgba(197,107,255,.16); }
+.mci svg, .mcpp svg { color: var(--nep); }
+:root.light .iaconf b, :root.light .mcpp b, :root.light .mcr b, :root.light .iah em { text-shadow: none; }
