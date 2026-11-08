@@ -16,6 +16,10 @@ from model import (DATA, SOCCER, Poi, load, soccer_markets, nba_teams, is_presea
                    nba_walk, STATS, stat_val)
 
 DIAS = 8  # cuántos días hacia adelante
+# Liga MX y Liga BetPlay: solo ganador, gana o empata, goles, ambos marcan, córners y tarjetas
+LIGAS_SIMPLES = {"mex.1", "col.1"}
+MERCADOS_SIMPLES = {"cor", "tar"}
+
 # ---- la app busca ERRORES DE CUOTA de las casas de apuestas ----
 # valor = probabilidad x cuota de la casa - 1   (ej. 70 % x 1.60 - 1 = +12 %)
 VALOR_MIN = 0.05            # solo se marca "error de la casa" con +5 % o más
@@ -175,7 +179,11 @@ def soccer(par, report):
             # el mercado más probable que sí pague eso)
             con_casa(sels, PESO["futbol"])
             by = {s["m"]: s for s in sels}
-            pick = elegir(sels, prefer=[by["1"], by["X"], by["2"]])
+            if key in LIGAS_SIMPLES:   # solo ganador, gana o empata, goles y ambos marcan
+                cand = [s for s in sels if s["m"] in ("1", "2", "1X", "X2", "btts_si", "btts_no") or s["m"].startswith(("mas_", "menos_"))]
+                pick = elegir(cand, prefer=[by["1"], by["2"]])
+            else:
+                pick = elegir(sels, prefer=[by["1"], by["X"], by["2"]])
             # diferencia con la casa: AÚN SIN PROBAR (no hay cuotas históricas)
             val = [s for s in sels if s.get("valor", -1) > 0.05 and s["p"] >= 0.30]
             out.append({
@@ -842,6 +850,10 @@ def main():
     for g in f:
         x = ex.get(g["id"])
         if x:
+            if g["lg"] in LIGAS_SIMPLES:   # pedido del usuario: sin tiros, tiros a puerta ni faltas
+                x["grupos"] = [q for q in x["grupos"] if q.get("s") in MERCADOS_SIMPLES]
+                x["picks"] = [q for q in x["picks"] if q.get("s") in MERCADOS_SIMPLES]
+                x["jug"] = [q for q in x["jug"] if q.get("s") in MERCADOS_SIMPLES]
             x["jug"] = x["jug"][:30]
             g["extra"] = x
     nb, injured = nba(par["nba"])
