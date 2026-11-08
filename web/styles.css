@@ -1108,3 +1108,11 @@ body { font-variant-numeric: tabular-nums; }
 .light .iaconf b, .light .iah em { text-shadow: none; }
 /* el verde de "valor" con texto oscuro para leerse sobre verde */
 .pcval { color: #04130a; }
+
+/* ===== Acento: NARANJA tipo IABET en vez de azul (pedido del usuario) ===== */
+:root { --a: #ff8a1f; --a2: #f06a00; --asoft: rgba(255,138,31,.15); --atx: #ffa04d; --bad: #ff8a1f; --badsoft: rgba(255,138,31,.15);
+  --pkbad: rgba(255,138,31,.16); --pkbadtx: #ffa04d; }
+:root.light { --a: #ea6a12; --a2: #c95500; --asoft: rgba(234,106,18,.10); --atx: #d65f0c; --bad: #ea6a12; --badsoft: rgba(234,106,18,.10);
+  --pkbad: #fde4d3; --pkbadtx: #d65f0c; }
+.pkbox.dir.bad { border-color: rgba(255,138,31,.45); }
+.hr.pe { border-left-color: var(--a); }
