@@ -113,12 +113,16 @@ def completar(partidos):
         v = g.get("ven")
         if not v:
             continue
-        if v not in db and nuevos < 60:   # tope por corrida para no abusar del servicio
+        import datetime as _dt
+        hoy = _dt.date.today().isoformat()
+        sin_foto = v in db and not db[v].get("foto") and db[v].get("q") != hoy   # reintento 1 vez al día
+        if (v not in db or sin_foto) and nuevos < 60:   # tope por corrida para no abusar del servicio
             info = buscar(v, g.get("city"))
             if g.get("vimg_espn") and not info.get("img"):
                 info["img"] = g["vimg_espn"]
             if info.get("img"):
                 info["foto"] = foto(info["img"], v)
+            info["q"] = hoy
             db[v] = info
             nuevos += 1
         info = db.get(v) or {}
