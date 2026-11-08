@@ -704,3 +704,59 @@ img.hpimg.foto { width: 48%; height: 100%; object-fit: cover; object-position: t
 .h2r em.g { background: rgba(34,197,94,.16); color: #22c55e; } .h2r em.r { background: rgba(240,138,28,.16); color: #f08a1c; }
 .mb .bars i { height: 100%; } .mb .bars i s { flex: none; }
 .pkcard.pos .big { color: var(--tx); }
+
+/* ============ Análisis IA y Simulaciones Monte Carlo ============ */
+:root { --iabg: linear-gradient(180deg, #0f2a1d 0%, #0b1712 45%, #0b0f0d 100%); --iabd: #1f4a33; --iatx: #e9f5ee; --iasub: #8fa79a;
+  --mcbg: linear-gradient(180deg, #241a4a 0%, #1a1335 40%, #120d22 75%, #0c0a14 100%); --mcbd: #3b2d78; --mcp: #b79cff; --mcp2: #6d6af6; }
+:root.light { --iabg: linear-gradient(180deg, #e6f8ed 0%, #f2fbf5 50%, #ffffff 100%); --iabd: #bfe9cf; --iatx: #0b0f0d; --iasub: #5d6964;
+  --mcbg: linear-gradient(180deg, #ece7ff 0%, #f4f1ff 50%, #ffffff 100%); --mcbd: #d9d0ff; --mcp: #6d4fe0; --mcp2: #6d6af6; }
+.iac, .mcc { border-radius: 22px; border: 1px solid var(--iabd); background: var(--iabg); margin-top: 16px; overflow: hidden; color: var(--iatx); }
+.mcc { border-color: var(--mcbd); background: var(--mcbg); }
+.iah { display: flex; align-items: center; gap: 14px; padding: 18px 18px 0; }
+.iah > div { flex: 1; min-width: 0; } .iah b { display: block; font-size: 19px; font-weight: 800; letter-spacing: -.3px; } .iah small { color: var(--iasub); font-size: 13px; }
+.iaic { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; background: rgba(34,197,94,.14); border: 1px solid rgba(34,197,94,.35); color: #22c55e; flex: none; }
+.iaic svg { width: 22px; height: 22px; }
+.iaic.mc { background: rgba(140,110,255,.16); border-color: rgba(140,110,255,.45); color: var(--mcp); }
+.iah em { font-style: normal; display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 800; letter-spacing: .6px; color: #22c55e; border: 1px solid rgba(34,197,94,.5); background: rgba(34,197,94,.1); padding: 6px 12px; border-radius: 99px; flex: none; }
+.iah em i { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; }
+.iah em.mc { color: var(--mcp); border-color: rgba(140,110,255,.55); background: rgba(140,110,255,.12); } .iah em.mc svg { width: 14px; height: 14px; }
+.iaconf { display: flex; justify-content: space-between; align-items: flex-end; padding: 18px 18px 0; }
+.iaconf span { color: var(--iasub); font-size: 12.5px; font-weight: 700; letter-spacing: .8px; } .iaconf b { font-size: 40px; font-weight: 800; color: #22c55e; letter-spacing: -1px; line-height: 1; }
+.iabar { height: 9px; border-radius: 9px; background: rgba(127,127,127,.22); margin: 12px 18px 0; overflow: hidden; } .iabar s { display: block; height: 100%; border-radius: 9px; background: linear-gradient(90deg, #22c55e, #4ade80); }
+.iapk { color: var(--iasub); font-size: 12.5px; letter-spacing: .5px; padding: 8px 18px 16px; }
+.iaf { border-top: 1px solid var(--iabd); padding: 16px 18px; background: rgba(0,0,0,.08); }
+.iaf .fl { margin: 0 0 12px; color: var(--iasub); }
+.chips2 { display: flex; flex-wrap: wrap; gap: 10px; }
+.chips2 span { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--iabd); background: rgba(34,197,94,.06); padding: 8px 14px; border-radius: 99px; font-size: 14px; font-weight: 700; }
+.chips2 svg { width: 16px; height: 16px; }
+.iatx { border-top: 1px solid var(--iabd); margin: 0; padding: 18px; font-size: 16px; line-height: 1.6; color: var(--iasub); }
+.ia3 { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; margin: 0 18px; padding: 14px 0 18px; border-top: 1px solid var(--iabd); }
+.ia3 span { display: block; font-size: 12px; font-weight: 700; letter-spacing: .8px; color: var(--iasub); } .ia3 b { font-size: 16px; }
+.mci { display: flex; gap: 10px; margin: 16px 18px 0; padding: 12px 14px; border-radius: 14px; background: rgba(140,110,255,.12); color: var(--iasub); font-size: 14.5px; line-height: 1.45; }
+.mci svg { width: 18px; height: 18px; flex: none; margin-top: 2px; }
+.mcp { padding: 18px 18px 16px; } .mcp .fl { margin: 0; color: var(--iasub); }
+.mcpp { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 4px; }
+.mcpp span { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; } .mcpp svg { width: 20px; height: 20px; color: var(--iasub); }
+.mcpp b { font-size: 42px; font-weight: 800; color: var(--mcp); letter-spacing: -1px; line-height: 1; }
+.mcbar { height: 13px; border-radius: 9px; background: rgba(127,127,127,.2); margin-top: 10px; overflow: hidden; } .mcbar s { display: block; height: 100%; border-radius: 9px; background: linear-gradient(90deg, #6d6af6, #b79cff); }
+.mcrc { color: var(--iasub); font-size: 13.5px; margin-top: 10px; }
+.mcz { background: rgba(0,0,0,.18); padding: 16px 18px; }
+:root.light .mcz { background: rgba(109,79,224,.05); }
+.mch { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+.mch .fl { color: var(--iasub); } .mch small { color: var(--iasub); font-size: 13px; opacity: .8; }
+.mch span { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--iasub); font-weight: 600; } .mch u { width: 16px; border-top: 3px solid #ef4444; border-radius: 2px; }
+.mcr { display: grid; grid-template-columns: 96px 1fr 46px; gap: 12px; align-items: center; margin-top: 12px; font-size: 14px; color: var(--iasub); }
+.mcr i { position: relative; height: 8px; border-radius: 9px; background: rgba(127,127,127,.18); }
+.mcr s { display: block; height: 100%; border-radius: 9px; background: var(--mcp); opacity: .85; }
+.mcr.lo s { background: rgba(127,127,127,.5); }
+.mcr u { position: absolute; top: -3px; height: 14px; border-left: 2px solid #ef4444; opacity: .8; }
+.mcr b { text-align: right; font-size: 17px; color: var(--mcp); } .mcr.lo b { color: var(--iasub); }
+.mcr.mp span { color: var(--iatx); font-weight: 800; text-transform: uppercase; } .mcr.mp i { height: 13px; } .mcr.mp b { font-size: 20px; }
+.mc4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 16px 18px 18px; background: rgba(0,0,0,.28); }
+:root.light .mc4 { background: rgba(109,79,224,.07); }
+.mc4 span { display: block; font-size: 11px; font-weight: 700; letter-spacing: .6px; color: var(--iasub); min-height: 28px; line-height: 1.25; } .mc4 b { font-size: 20px; text-align: center; display: block; }
+.iah b { font-size: 17.5px; white-space: nowrap; } .iah small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.iah em { padding: 5px 10px; font-size: 11px; }
+.chips2 { gap: 8px; } .chips2 span { font-size: 13px; padding: 7px 11px; gap: 6px; } .chips2 svg { width: 14px; height: 14px; }
+.mch span { white-space: nowrap; }
+.mcc .iah b { white-space: normal; line-height: 1.15; }

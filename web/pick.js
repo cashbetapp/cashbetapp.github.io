@@ -265,29 +265,95 @@ function pkContexto(P) {
     <div class="pk3">${tres.map(([t, s]) => s ? `<div class="pkbox c ol ${s.p === best ? "sel" : ""}"><div class="k">${esc(t.toUpperCase())}</div><b>${pct(s.p, 1)}</b></div>` : "").join("")}</div>`;
 }
 
+I.bolt2 = '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>';
+I.home2 = '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>';
+I.bars2 = '<path d="M6 20V10M12 20V4M18 20v-7"/>';
+I.info = '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>';
+I.target = '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>';
+I.sparkle = '<path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/>';
+
+// ---------- Monte Carlo (en el celular): el partido se simula N veces
+function rngDe(seed) { let a = seed >>> 0; return () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function gauss(r) { let u = 0, v = 0; while (!u) u = r(); while (!v) v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+function gamma(r, k) {   // Marsaglia-Tsang, media k
+  if (k < 1) return gamma(r, k + 1) * Math.pow(r(), 1 / k);
+  const d = k - 1 / 3, c = 1 / Math.sqrt(9 * d);
+  for (;;) { let x, v; do { x = gauss(r); v = 1 + c * x; } while (v <= 0); v = v * v * v; const u = r();
+    if (u < 1 - 0.0331 * x * x * x * x || Math.log(u) < 0.5 * x * x + d * (1 - v + Math.log(v))) return d * v; }
+}
+function poisson(r, l) { if (l > 30) return Math.max(0, Math.round(l + Math.sqrt(l) * gauss(r))); const L = Math.exp(-l); let k = 0, p = 1; do { k++; p *= r(); } while (p > L); return k - 1; }
+function montecarlo(P, N = 100000) {
+  const m = Math.max(pkEsp(P) || 0.05, 0.05), disp = P.x.disp || 1, nObs = Math.max(pkSerie(P).length, 5);
+  let seed = 0; for (const ch of P.g.id + P.x.m) seed = (seed * 31 + ch.charCodeAt(0)) | 0;
+  const r = rngDe(seed);
+  const rr = disp > 1.001 ? m / (disp - 1) : 0;          // binomial negativa = Poisson con media gamma
+  const draw = (mm) => poisson(r, rr ? mm * gamma(r, rr) / rr : mm);
+  const out = new Array(N); let ok = 0;
+  const muSamp = new Array(400);
+  for (let i = 0; i < N; i++) {
+    const mm = m * gamma(r, nObs) / nObs;               // incertidumbre del promedio (según partidos observados)
+    const v = draw(mm); out[i] = v; if (pkHit(P, v)) ok++;
+    if (i < 400) muSamp[i] = mm;
+  }
+  out.sort((a, b) => a - b);
+  const q = (f) => out[Math.min(N - 1, Math.floor(f * N))];
+  const cnt = {}; out.forEach((v) => (cnt[v] = (cnt[v] || 0) + 1));
+  const moda = +Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a])[0];
+  const mean = out.reduce((s, v) => s + v, 0) / N, sd = Math.sqrt(out.reduce((s, v) => s + (v - mean) ** 2, 0) / N);
+  // rango de confianza: probabilidad con el promedio en su 10 % bajo y 10 % alto
+  muSamp.sort((a, b) => a - b);
+  const pAt = (mm) => { let h = 0; for (let i = 0; i < 8000; i++) if (pkHit(P, draw(mm))) h++; return h / 8000; };
+  const pa = pAt(muSamp[40]), pb = pAt(muSamp[359]);
+  return { N, p: ok / N, lo: Math.min(pa, pb), hi: Math.max(pa, pb), q05: q(0.05), q25: q(0.25), q50: q(0.5), q75: q(0.75), q95: q(0.95), moda, mean, sd };
+}
+
 function pkAnalisis(P) {
-  const { g, x } = P, all = pkSerie(P), sd = pkSide(P), rival = g[sd === "h" ? "a" : "h"];
-  const v10 = all.slice(0, 10), hits = v10.filter((e) => pkHit(P, e.v)).length, m10 = media(v10.map((e) => e.v));
-  const loc = all.slice(0, 20).filter((e) => e.l), vis = all.slice(0, 20).filter((e) => !e.l);
-  const casa = (P.sc === "j" ? x.side : sd) === "h";
-  const lv = casa ? loc : vis;
-  const esp = pkEsp(P);
-  const who = P.sc === "j" ? x.jugador : P.sc === "t" ? `El partido entre ${g.h.n} y ${g.a.n}` : g[sd].n;
-  const pm = Object.fromEntries(g.mercados.map((s) => [s.m, s]));
-  const t = [];
-  t.push(`${who} ${P.sc === "t" ? "llega con" : "promedia"} ${n1(m10)} ${UN[P.s]} ${P.sc === "t" ? `por partido en los últimos 10 de ${g[sd].n}` : "en sus últimos 10 partidos"}, y ${P.lado === "mas" ? "superó" : "quedó por debajo de"} la línea de ${P.ln} en ${hits} de ellos.`);
-  if (lv.length >= 3 && P.sc !== "t") t.push(`Como ${casa ? "local" : "visitante"}, que es como juega este partido, promedia ${n1(media(lv.map((e) => e.v)))}.`);
-  if (esp != null) t.push(`El modelo, que mide la fuerza de cada equipo y la del rival con toda la temporada (dando más peso a lo reciente), espera ${n1(esp)} ${UN[P.s]} frente a ${rival.n}.`);
-  t.push(`Por eso le da ${pct(x.p)} a "${pkPill(P).toLowerCase()}", con una cuota justa de ${odd(x.justa)}: si tu casa paga más que eso, el pick tiene valor según el modelo.`);
-  if (x.prueba) t.push(`En la prueba con partidos que el modelo no había visto, este tipo de pick acertó el ${x.prueba}% de las veces.`);
-  if (P.sc === "j") t.push(`Es titular probable según sus últimos partidos; si no juega, la apuesta normalmente se anula.`);
-  const ganH = pm["1"] ? pm["1"].p : 0, ganA = pm["2"] ? pm["2"].p : 0;
-  return `<div class="pkcard"><h4 class="ia">${ic("spark")}Análisis IA del pick</h4><div class="small">Escrito automáticamente con los números del modelo y de la temporada.</div>
-    <p class="iat">${t.map(esc).join(" ")}</p></div>
-    <h4 class="pksub">Probabilidad de victoria <small>Modelo</small></h4>
-    <div class="pkcard"><div class="pv"><span>${crest(g.h, 22)}${esc(abT(g.h))}</span><span>${esc(abT(g.a))}${crest(g.a, 22)}</span></div>
-      <div class="pv big"><b class="${ganH >= ganA ? "g" : ""}">${pct(ganH, 1)}</b><b class="${ganA > ganH ? "g" : ""}">${pct(ganA, 1)}</b></div>
-      <div class="pvb"><i class="${ganH >= ganA ? "on" : ""}" style="width:${ganH * 100}%"></i><u class="${ganA > ganH ? "on" : ""}" style="width:${ganA * 100}%"></u></div></div>`;
+  const { g, x } = P, all = pkSerie(P), sd = pkSide(P), rival = pkRival(P), up = P.lado === "mas";
+  const hit = (v) => pkHit(P, v), U = UN[P.s];
+  const v10 = all.slice(0, 10), w = v10.map((e) => e.v), hits = v10.filter((e) => hit(e.v)).length, avg = media(w);
+  const loc = all.filter((e) => e.l).slice(0, 10), vis = all.filter((e) => !e.l).slice(0, 10);
+  const ml = media(loc.map((e) => e.v)), mv = media(vis.map((e) => e.v));
+  const l5 = media(all.slice(0, 5).map((e) => e.v)), l10 = avg;
+  const sup = (v) => (up ? v > P.ln : v < P.ln);
+  // tendencia: lo reciente a favor del pick
+  const tr = sup(l5) && hits / Math.max(v10.length, 1) >= 0.6 ? "Fuerte" : sup(l10) ? "Media" : "Débil";
+  const casaHoy = (P.sc === "j" ? x.side : sd) === "h";
+  const fuerteLV = !loc.length || !vis.length ? null : (up ? ml >= mv : ml <= mv) ? "Local más fuerte" : "Visitante más fuerte";
+  const senal = [sup(avg), sup(mediana(w)), sup(media(all.slice(0, 3).map((e) => e.v))), avg ? desv(w) / avg < 0.6 : false].filter(Boolean).length;
+  const sTxt = senal >= 3 ? "Fuerte" : senal === 2 ? "Media" : "Débil";
+  const cTxt = x.p >= 0.7 ? "Alta" : x.p >= 0.58 ? "Media" : "Baja";
+  const pick = pkPill(P);
+  const who = P.sc === "j" ? x.jugador : P.sc === "t" ? `El partido ${abT(g.h)} vs ${abT(g.a)}` : g[sd].n;
+  const verbo = up ? "ha superado" : "se ha quedado por debajo de";
+  const t = [`${who} ${verbo} ${P.ln} ${U} en ${hits} de los últimos ${v10.length} juegos (${v10.length ? Math.round((100 * hits) / v10.length) : 0}%).`];
+  t.push(`Promediando ${n1(avg)} ${U.toUpperCase()} en este período — ${n1(Math.abs(avg - P.ln))} ${avg >= P.ln ? "por encima" : "por debajo"} de la línea.`);
+  const lv = casaHoy ? loc : vis, mlv = casaHoy ? ml : mv;
+  if (lv.length) t.push(`Los números de ${casaHoy ? "local" : "visitante"} (${n1(mlv)}) ${sup(mlv) ? "respaldan" : "no respaldan"} el pick en el partido de hoy.`);
+  if (pkEsp(P) != null) t.push(`El modelo espera ${n1(pkEsp(P))} ${U} frente a ${rival.n}.`);
+  const fact = [
+    ["trend", `Tendencia: ${tr}`],
+    ["bars2", `10J prom: ${n1(avg)}`],
+    ...(fuerteLV ? [["home2", fuerteLV]] : []),
+    ...(P.sc === "j" && x.est ? [["shield", `Titular ${x.est.tit} de ${x.est.n}`]] : [["shield", `${pkVr(P).length ? `Vs ${abT(rival)}: ${pkVr(P).filter((e) => hit(e.v)).length}/${pkVr(P).length}` : "Sin cruces recientes"}`]]),
+  ];
+  const mc = montecarlo(P);
+  const mx = Math.max(mc.q95, P.ln * 1.6, 1);
+  const fila = (lab, v, cls) => `<div class="mcr ${cls || ""}"><span>${lab}</span><i><s style="width:${Math.max(3, (100 * v) / mx)}%"></s><u style="left:${(100 * P.ln) / mx}%"></u></i><b>${n1(v)}</b></div>`;
+  return `<div class="iac">
+      <div class="iah"><span class="iaic">${ic("bolt2")}</span><div><b>Análisis IA</b><small>CASHBET v2</small></div><em><i></i>MODELO EN VIVO</em></div>
+      <div class="iaconf"><span>CONFIANZA DEL MODELO</span><b>${pct(x.p)}</b></div>
+      <div class="iabar"><s style="width:${x.p * 100}%"></s></div><div class="iapk">${esc(pick.toUpperCase())}</div>
+      <div class="iaf"><div class="fl">FACTORES CLAVE</div><div class="chips2">${fact.map(([i, s]) => `<span>${ic(i)}${esc(s)}</span>`).join("")}</div></div>
+      <p class="iatx">${t.map(esc).join(" ")}</p>
+      <div class="ia3"><div><span>SEÑAL</span><b>${sTxt}</b></div><div><span>CONFIANZA</span><b>${cTxt}</b></div><div><span>MUESTRA</span><b>${v10.length} juegos</b></div></div></div>
+    <div class="mcc">
+      <div class="iah"><span class="iaic mc">${ic("pulse")}</span><div><b>Simulaciones Monte Carlo</b><small>${mc.N.toLocaleString("es-CO")} simulaciones</small></div><em class="mc">${ic("sparkle")}CASHBET</em></div>
+      <div class="mci">${ic("info")}<span>Nuestra IA simuló este juego ${mc.N.toLocaleString("es-CO")} veces para predecir el resultado más probable</span></div>
+      <div class="mcp"><div class="fl">PROBABILIDAD DE ACERTAR</div><div class="mcpp"><span>${ic("target")}${esc(pick.toUpperCase())}</span><b>${(mc.p * 100).toFixed(1)}%</b></div>
+        <div class="mcbar"><s style="width:${mc.p * 100}%"></s></div><div class="mcrc">Rango de confianza: ${Math.round(mc.lo * 100)}% — ${Math.round(mc.hi * 100)}%</div></div>
+      <div class="mcz"><div class="mch"><div><div class="fl" style="margin:0">RANGO PROYECTADO</div><small>Lo que nuestra IA predice que podría pasar</small></div><span><u></u>OBJETIVO ${P.ln}</span></div>
+        ${fila("Peor caso", mc.q05, "lo")}${fila("Rango bajo", mc.q25, "lo")}${fila("MÁS PROBABLE", mc.q50, "mp")}${fila("Rango alto", mc.q75)}${fila("Mejor caso", mc.q95)}</div>
+      <div class="mc4"><div><span>RESULTADO ESPERADO</span><b>${n1(mc.mean)}</b></div><div><span>RESULTADO MÁS TÍPICO</span><b>${n1(mc.moda)}</b></div><div><span>CUÁNTO VARÍA</span><b>±${n1(mc.sd)}</b></div><div><span>MÉTODO DE CÁLCULO</span><b>IA Sim</b></div></div></div>`;
 }
 
 // ------------------------------------------------------------ lista de Predicciones

@@ -429,7 +429,7 @@ def predict(soon, today_ord):
                         vals = [((e[s] + e["o" + s]) if sc == "t" else e[s], e["d"]) for e in L0.th.get(tid, [])]
                         picks.append(_sel(f"{s}|{sc}|{b[1]}|{b[2]:g}", b[0], _txt(s, "e", b[1], b[2], quien),
                                           s=s, sc=sc, prueba=acierto.get(f"{s}_{'t' if sc == 't' else 'e'}"),
-                                          temp=temporadas(vals, b[1], b[2])))
+                                          temp=temporadas(vals, b[1], b[2]), esp=round(float(M), 2), disp=dsp))
                 if len(gr) > 3:
                     grupos.append(gr)
             jug = []
@@ -449,7 +449,7 @@ def predict(soon, today_ord):
                                     vr=[[e[s], e["_d"], e["_l"]] for e in L0.ph.get(r["pid"], [])
                                         if e["_vs"] == _ab(g, "a" if r["side"] == "h" else "h")][-5:][::-1],
                                     temp=temporadas([(e[s], e["_d"]) for e in L0.ph.get(r["pid"], [])], b[1], b[2]),
-                                    est=estado(L0, r["pid"], g[r["side"]]["id"])))
+                                    est=estado(L0, r["pid"], g[r["side"]]["id"]), disp=1.0))
             jug.sort(key=lambda x: -x["p"])
             hist = {sd: L0.th.get(g[sd]["id"], [])[-30:][::-1] for sd in ("h", "a")}
             vr = {sd: [e for e in L0.th.get(g[sd]["id"], []) if e["vs"] == _ab(g, "a" if sd == "h" else "h")][-5:][::-1]
