@@ -52,16 +52,26 @@ function seguidos() {
   const lgDe = (v) => v.lg || (Object.entries(D.ligas || {}).find(([, L]) => L.n === v.liga) || [])[0] || (v.liga === "NBA" ? "nba" : null);
   // seguidos guardados antes de las tarjetas nuevas: se completan con los datos del partido si siguen disponibles
   const completar = (id, v) => {
-    if (v.nom) return v;
+    if (v.nom && id.startsWith("pk|")) return v;
     const pk = id.startsWith("pk|") ? id.slice(3) : null;
-    if (pk) {
+    if (pk && !v.nom) {
       const gid = pk.slice(0, pk.indexOf("|")), P = D.byId[gid] && pkFind(gid, pk.slice(pk.indexOf("|") + 1));
       if (P) { const tm = pkTeam(P); return Object.assign({}, v, { lg: P.g.lg, hab: abT(P.g.h), aab: abT(P.g.a), pill: pkPill(P), up: P.lado === "mas",
         tipo: P.sc === "j" ? "Jugador" : P.sc === "t" ? "Total del partido" : "Total del equipo", nom: P.sc === "j" ? P.x.jugador : P.sc === "t" ? `${P.g.h.n} vs ${P.g.a.n}` : tm.n,
         foto: P.sc === "j" ? P.x.foto || null : null, tl: tm ? tm.logo : null }); }
       return Object.assign({}, v, { tipo: "Pick", nom: v.txt });
     }
-    return Object.assign({}, v, { tipo: "Partido", nom: `${v.h} vs ${v.a}`, pill: v.txt });
+    // pick de partido: si es a favor de un equipo, se muestra ESE equipo (escudo y nombre)
+    const G = D.byId[id];
+    if (G) v = Object.assign({}, v, { hab: v.hab || G.h.ab, aab: v.aab || G.a.ab, lg: v.lg || G.lg, m: v.m || G.pick.m });
+    const m = v.m || "", t = (v.txt || "").toLowerCase();
+    let lado = /^(1|1X)$|^hcp_local/.test(m) ? "h" : /^(2|X2)$|^hcp_visita/.test(m) ? "a" : null;   // "12" (no hay empate) = los dos
+    if (!lado && !m && v.h && t.includes(v.h.toLowerCase())) lado = "h";
+    if (!lado && !m && v.a && t.includes(v.a.toLowerCase())) lado = "a";
+    const total = /^(mas|menos)_|^btts/.test(m) || /^(más|menos) de/.test(t);
+    if (lado) return Object.assign({}, v, { nom: v[lado], tl: lado === "h" ? v.hl : v.al, pill: v.pill || v.txt,
+      tipo: /^hcp/.test(m) || /[+-]\d/.test(t) ? "Hándicap" : /^(1X|X2)$/.test(m) || / o empate/.test(t) ? "Doble oportunidad" : "Ganador" });
+    return Object.assign({}, v, { tipo: total ? "Total del partido" : "Partido", nom: `${v.h} vs ${v.a}`, pill: v.pill || v.txt, tl: null });
   };
   const fila = ({ id, v: v0, e }) => {
     const v = completar(id, v0);
