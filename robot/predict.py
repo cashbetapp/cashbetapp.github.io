@@ -16,27 +16,87 @@ from model import (DATA, SOCCER, Poi, load, soccer_markets, nba_teams, is_presea
                    nba_walk, STATS, stat_val)
 
 DIAS = 8  # cuántos días hacia adelante
-CUOTA_MIN = 1.50  # el usuario pidió cuota mínima 1.50 (antes 1.30)
+# ---- la app busca ERRORES DE CUOTA de las casas de apuestas ----
+# valor = probabilidad x cuota de la casa - 1   (ej. 70 % x 1.60 - 1 = +12 %)
+VALOR_MIN = 0.05            # solo se marca "error de la casa" con +5 % o más
+MARGEN = 1.05               # sin cuota de la casa: vale la pena si paga 5 % más que la justa
+PMIN, PMAX = 0.55, 0.75     # picks por probabilidad (sin cuota de casa): ni dudosos ni regalados
+CUOTA_MIN = round(1 / PMAX, 2)
+# peso del modelo frente a la casa (se ajusta solo con los resultados reales, ver pesos())
+PESO = {"futbol": 0.5, "nba": 0.5, "props": 0.3}
 
 
-def cuota_ef(s):
-    """Cuota real de la casa si existe; si no, la cuota justa del modelo."""
-    return s.get("cuota") or s["justa"]
+def sin_vig(odds):
+    """Probabilidades que da la casa quitándole su comisión."""
+    inv = {k: 1 / o for k, o in odds.items() if o}
+    if len(inv) >= 2:
+        t = sum(inv.values())
+        if t > 1:
+            return {k: v / t for k, v in inv.items()}
+    return {k: v / 1.05 for k, v in inv.items()}
+
+
+def con_casa(sels, peso):
+    """Mezcla la probabilidad del modelo con la de la casa (el modelo solo pesa lo que
+    ha demostrado) y calcula el valor real de cada opción con cuota de la casa."""
+    q = sin_vig({s["m"]: s.get("cuota") for s in sels if s.get("cuota")})
+    for s in sels:
+        if s["m"] in q:
+            s["casa"] = round(q[s["m"]], 4)
+            s["pv"] = round(peso * s["p"] + (1 - peso) * q[s["m"]], 4)
+            s["valor"] = round(s["pv"] * s["cuota"] - 1, 3)
+    return sels
 
 
 def elegir(sels, prefer=None):
-    """Pick principal: el más probable que pague >= CUOTA_MIN. Si 'prefer' tiene
-    alguno apto con >= 50 %, se usa ese grupo primero (p. ej. ganador)."""
-    apt = [s for s in sels if cuota_ef(s) >= CUOTA_MIN and s["p"] >= 0.5]
+    """1) Si la casa paga una cuota mal puesta (valor >= +5 %), ese es el pick.
+    2) Si no, el más probable entre 55 % y 75 % que NO tenga cuota de casa (la casa
+       que sí tenemos paga menos de lo que vale -> no se recomienda); se muestra la
+       cuota mínima para que valga la pena en la casa de cada persona."""
+    val = [s for s in sels if s.get("valor") is not None and s["valor"] >= VALOR_MIN
+           and s["pv"] >= 0.40 and 1.40 <= s["cuota"] <= 4.0]
+    if val:
+        return dict(max(val, key=lambda s: s["valor"]), tipo="valor")
+    apt = [s for s in sels if PMIN <= s["p"] <= PMAX and not s.get("cuota")]
     if prefer:
         pa = [s for s in prefer if s in apt]
         if pa:
-            return max(pa, key=lambda s: s["p"])
+            s = max(pa, key=lambda s: s["p"])
+            return dict(s, tipo="prob", minima=round(s["justa"] * MARGEN, 2))
     if apt:
-        return max(apt, key=lambda s: s["p"])
-    # nada probable paga >= CUOTA_MIN (favorito muy claro): se muestra el favorito
-    # marcado como "bajo"; no entra a las listas de picks ni a la libreta
+        s = max(apt, key=lambda s: s["p"])
+        return dict(s, tipo="prob", minima=round(s["justa"] * MARGEN, 2))
+    # nada sirve (favorito regalado, partido muy parejo o la casa ya paga lo justo):
+    # se muestra el más probable marcado "bajo"; no entra a las listas ni a la libreta
     return dict(max(sels, key=lambda s: s["p"]), bajo=True)
+
+
+def pesos():
+    """Cuánto creerle al modelo frente a la casa, según los picks reales ya calificados
+    (el que mejor habría acertado: menor log-loss). Con pocos datos, valores prudentes."""
+    p = os.path.join(DATA, "ledger.json")
+    if not os.path.exists(p):
+        return
+    L = json.load(open(p, encoding="utf-8"))
+    grupos = {
+        "props": [(e.get("pm", e["p"]), e["casa"] / 1.045, e["ok"]) for e in L.get("props", {}).values()
+                  if e.get("ok") is not None and e.get("casa")],
+        "futbol": [(e.get("pm", e["p"]), e.get("q") or 1 / e["cuota"] / 1.05, e["ok"]) for e in L.get("partidos", {}).values()
+                   if e.get("ok") is not None and e.get("cuota_casa") and e.get("dep") == "futbol"],
+        "nba": [(e.get("pm", e["p"]), e.get("q") or 1 / e["cuota"] / 1.03, e["ok"]) for e in L.get("partidos", {}).values()
+                if e.get("ok") is not None and e.get("cuota_casa") and e.get("dep") == "nba"],
+    }
+    for k, xs in grupos.items():
+        if len(xs) < 40:
+            continue
+        def ll(w):
+            t = 0
+            for pm, q, ok in xs:
+                v = min(max(w * pm + (1 - w) * min(q, 0.97), 0.02), 0.98)
+                t -= math.log(v if ok else 1 - v)
+            return t
+        PESO[k] = min(range(0, 101, 5), key=lambda w: ll(w / 100)) / 100
+    print("peso del modelo frente a la casa:", PESO)
 
 
 def now():
@@ -57,7 +117,6 @@ def sel(mk, p, odd=None):
     s = {"m": mk, "p": round(float(p), 4), "justa": round(1 / max(float(p), 1e-6), 2)}
     if odd:
         s["cuota"] = odd
-        s["valor"] = round(float(p) * odd - 1, 3)   # >0: la casa paga más de lo que debería
     return s
 
 
@@ -114,6 +173,7 @@ def soccer(par, report):
             # oportunidad fuerte; si no, el mercado de goles más seguro
             # (siempre con cuota >= 1.30; si el favorito paga menos, se busca
             # el mercado más probable que sí pague eso)
+            con_casa(sels, PESO["futbol"])
             by = {s["m"]: s for s in sels}
             pick = elegir(sels, prefer=[by["1"], by["X"], by["2"]])
             # diferencia con la casa: AÚN SIN PROBAR (no hay cuotas históricas)
@@ -229,6 +289,7 @@ def nba(par):
         if od.get("ou"):
             p = 1 - norm.cdf((od["ou"] - tot) / sd_t)
             sels += [sel(f"mas_{od['ou']}", p), sel(f"menos_{od['ou']}", 1 - p)]
+        con_casa(sels, PESO["nba"])
         pick = elegir(sels, prefer=sels[:2])
         val = [s for s in sels[:2] if s.get("valor", -1) > 0.03]
         out.append({
@@ -320,10 +381,12 @@ def props(injured, days=None):
                 p = max(p_over, 1 - p_over)
                 worst = min(odds)  # no se sabe cuál cuota es "más" y cuál "menos": se usa la peor
                 ks = PROP_TYPES[t]
+                q = min(1 / worst / 1.045, 0.97)
+                pv = PESO["props"] * p + (1 - PESO["props"]) * q
                 out.append({"ev": e, "at": ev["at"], "partido": ev["name"], "pl": pid, "jugador": names[pid][0],
                             "equipo": names[pid][1], "tipo": NOMBRE[t], "t": t, "linea": ln, "lado": side,
-                            "esperado": round(mu, 1), "p": round(p, 4), "cuota": worst,
-                            "casa": round(1 / worst, 4), "valor": round(p * worst - 1, 3),
+                            "esperado": round(mu, 1), "p": round(pv, 4), "pm": round(p, 4), "cuota": worst,
+                            "casa": round(1 / worst, 4), "valor": round(pv * worst - 1, 3),
                             "ult": [sum(x[k] for k in ks) for x in prev[-10:]],
                             "prom": round(float(np.mean([sum(x[k] for k in ks) for x in prev[-10:]])), 1)})
     out.sort(key=lambda x: -x["valor"])
@@ -411,12 +474,13 @@ def ledger(partidos, props_, extras=None):
             pk = g["pick"]
             L["partidos"][g["id"]] = {"at": g["at"], "lg": g["lg"], "liga": g["liga"], "dep": g["dep"],
                                       "h": g["h"]["n"], "a": g["a"]["n"], "hl": g["h"]["logo"], "al": g["a"]["logo"],
-                                      "m": pk["m"], "txt": pick_name(pk["m"], g), "p": pk["p"],
+                                      "m": pk["m"], "txt": pick_name(pk["m"], g), "p": pk.get("pv", pk["p"]), "pm": pk["p"],
+                                      "q": pk.get("casa"), "tipo": pk.get("tipo"), "valor": pk.get("valor"),
                                       "cuota": pk.get("cuota") or pk["justa"], "cuota_casa": bool(pk.get("cuota"))}
     for x in props_:
         if x["at"] > ahora:
             k = f"{x['ev']}_{x['pl']}_{x['t']}_{x['linea']}"
-            L["props"][k] = {kk: x[kk] for kk in ("ev", "at", "pl", "jugador", "t", "tipo", "linea", "lado", "p", "cuota", "casa")}
+            L["props"][k] = {kk: x.get(kk) for kk in ("ev", "at", "pl", "jugador", "t", "tipo", "linea", "lado", "p", "pm", "cuota", "casa", "valor")}
     # calificar
     res = {}
     for key in SOCCER + ["nba"]:
@@ -475,7 +539,10 @@ def ledger(partidos, props_, extras=None):
     por = {}
     for e in L["extra"].values():
         por.setdefault(e["s"] + "_" + ("j" if e["sc"] == "j" else "t" if e["sc"] == "t" else "e"), []).append(e)
+    val = [e for e in list(L["partidos"].values()) + list(L["props"].values())
+           if (e.get("valor") or -1) >= VALOR_MIN and e.get("cuota")]
     return {"partidos": stats(L["partidos"].values()), "props": stats(L["props"].values()), "ultimos": hist,
+            "valor": stats(val),
             "extra": stats(L["extra"].values()), "extra_por": {k: stats(v) for k, v in por.items()}, "semana": semana}
 
 
@@ -618,6 +685,7 @@ def liga_logos():
 
 
 def main():
+    pesos()
     r = rep()
     par = r["parametros"]
     f = soccer(par["futbol"], r)
@@ -659,7 +727,7 @@ def main():
             "extra": {k: {"titulo": v["titulo"], "picks": v["picks"], "acierto": v["acierto_picks"],
                           "dijo": v["dijo_picks"], "publicar": v["publicar"]} for k, v in xrep["mercados"].items()},
         },
-        "cuota_min": CUOTA_MIN,
+        "cuota_min": CUOTA_MIN, "valor_min": VALOR_MIN, "margen": MARGEN, "peso": PESO,
         "registro": rec,
         "ligas": liga_logos(),
         "partidos": sorted(f + nb, key=lambda x: x["at"]),

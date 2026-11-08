@@ -99,10 +99,10 @@ async function load() {
   const ahora = Date.now() - 2.5 * 3600e3;
   D.partidos = D.partidos.filter((g) => new Date(g.at).getTime() > ahora);
   D.byId = Object.fromEntries(D.partidos.map((g) => [g.id, g]));
-  // props: se esconden las que chocan demasiado con la casa (casi siempre falta
-  // información, como un compañero lesionado); el resto se muestra EN PRUEBA
-  D.propsOk = (D.props || []).filter((x) => new Date(x.at).getTime() > Date.now() && x.p - x.casa > 0.015 && x.p - x.casa <= 0.15)
-    .sort((a, b) => (b.p - b.casa) - (a.p - a.casa));
+  // props NBA: solo las que tienen valor real contra la casa (probabilidad ya mezclada
+  // con la de la casa según lo que el modelo ha demostrado)
+  D.propsOk = (D.props || []).filter((x) => new Date(x.at).getTime() > Date.now() && x.valor >= (D.valor_min || 0.05))
+    .sort((a, b) => b.valor - a.valor);
   route();
 }
 

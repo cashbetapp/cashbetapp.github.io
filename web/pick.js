@@ -156,7 +156,8 @@ function pkResumen(P) {
   return `<div class="pk3">
       <div class="pkbox dir ${up ? "" : "bad"}"><div class="k">Dirección</div><b>${up ? "MÁS DE" : "MENOS DE"}</b></div>
       <div class="pkbox"><div class="k">Línea</div><b>${P.ln}</b></div>
-      <div class="pkbox"><div class="k">Cuota justa</div><b>${odd(x.justa)}</b></div></div>
+      <div class="pkbox"><div class="k">Vale desde</div><b>${odd(vale(x.justa))}</b></div></div>
+    <div class="pkvale">${ic("info")}<span>Probabilidad ${pct(x.p)} → cuota justa ${odd(x.justa)}. No tenemos la cuota de la casa para este mercado: <b>si tu casa paga ${odd(vale(x.justa))} o más, es un error de la casa</b> a tu favor.</span></div>
     <hr class="pkhr">
     <div class="pkcard ol"><h4>Lo clave</h4><div class="small">Lo que dicen sus últimos partidos sobre el de hoy</div>${clvList(lc)}</div>
     <div class="pkhist" style="margin-top:18px"><h4>${quien}</h4><div class="pk5">${[5, 10, 20].map((k) => `<button class="${n === k ? "on" : ""}" data-act="pkn" data-k="${k}">${k}G</button>`).join("")}</div></div>
@@ -366,18 +367,19 @@ function pickItems() {
   const hoy = D.partidos.filter((g) => esHoy(g.at) && new Date(g.at) > Date.now());
   const it = [];
   for (const g of hoy) {
-    if (!g.pick.bajo) it.push({ k: "g", g, p: g.pick.p, mk: "res", dep: g.dep, eq: 1 });
+    if (!g.pick.bajo) it.push({ k: "g", g, p: g.pick.tipo === "valor" ? g.pick.pv : g.pick.p, mk: "res", dep: g.dep, eq: 1,
+      val: g.pick.tipo === "valor" ? g.pick.valor : null, casa: g.pick.tipo === "valor" ? g.pick.cuota : null, min: g.pick.minima || vale(g.pick.justa) });
     if (g.extra) {
-      g.extra.picks.forEach((x) => it.push({ k: "x", g, x, p: x.p, mk: x.s, dep: "futbol", eq: 1 }));
-      g.extra.jug.forEach((x) => it.push({ k: "x", g, x, p: x.p, mk: x.s, dep: "futbol", eq: 0 }));
+      g.extra.picks.forEach((x) => it.push({ k: "x", g, x, p: x.p, mk: x.s, dep: "futbol", eq: 1, min: vale(x.justa) }));
+      g.extra.jug.forEach((x) => it.push({ k: "x", g, x, p: x.p, mk: x.s, dep: "futbol", eq: 0, min: vale(x.justa) }));
     }
   }
-  // jugadores NBA (en prueba): cuota mínima, 1 por jugador y 3 por partido
+  // jugadores NBA: solo con valor real contra la casa; 1 por jugador y 3 por partido
   const vistoJ = new Set(), porEv = {};
-  D.propsOk.filter((x) => esHoy(x.at) && x.cuota >= (D.cuota_min || 1.5) && x.p >= 0.5).sort((a, b) => b.p - a.p).forEach((x) => {
+  D.propsOk.filter((x) => esHoy(x.at) && x.cuota >= 1.4).forEach((x) => {
     if (vistoJ.has(x.pl) || (porEv[x.ev] || 0) >= 3) return;
     vistoJ.add(x.pl); porEv[x.ev] = (porEv[x.ev] || 0) + 1;
-    it.push({ k: "pr", x, p: x.p, mk: "nbaj", dep: "nba", eq: 0 });
+    it.push({ k: "pr", x, p: x.p, mk: "nbaj", dep: "nba", eq: 0, val: x.valor, casa: x.cuota });
   });
   it.forEach((e) => { e.gid = e.g ? e.g.id : e.x.ev; e.pr = pruebaDe(e); });
   return it;
@@ -391,11 +393,14 @@ function pruebaDe(e) {
   const b = (cal || []).find((r) => { const [lo, hi] = r.rango.replace("%", "").split("-").map(Number); return q * 100 >= lo && q * 100 < (hi === 100 ? 101 : hi); });
   return b ? b.paso : 0;
 }
-const ordenar = (xs) => xs.sort((a, b) => b.p - a.p || b.pr - a.pr);
-// valor contra la casa (solo cuando hay cuota real de la casa)
-const valorCasa = (e) => (e.k === "g" && e.g.pick.cuota ? e.p * e.g.pick.cuota - 1 : 0);
+// primero los ERRORES DE CUOTA (más valor primero); después los de mayor probabilidad
+const ordenar = (xs) => xs.sort((a, b) => (b.val != null) - (a.val != null) || (b.val || 0) - (a.val || 0) || b.p - a.p || b.pr - a.pr);
+// cuota mínima para que valga la pena cuando no tenemos la cuota de la casa
+const vale = (justa) => Math.round(justa * (D.margen || 1.05) * 100) / 100;
+const valorCasa = (e) => e.val || 0;
+const valTxt = (v) => `+${Math.round(v * 100)}%`;
 // pick "fuerte": puede acompañar al mejor del mismo partido
-const fuerte = (e) => e.k !== "pr" && ((e.p >= 0.65 && e.pr >= 61) || valorCasa(e) >= 0.05);
+const fuerte = (e) => valorCasa(e) >= (D.valor_min || 0.05) || (e.k !== "pr" && e.p >= 0.65 && e.pr >= 61);
 const tipoMk = (e) => (e.k === "x" ? e.x.s + "|" + (e.x.sc === "j" ? "j" : "e") : e.mk);
 // los mejores: el mejor de cada partido siempre; hasta 'n' por partido si los
 // siguientes son fuertes y de otro mercado (el resto se ve en la ficha)
@@ -425,7 +430,7 @@ function picks() {
       <button class="pkfil ${fil ? "on" : ""}" data-act="pfil" aria-label="Filtros">${ic(fil ? "filtro" : "ball")}</button></div>
     ${fil ? `<div class="small" style="margin:-2px 2px 10px">Filtro: ${ui.pdep === "todos" ? "todos los deportes" : ui.pdep === "nba" ? "NBA" : "Fútbol"} · ${esc(MK.find(([k]) => k === ui.pmk)?.[1] || "")}</div>` : ""}
     <div class="pclist">${it.map(pcCard).join("") || `<div class="empty">Hoy ya no quedan picks con este filtro. Los de mañana aparecen aquí desde mañana; puedes verlos antes en el Calendario.</div>`}</div>
-    <div class="small" style="text-align:center;margin:14px 0">El mejor pick de cada partido (hasta 3 si los otros son fuertes) · cuota ${odd(D.cuota_min || 1.5)} o más · ordenados por confianza.<br>Todos los mercados de cada partido están en su ficha.</div>`;
+    <div class="small" style="text-align:center;margin:14px 0">Primero los <b>errores de cuota</b>: la casa paga más de lo que vale (valor = probabilidad × cuota − 1, desde +${Math.round((D.valor_min || 0.05) * 100)}%).<br>Después los más probables donde no tenemos la cuota de la casa: valen la pena si tu casa paga al menos lo que dice "vale desde".</div>`;
 }
 // foto del jugador recortada, pegada al borde izquierdo de la ficha, con el logo de la liga
 function fotoJug(foto, nombre, tm, liga) {
@@ -456,7 +461,7 @@ function pcCard(e) {
   }
   return `<button class="pcard ${jug ? "jg" : ""}" ${attr}>${img}<div class="pcm"><div class="pcl">${jug ? lab : esc(lab)}</div><div class="pct">${esc(tit)}</div><div class="pcs">${esc(sub)}</div>
     <span class="pcpill ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(pill)}</span></span></div>
-    <div class="pcr"><span class="pcp"><i></i>${pct(e.p)}</span><span class="pcc">cuota ${odd(cuota)}</span></div></button>`;
+    <div class="pcr"><span class="pcp"><i></i>${pct(e.p)}</span>${e.val != null ? `<span class="pcval">VALOR ${valTxt(e.val)}</span><span class="pcc">casa ${odd(e.casa)}</span>` : `<span class="pcc">vale desde ${odd(e.min || cuota)}</span>`}</div></button>`;
 }
 function openFiltros() {
   openSheet(`<h2 class="pkh2" style="margin-top:4px">Filtros</h2>

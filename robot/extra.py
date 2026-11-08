@@ -26,8 +26,9 @@ LE = {"cor": [2.5, 3.5, 4.5, 5.5, 6.5], "sot": [1.5, 2.5, 3.5, 4.5, 5.5], "tir":
 # jugadores: estadística -> (campo en el box score, líneas)
 PJ = {"sot": ("shotsOnTarget", [0.5, 1.5]), "tir": ("totalShots", [0.5, 1.5, 2.5]),
       "fal": ("foulsCommitted", [0.5, 1.5]), "tar": ("yellowCards", [0.5])}
-CUOTA_MIN = 1.50            # el usuario pidió cuota mínima 1.50 (antes 1.30)
-MAXP = 1 / CUOTA_MIN        # -> probabilidad máxima de un pick: 76,9 %
+MAXP = 0.75                 # pick por probabilidad entre 55 % y 75 % (sin cuota de casa:
+PMIN = 0.55                 # la app muestra "vale la pena si tu casa paga más de X")
+CUOTA_MIN = round(1 / MAXP, 2)
 
 
 def tval(t, s):
@@ -246,7 +247,7 @@ def pick_eval(P, Yb):
     entre las que pagan cuota justa >= CUOTA_MIN. Devuelve (prob, acierto)."""
     C = np.concatenate([P, 1 - P], axis=1)
     O = np.concatenate([Yb, 1 - Yb], axis=1)
-    ok = (C >= 0.5) & (C <= MAXP)
+    ok = (C >= PMIN) & (C <= MAXP)
     Cm = np.where(ok, C, -1)
     j = np.argmax(Cm, axis=1)
     has = Cm[np.arange(len(C)), j] >= 0.5
@@ -333,7 +334,7 @@ def _txt(s, sc, lado, ln, quien=""):
 def _best(pov, lines):
     """Pick de un mercado: el lado/línea más probable con cuota justa >= CUOTA_MIN."""
     c = [(p, "mas", ln) for p, ln in zip(pov, lines)] + [(1 - p, "menos", ln) for p, ln in zip(pov, lines)]
-    c = [x for x in c if 0.5 <= x[0] <= MAXP]
+    c = [x for x in c if PMIN <= x[0] <= MAXP]
     return max(c, key=lambda x: x[0]) if c else None
 
 

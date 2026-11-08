@@ -887,3 +887,12 @@ img.hpimg.foto { width: auto; height: 100%; max-width: 50%; right: 0; left: auto
 .pcard .pcm { padding-right: 0; } .pcard .pct, .pcard .pcl, .pcard .pcs { padding-right: 64px; }
 .pcard.jg { padding-left: 116px; min-height: 116px; }
 .pjf { width: 112px; } .pjf img { width: 112px; height: 116px; object-fit: contain; object-position: bottom center; }
+
+/* ===== errores de cuota (valor) ===== */
+.pcval { font-size: 10.5px; font-weight: 800; letter-spacing: .3px; color: #04130a; background: #39ff7a; padding: 3px 8px; border-radius: 99px; box-shadow: 0 0 10px rgba(57,255,122,.45); }
+.light .pcval { background: #00c853; color: #fff; box-shadow: none; }
+.hpb .hc b { color: #39ff7a; }
+.pkvale { display: flex; gap: 10px; align-items: flex-start; margin: 12px 0 4px; padding: 11px 13px; border-radius: 14px; background: var(--pkt); font-size: 13.5px; line-height: 1.45; color: var(--tx2); }
+.pkvale svg { width: 17px; height: 17px; flex: none; margin-top: 1px; color: var(--tx3); }
+.pkvale b { color: var(--tx); }
+.pkvale.v { background: rgba(57,255,122,.1); border: 1px solid rgba(57,255,122,.35); } .pkvale.v svg { color: #22c55e; }

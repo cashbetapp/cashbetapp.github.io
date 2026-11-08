@@ -33,7 +33,7 @@ function gCard(g) {
   return `<button class="gc" data-g="${g.id}"><div class="gt">${t("h")}
       <div class="mid"><b>${hora(g.at)}</b><span class="lg">${esc(g.liga)}</span><div class="fm">${dotsF(f.h)}<i>FORMA</i>${dotsF(f.a)}</div><span class="det">Detalles</span></div>${t("a")}</div>
     <div class="godds"><span><em>${esc(abT(g.h))}</em><b>${odd(o1)}</b></span>${oX ? `<span><em>X</em><b>${odd(oX)}</b></span>` : ""}<span><em>${esc(abT(g.a))}</em><b>${odd(o2)}</b></span></div>
-    ${g.pick.bajo ? `<div class="gpk low"><span>Favorito claro: ${esc(g.pick.txt)} · paga menos de ${odd(D.cuota_min || 1.5)}, sin pick</span></div>` : `<div class="gpk ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(g.pick.txt)}</span><b>${pct(g.pick.p)}</b></div>`}</button>`;
+    ${g.pick.bajo ? `<div class="gpk low"><span>Sin pick: ${g.pick.p > 0.75 ? `favorito muy claro (${esc(g.pick.txt)})` : "la casa ya paga lo justo"}</span></div>` : `<div class="gpk ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(g.pick.txt)}</span><b>${pct(g.pick.p)}</b></div>`}</button>`;
 }
 function calendario() {
   const dias = [];
@@ -91,7 +91,7 @@ function inicio() {
     <div class="tiles t2">
       <div class="tile"><div class="k">Efectividad</div><div class="v">${real ? Math.round(rec.ef) : Math.round(efPrueba)}%<small>${real ? "real" : "prueba"}</small></div></div>
       <div class="tile"><div class="k">Racha</div><div class="v">${rec.n ? rec.racha.replace(" ", "") : "—"}</div></div>
-      <div class="tile"><div class="k">Cuota prom.</div><div class="v">${cprom ? odd(cprom) : "—"}</div></div></div>
+      <div class="tile"><div class="k">Errores de cuota</div><div class="v">${its.filter((e) => e.val != null).length}<small>hoy</small></div></div></div>
     ${top.length ? `<div class="sec"><h2 class="ih">${ic("bolt")}Picks destacados (${top.length})</h2><button class="pill dk" data-go="picks">Top picks</button></div>
       <div class="car">${top.map(heroPick).join("")}</div><div class="dots">${top.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</div>` : ""}
     <div class="sec"><h2 class="ih">${ic("trend")}Picks principales</h2><button class="pill dk" data-go="picks">Ver todo ${ic("right")}</button></div>
@@ -117,7 +117,7 @@ function heroPick(e) {
   }
   const pk = esc(pick).replace(/(\d+(?:\.\d+)?)/, "<em>$1</em>");
   return `<button class="hp" ${attr}><span class="hpchip">${lk ? lgLogo(lk, 16) : ""}${esc(chip)}</span><div class="hpt"><small>${esc(small)}</small><h3>${esc(big)}</h3><span>${esc(sub)}</span>
-      <div class="hpk">${pk}</div><div class="hpb"><span class="hc">cuota ${odd(cuota)}</span><span class="ha">${pct(e.p)} · Análisis ${ic("right")}</span></div></div>${img}</button>`;
+      <div class="hpk">${pk}</div><div class="hpb"><span class="hc">${e.val != null ? `casa ${odd(e.casa)} · <b>valor ${valTxt(e.val)}</b>` : `vale desde ${odd(e.min || cuota)}`}</span><span class="ha">${pct(e.p)} · Análisis ${ic("right")}</span></div></div>${img}</button>`;
 }
 
 // ------------------------------------------------------------ FICHA DE PARTIDO
@@ -140,8 +140,9 @@ function openGame(id, tab) {
       <div class="ghteams">${tm("h", "LOCAL")}<div class="vs">VS</div>${tm("a", "VISITANTE")}</div>
       ${g.ven ? `<div class="ghven">${ic("pin")}<span><b>${esc(g.ven)}</b>${g.city ? `<br>${esc(g.city)}` : ""}</span></div>` : ""}
       <div class="ghc">${c1 ? `<span>${c1}</span>` : ""}<b>${c2}</b></div></div>
-    ${g.pick.bajo ? `<div class="ajnote">Favorito claro (${esc(g.pick.txt)}, ${pct(g.pick.p)}), pero paga menos de ${odd(D.cuota_min || 1.5)}: no hay pick de partido. Mira Cuotas y Jugadores para otros mercados.</div>` : ""}
-    <div class="gpick" ${g.pick.bajo ? 'style="display:none"' : ""}><div><small>PICK DEL MODELO</small><span class="pcpill ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(g.pick.txt)}</span></span></div><div class="r"><b>${pct(g.pick.p)}</b><span>cuota ${odd(g.pick.cuota || g.pick.justa)}</span></div></div>
+    ${g.pick.bajo ? `<div class="ajnote">${g.pick.p > 0.75 ? `Favorito muy claro (${esc(g.pick.txt)}, ${pct(g.pick.p)}): paga demasiado poco para valer la pena.` : "La casa ya paga lo justo en este partido: no encontramos un error de cuota."} Mira Jugadores y Cuotas para otros mercados.</div>` : ""}
+    <div class="gpick" ${g.pick.bajo ? 'style="display:none"' : ""}><div><small>PICK DEL MODELO</small><span class="pcpill ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(g.pick.txt)}</span></span></div><div class="r"><b>${pct(g.pick.tipo === "valor" ? g.pick.pv : g.pick.p)}</b><span>${g.pick.tipo === "valor" ? `casa ${odd(g.pick.cuota)} · valor ${valTxt(g.pick.valor)}` : `vale desde ${odd(g.pick.minima || vale(g.pick.justa))}`}</span></div></div>
+    ${g.pick.tipo === "valor" ? `<div class="pkvale v">${ic("bolt")}<span><b>Error de la casa:</b> paga ${odd(g.pick.cuota)} y según el modelo (mezclado con la propia casa) pasa ${pct(g.pick.pv)} de las veces. La cuota justa sería ${odd(1 / g.pick.pv)}.</span></div>` : ""}
     <div class="gacts"><button class="pkseg ${seg[id] ? "on" : ""}" data-act="seg">${ic(seg[id] ? "check" : "heart")}${seg[id] ? "Siguiendo" : "Seguir pick"}</button><button class="pkseg" data-act="tobank">${ic("plus")}Al bankroll</button></div>
     <div class="pktabs dark gtabs">${tabs.map(([k, l]) => `<button class="${t === k ? "on" : ""}" data-act="gtab" data-k="${k}">${l}</button>`).join("")}</div>
     ${t === "previa" ? gPrevia(g) : t === "cuotas" ? gCuotas(g) : t === "equipos" ? gEquipos(g) : gJugadores(g)}`;
