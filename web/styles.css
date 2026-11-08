@@ -824,3 +824,16 @@ img.pcimg.foto { height: 74px; margin: -4px 0; border-radius: 12px; }
 
 /* escudos: nítidos y sin deformarse */
 img.crest, .pjl img, .lglogo { object-fit: contain !important; image-rendering: auto; }
+
+/* dos escudos: completos, sin taparse (en diagonal) */
+.pkmini.dos { padding: 0; gap: 2px; justify-content: center; align-items: center; }
+.pkmini.dos img, .pkmini.dos .crest-f { margin: 0 !important; width: 26px !important; height: 26px !important; }
+.pkbig.dos { position: relative; width: 150px; height: 150px; display: block; }
+.pkbig.dos img, .pkbig.dos .crest-f { position: absolute; width: 74px !important; height: 74px !important; margin: 0 !important; }
+.pkbig.dos > :first-child { left: 0; top: 0; } .pkbig.dos > :last-child { right: 0; bottom: 0; }
+.pcimg.dos { position: relative; display: block; }
+.pcimg.dos img, .pcimg.dos .crest-f { position: absolute; width: 34px !important; height: 34px !important; margin: 0 !important; }
+.pcimg.dos > :first-child { left: 0; top: 0; } .pcimg.dos > :last-child { right: 0; bottom: 0; }
+.hpimg.dos { display: block; }
+.hpimg.dos img, .hpimg.dos .crest-f { position: absolute; width: 76px !important; height: 76px !important; margin: 0 !important; }
+.hpimg.dos > :first-child { left: 12%; top: 22%; } .hpimg.dos > :last-child { left: 46%; top: 46%; }
