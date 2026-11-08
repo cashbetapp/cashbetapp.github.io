@@ -160,10 +160,11 @@ function after(tab) {
 }
 window.addEventListener("hashchange", route);
 document.addEventListener("click", (e) => {
-  const t = e.target.closest("[data-go],[data-g],[data-mp],[data-pr],[data-pk],[data-act]");
+  const t = e.target.closest("[data-go],[data-g],[data-mp],[data-res],[data-pr],[data-pk],[data-act]");
   if (!t) return;
   if (t.dataset.go) { location.hash = t.dataset.go; }
   else if (t.dataset.mp && typeof openMatchPick === "function") openMatchPick(t.dataset.mp);
+  else if (t.dataset.res && typeof openResultado === "function") openResultado(t.dataset.res);
   else if (t.dataset.g) openGame(t.dataset.g, t.dataset.t || "resumen");
   else if (t.dataset.pk) openPick(t.dataset.pk, t.dataset.m);
   else if (t.dataset.pr) openProp(+t.dataset.pr);
@@ -526,6 +527,7 @@ function act(a, el) {
   if (typeof actCuentaSync === "function" && actCuentaSync(a)) return;
   if (typeof actSeguidos === "function" && actSeguidos(a, el)) return;
   if (typeof actInicio2 === "function" && actInicio2(a)) return;
+  if (typeof actRes === "function" && actRes(a, el)) return;
   if (typeof actMatchPick === "function" && a.startsWith("mp") && actMatchPick(a, el)) return;
   if (typeof actVistas === "function" && actVistas(a, el)) return;
   if (typeof actPick === "function" && actPick(a, el)) return;

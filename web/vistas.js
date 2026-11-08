@@ -36,28 +36,34 @@ function gCard(g) {
     ${g.pick.bajo ? `<div class="gpk low"><span>Sin pick: ${g.pick.p > 0.75 ? `favorito muy claro (${esc(g.pick.txt)})` : "la casa ya paga lo justo"}</span></div>` : `<div class="gpk ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(g.pick.txt)}</span><b>${pct(g.pick.p)}</b></div>`}</button>`;
 }
 function calendario() {
-  const dias = [];
-  for (let i = 0; i < 8; i++) { const d = new Date(); d.setDate(d.getDate() + i); dias.push(d); }
-  const sel = dkey(dias[ui.cal]);
-  let gs = D.partidos.filter((g) => dkey(new Date(g.at)) === sel);
-  if (ui.calDep !== "todos") gs = gs.filter((g) => g.dep === ui.calDep);
-  if (ui.calLg !== "todas") gs = gs.filter((g) => g.lg === ui.calLg);
+  if (typeof cargarRes === "function") { if (!RES) cargarRes(); else vivo(); }
+  const dia = new Date(); dia.setDate(dia.getDate() + ui.cal);
+  const sel = dkey(dia), R = (typeof RES !== "undefined" && RES) || {};
+  const jugado = (id) => R[id] && (R[id].st === "in" || R[id].st === "post");
+  // por jugarse (del modelo) + en vivo / terminados (ESPN)
+  let gs = D.partidos.filter((g) => dkey(new Date(g.at)) === sel && !jugado(g.id)).map((g) => ({ g, lg: g.lg, dep: g.dep }));
+  Object.entries(R).forEach(([id, r]) => { if (dkey(new Date(r.at)) === sel && (r.st === "in" || r.st === "post")) gs.push({ r, id, lg: r.lg, dep: r.dep }); });
+  if (ui.calDep !== "todos") gs = gs.filter((x) => x.dep === ui.calDep);
+  if (ui.calLg !== "todas") gs = gs.filter((x) => x.lg === ui.calLg);
   const grupos = {};
-  gs.forEach((g) => (grupos[g.lg] = grupos[g.lg] || []).push(g));
+  gs.forEach((x) => (grupos[x.lg] = grupos[x.lg] || []).push(x));
   const keys = ORDEN.filter((k) => grupos[k]);
-  const lab = ui.cal === 0 ? "Hoy" : ui.cal === 1 ? "Mañana" : cap(fmtS.format(dias[ui.cal]));
+  const dias = { [ui.cal]: dia };
+  const lab = ui.cal === 0 ? "Hoy" : ui.cal === 1 ? "Mañana" : ui.cal === -1 ? "Ayer" : cap(fmtS.format(dia));
   const depTxt = ui.calDep === "futbol" ? "Fútbol" : ui.calDep === "nba" ? "Baloncesto" : "";
   const fil = ui.calDep !== "todos" || ui.calLg !== "todas";
   const solo = keys.length === 1;
   return header("Calendario", `${gs.length} juegos · ${fmtD.format(dias[ui.cal])}`) + `
-    <div class="cbar"><div class="cday"><button data-act="cal" data-i="${Math.max(ui.cal - 1, 0)}" ${ui.cal ? "" : "disabled"} aria-label="Día anterior">${ic("left")}</button><b>${lab}</b><button data-act="cal" data-i="${Math.min(ui.cal + 1, 7)}" ${ui.cal < 7 ? "" : "disabled"} aria-label="Día siguiente">${ic("right")}</button></div>
+    <div class="cbar"><div class="cday"><button data-act="cal" data-i="${Math.max(ui.cal - 1, -2)}" ${ui.cal > -2 ? "" : "disabled"} aria-label="Día anterior">${ic("left")}</button><b>${lab}</b><button data-act="cal" data-i="${Math.min(ui.cal + 1, 7)}" ${ui.cal < 7 ? "" : "disabled"} aria-label="Día siguiente">${ic("right")}</button></div>
       <button class="cfil ${fil ? "on" : ""}" data-act="cfil">${ic("filtro")}${fil ? `<span>${esc(ui.calLg !== "todas" ? D.ligas[ui.calLg].n : depTxt)}</span>` : ""}</button></div>
     ${keys.map((k) => {
-      const xs = grupos[k].sort((a, b) => b.pick.p - a.pick.p), open = solo || ui.calOpen[k];
-      return `<div class="lgg ${open ? "open" : ""}">${solo ? "" : `<button class="lgh" data-act="lgt" data-k="${k}">${lgLogo(k)}<b>${esc(D.ligas[k] ? D.ligas[k].n : xs[0].liga)}</b><span>${xs.length} ${xs.length === 1 ? "juego" : "juegos"}</span>${ic("chev")}</button>`}
-        ${open ? `<div class="lgb">${xs.map(gCard).join("")}</div>` : ""}</div>`;
+      // en vivo primero, luego por jugarse (por confianza) y al final los terminados
+      const ord = (x) => (x.r ? (x.r.st === "in" ? 0 : 2) : 1);
+      const xs = grupos[k].sort((a, b) => ord(a) - ord(b) || (b.g && a.g ? b.g.pick.p - a.g.pick.p : 0)), open = solo || ui.calOpen[k];
+      return `<div class="lgg ${open ? "open" : ""}">${solo ? "" : `<button class="lgh" data-act="lgt" data-k="${k}">${lgLogo(k)}<b>${esc(D.ligas[k] ? D.ligas[k].n : (xs[0].g || xs[0].r).liga)}</b><span>${xs.length} ${xs.length === 1 ? "juego" : "juegos"}</span>${ic("chev")}</button>`}
+        ${open ? `<div class="lgb">${xs.map((x) => (x.g ? gCard(x.g) : gCardRes(x.r, x.id))).join("")}</div>` : ""}</div>`;
     }).join("") || `<div class="empty">No hay partidos este día en las ligas que seguimos.</div>`}
-    ${keys.length ? `<div class="small" style="text-align:center;margin:12px 0">Dentro de cada liga, ordenados por confianza del pick</div>` : ""}`;
+    ${keys.length ? `<div class="small" style="text-align:center;margin:12px 0">En vivo primero; los por jugarse, por confianza del pick</div>` : ""}`;
 }
 function openCalFiltros() {
   const dep = [["todos", "Todos"], ["futbol", "Fútbol"], ["nba", "Baloncesto"]];

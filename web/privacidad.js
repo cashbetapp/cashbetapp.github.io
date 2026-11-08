@@ -9,7 +9,7 @@ function privCuerpo() {
       <p>CASHBET no usa analítica, publicidad ni rastreo. Para ver los picks necesitas una cuenta gratis (correo o Google).</p></div>
     <div class="prv_pvb">
       ${fila("01", "bars2", "Qué guardamos", "En este celular: los picks que sigues, tu bankroll, tu nombre, el tema y el formato de cuotas (y una copia en tu cuenta). No pedimos datos de pago ni apostamos en tu nombre.")}
-      ${fila("02", "eye", "Qué no hacemos", "No usamos herramientas de analítica ni de seguimiento, no grabamos tu sesión y no compartimos datos con nadie. Para mostrarte la página, GitHub (donde está alojada) y Google Fonts (la letra) reciben tu dirección IP, como con cualquier sitio web.")}
+      ${fila("02", "eye", "Qué no hacemos", "No usamos herramientas de analítica ni de seguimiento, no grabamos tu sesión y no compartimos datos con nadie. Para mostrarte la página, GitHub (donde está alojada), Google Fonts (la letra) y ESPN (marcadores en vivo, fotos y noticias) reciben tu dirección IP, como con cualquier sitio web.")}
       ${fila("03", "user", "Tu cuenta", "Guardamos tu nombre, tu correo, los picks que sigues, tu bankroll y tus preferencias en Firebase (Google) para que los veas en cualquier equipo. Solo tú puedes leerlos.")}
       ${fila("04", "lock", "Tu control", "Puedes borrar lo guardado en este celular desde Perfil &gt; Privacidad, y eliminar tu cuenta y sus datos de la nube desde Perfil cuando quieras. Nada de esto afecta los pronósticos.")}
     </div>`;
