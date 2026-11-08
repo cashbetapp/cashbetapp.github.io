@@ -1348,3 +1348,5 @@ body.sincuenta #app { padding-bottom: calc(env(safe-area-inset-bottom) + 24px); 
 .rei { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--card2); color: var(--tx2); }
 .rei svg { width: 15px; height: 15px; } .rei.g { color: var(--p); background: rgba(57,255,122,.12); } .rei.y { color: #ffd21f; background: rgba(255,210,31,.14); } .rei.r { color: #ff4d4d; background: rgba(255,77,77,.14); }
 .rer b { display: block; font-size: 14px; } .rer small { color: var(--tx3); font-size: 12px; }
+
+.flist.fscroll { max-height: 260px; overflow-y: auto; }

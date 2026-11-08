@@ -421,16 +421,18 @@ function picks() {
   if (ui.pseg === "equipos") it = it.filter((e) => e.eq);
   if (ui.pdep !== "todos") it = it.filter((e) => e.dep === ui.pdep);
   if (ui.pmk !== "todos") it = it.filter((e) => e.mk === ui.pmk);
+  if (ui.pgame && ui.pgame !== "todos") it = it.filter((e) => e.gid === ui.pgame);
   // Todos: 1 por partido y sin jugadores NBA en prueba; Jugadores/Equipos o con filtro: 2 por partido
   if (ui.pseg === "todos" && ui.pmk === "todos") it = mejores(it.filter((e) => e.k !== "pr"), 3);
   else it = ordenar([...mejores(it.filter((e) => e.k !== "pr"), 3), ...it.filter((e) => e.k === "pr")]);   // NBA: hasta 3 jugadores por partido
+  if (ui.pord && ui.pord !== "conf") it = ordenPor(it, ui.pord);
   const total = it.length;
   it = it.slice(0, 80);
-  const fil = ui.pdep !== "todos" || ui.pmk !== "todos";
+  const fil = ui.pdep !== "todos" || ui.pmk !== "todos" || (ui.pgame && ui.pgame !== "todos") || (ui.pord && ui.pord !== "conf");
   return header("Predicciones", `${total} mejores picks · ${fmtD.format(new Date())}`) + `
     <div class="pkbar"><div class="pktabs dark">${[["todos", "Todos"], ["jugadores", "Jugadores"], ["equipos", "Equipos"]].map(([k, l]) => `<button class="${ui.pseg === k ? "on" : ""}" data-act="pseg" data-k="${k}">${l}</button>`).join("")}</div>
       <button class="pkfil ${fil ? "on" : ""}" data-act="pfil" aria-label="Filtros">${ic(fil ? "filtro" : "ball")}</button></div>
-    ${fil ? `<div class="small" style="margin:-2px 2px 10px">Filtro: ${ui.pdep === "todos" ? "todos los deportes" : ui.pdep === "nba" ? "NBA" : "Fútbol"} · ${esc(MK.find(([k]) => k === ui.pmk)?.[1] || "")}</div>` : ""}
+    ${fil ? `<div class="small" style="margin:-2px 2px 10px">Filtro: ${ui.pdep === "todos" ? "todos los deportes" : ui.pdep === "nba" ? "NBA" : "Fútbol"} · ${esc(MK.find(([k]) => k === ui.pmk)?.[1] || "")}${ui.pgame && ui.pgame !== "todos" && D.byId[ui.pgame] ? ` · ${esc(abT(D.byId[ui.pgame].h))} vs ${esc(abT(D.byId[ui.pgame].a))}` : ""} · orden: ${esc((ORDS.find(([k]) => k === (ui.pord || "conf")) || [])[1] || "")}</div>` : ""}
     <div class="pclist">${it.map(pcCard).join("") || `<div class="empty">Hoy ya no quedan picks con este filtro. Los de mañana aparecen aquí desde mañana; puedes verlos antes en el Calendario.</div>`}</div>
     <div class="small" style="text-align:center;margin:14px 0">Primero los <b>errores de cuota</b>: la casa paga más de lo que vale (valor = probabilidad × cuota − 1, desde +${Math.round((D.valor_min || 0.05) * 100)}%).<br>Después los más probables donde no tenemos la cuota de la casa: valen la pena si tu casa paga al menos lo que dice "vale desde".</div>`;
 }
@@ -466,9 +468,33 @@ function pcCard(e) {
     <div class="pcr"><span class="pcp"><i></i>${pct(e.p)}</span></div>
     <div class="pcb">${e.val != null ? `<span class="pcval">+${Math.round(e.val * 100)}%</span><span class="pcc">${odd(e.casa)}</span>` : e.prueba ? `<span class="pcc" title="Cuota de la casa (en prueba)">${odd(e.casa)}</span>` : `<span class="pcc" title="Vale la pena desde esta cuota">≥${odd(e.min || cuota)}</span>`}</div></button>`;
 }
+// ---- orden de la lista (como IABET; aquí todas las opciones son gratis)
+const ORDS = [["conf", "Confianza"], ["tasa", "Tasa de acierto (últimos 10)"], ["cuota", "Cuota"], ["edge", "Edge (ventaja sobre la cuota)"], ["mc", "Monte Carlo"]];
+const _tasaC = {};
+function tasaPick(e) {
+  const k = e.k + "|" + (e.gid || "") + "|" + (e.x ? e.x.m || e.x.pl + e.x.t + e.x.linea : "");
+  if (k in _tasaC) return _tasaC[k];
+  let v = null;
+  try {
+    if (e.k === "x") { const P = pkFind(e.g.id, e.x.m); const s = pkSerie(P).slice(0, 10); if (s.length) v = s.filter((q) => pkHit(P, q.v)).length / s.length; }
+    else if (e.k === "g" && typeof mpSerie === "function") { const I = mpInfo(e.g), s = mpSerie(e.g, I, I.side || "h").slice(0, 10); if (s.length) v = s.filter((q) => I.hit(q.v)).length / s.length; }
+    else if (e.k === "pr" && e.x.ult) { const s = e.x.ult.slice(-10); if (s.length) v = s.filter((t) => (e.x.lado === "mas" ? t > e.x.linea : t < e.x.linea)).length / s.length; }
+  } catch (err) {}
+  return (_tasaC[k] = v);
+}
+const cuotaDe = (e) => e.casa || (e.k === "g" ? e.g.pick.cuota || e.g.pick.justa : e.k === "x" ? e.x.justa : e.x.cuota) || 0;
+const edgeDe = (e) => (e.val != null ? e.val : e.casa ? e.p * e.casa - 1 : e.p * (e.min || cuotaDe(e)) - 1);
+function ordenPor(xs, o) {
+  const f = o === "tasa" ? (e) => tasaPick(e) ?? -1 : o === "cuota" ? cuotaDe : o === "edge" ? edgeDe : (e) => e.p;   // Monte Carlo = la simulación reproduce la probabilidad del modelo
+  return [...xs].sort((a, b) => f(b) - f(a) || b.p - a.p);
+}
 function openFiltros() {
+  const juegos = D.partidos.filter((g) => esHoy(g.at) && new Date(g.at) > Date.now() && (ui.pdep === "todos" || g.dep === ui.pdep));
+  const op = (grp, k, l, cur) => `<button class="${cur === k ? "on" : ""}" data-act="${grp}" data-k="${k}"><span>${l}</span>${cur === k ? ic("check") : ""}</button>`;
   openSheet(`<h2 class="pkh2" style="margin-top:4px">Filtros</h2>
     <div class="fl">DEPORTE</div><div class="flist">${[["todos", "Todos"], ["futbol", "Fútbol"], ["nba", "Baloncesto (NBA)"]].map(([k, l]) => `<button class="${ui.pdep === k ? "on" : ""}" data-act="pdep" data-k="${k}"><span>${l}</span>${ui.pdep === k ? ic("check") : ""}</button>`).join("")}</div>
+    <div class="fl">ORDENAR POR</div><div class="flist">${ORDS.map(([k, l]) => op("pord", k, l, ui.pord || "conf")).join("")}</div>
+    <div class="fl">JUEGO</div><div class="flist fscroll">${op("pgame", "todos", "Todos los juegos", ui.pgame || "todos")}${juegos.map((g) => op("pgame", g.id, `${esc(g.dep === "nba" ? `${abT(g.a)} @ ${abT(g.h)}` : `${abT(g.h)} vs ${abT(g.a)}`)} · ${hora(g.at)}`, ui.pgame || "todos")).join("")}</div>
     <div class="fl">MERCADO</div><div class="flist">${MK.map(([k, l]) => `<button class="${ui.pmk === k ? "on" : ""}" data-act="pmk" data-k="${k}"><span>${l}</span>${ui.pmk === k ? ic("check") : ""}</button>`).join("")}</div>
     <button class="bigbtn" data-act="pfreset" style="margin-top:16px">Quitar filtros</button>`);
   $(".sheet").classList.add("pk");
@@ -500,7 +526,7 @@ function actPick(a, el) {
   }
   if (a === "pseg") { ui.pseg = k; rerender(); return true; }
   if (a === "pfil") { openFiltros(); return true; }
-  if (a === "pdep" || a === "pmk") { ui[a] = k; closeSheet(true); rerender(); return true; }
-  if (a === "pfreset") { ui.pdep = "todos"; ui.pmk = "todos"; closeSheet(true); rerender(); return true; }
+  if (a === "pdep" || a === "pmk" || a === "pord" || a === "pgame") { ui[a] = k; closeSheet(true); rerender(); return true; }
+  if (a === "pfreset") { ui.pdep = "todos"; ui.pmk = "todos"; ui.pord = "conf"; ui.pgame = "todos"; closeSheet(true); rerender(); return true; }
   return false;
 }
