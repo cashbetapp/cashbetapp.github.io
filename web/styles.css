@@ -805,3 +805,19 @@ img.pcimg.foto { height: 74px; margin: -4px 0; border-radius: 12px; }
 .pcpill { font-size: 11.5px; padding: 5px 10px; margin-top: 7px; }
 .pcp { font-size: 12px; padding: 3px 9px; }
 .hp { min-height: 196px; }
+
+/* ficha de jugador: foto recortada pegada a la izquierda (como el ejemplo) */
+.pcard.jg { padding-left: 128px; min-height: 124px; }
+.pjf { position: absolute; left: 0; bottom: 0; top: 0; width: 124px; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; }
+.pjf img { width: 124px; height: 124px; object-fit: cover; object-position: top center; display: block;
+  -webkit-mask-image: linear-gradient(90deg, #000 72%, transparent), linear-gradient(#000 80%, rgba(0,0,0,.85));
+  mask-image: linear-gradient(90deg, #000 72%, transparent); }
+.pjf.sin { align-items: center; }
+.pjs { width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center; font-size: 24px; font-weight: 800; color: var(--tx);
+  background: linear-gradient(160deg, #2a3330, #161b19); border: 1px solid rgba(255,255,255,.08); }
+.light .pjs { background: linear-gradient(160deg, #eceff2, #d9dee3); border-color: rgba(0,0,0,.06); }
+.pjl { position: absolute; left: 9px; bottom: 9px; display: grid; place-items: center; filter: drop-shadow(0 1px 3px rgba(0,0,0,.45)); }
+.pjl img, .pjl span { width: 22px !important; height: 22px !important; }
+.pcard.jg .pcl { display: flex; align-items: center; gap: 6px; font-size: 12px; letter-spacing: .4px; }
+.pcard.jg .pcl img, .pcard.jg .pcl .crest-f { width: 16px !important; height: 16px !important; flex: none; }
+.pcard.jg .pct { font-size: 19px; }

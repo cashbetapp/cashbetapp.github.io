@@ -562,10 +562,10 @@ def images(partidos, props_):
         for x in (g.get("extra") or {}).get("jug", []):
             if os.path.exists(os.path.join(DATA, f"img/f/{x['pid']}.png")):
                 x["foto"] = f"data/img/f/{x['pid']}.png"
-    # los que ESPN no tiene: foto libre de Wikimedia (comprobando fecha de nacimiento)
+    # los que ESPN no tiene: foto recortada de FotMob (nombre y equipo deben coincidir)
     try:
         import fotos
-        faltan = [(x["pid"], x["jugador"]) for g in partidos if g["at"] <= limite
+        faltan = [(x["pid"], x["jugador"], g[x.get("side") or "h"]["n"]) for g in partidos if g["at"] <= limite
                   for x in (g.get("extra") or {}).get("jug", []) if not x.get("foto")]
         wf = fotos.completar(faltan)
         for g in partidos:

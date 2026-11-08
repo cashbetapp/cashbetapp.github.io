@@ -427,8 +427,13 @@ function picks() {
     <div class="pclist">${it.map(pcCard).join("") || `<div class="empty">Hoy ya no quedan picks con este filtro. Los de mañana aparecen aquí desde mañana; puedes verlos antes en el Calendario.</div>`}</div>
     <div class="small" style="text-align:center;margin:14px 0">El mejor pick de cada partido (hasta 3 si los otros son fuertes) · cuota ${odd(D.cuota_min || 1.5)} o más · ordenados por confianza.<br>Todos los mercados de cada partido están en su ficha.</div>`;
 }
+// foto del jugador recortada, pegada al borde izquierdo de la ficha, con el logo de la liga
+function fotoJug(foto, nombre, tm, liga) {
+  const f = foto ? `<img src="${esc(foto)}" alt="" loading="lazy">` : `<span class="pjs">${esc(sigla({ n: nombre }))}</span>`;
+  return `<div class="pjf ${foto ? "" : "sin"}">${f}<span class="pjl">${liga}</span></div>`;
+}
 function pcCard(e) {
-  let img, lab, tit, sub, pill, up, attr, cuota, liga;
+  let img, lab, tit, sub, pill, up, attr, cuota, liga, jug = false;
   if (e.k === "g") {
     const g = e.g; up = isUp(g.pick.m);
     img = `<div class="pcimg dos">${crest(g.h, 46)}${crest(g.a, 46)}</div>`;
@@ -437,18 +442,19 @@ function pcCard(e) {
   } else if (e.k === "x") {
     const g = e.g, x = e.x, P = pkFind(g.id, x.m); up = P.lado === "mas" || pkPill(P) === "Recibe tarjeta";
     const tm = pkTeam(P);
-    img = P.sc === "j" ? (x.foto ? `<img class="pcimg foto" src="${esc(x.foto)}" alt="" loading="lazy">` : sinFoto(x.jugador, tm, 60, "pcimg"))
-      : P.sc === "t" ? `<div class="pcimg dos">${crest(g.h, 46)}${crest(g.a, 46)}</div>` : `<div class="pcimg">${crest(tm, 74)}</div>`;
-    lab = P.sc === "j" ? `JUGADOR · ${abT(tm)}` : P.sc === "t" ? "TOTAL DEL PARTIDO" : "TOTAL EQUIPO";
+    if (P.sc === "j") { jug = true; img = fotoJug(x.foto, x.jugador, tm, lgLogo(g.lg, 22)); }
+    else img = P.sc === "t" ? `<div class="pcimg dos">${crest(g.h, 46)}${crest(g.a, 46)}</div>` : `<div class="pcimg">${crest(tm, 74)}</div>`;
+    lab = P.sc === "j" ? `${crest(tm, 16)}${esc(abT(tm))}` : P.sc === "t" ? "TOTAL DEL PARTIDO" : "TOTAL EQUIPO";
     tit = P.sc === "j" ? x.jugador : P.sc === "t" ? `Total de ${UN[P.s]}` : tm.n;
     sub = `${abT(g.h)} vs ${abT(g.a)} · ${hora(g.at)}`; pill = pkPill(P); attr = `data-pk="${g.id}" data-m="${esc(x.m)}"`; cuota = x.justa; liga = g.liga;
   } else {
     const x = e.x; up = x.lado === "mas";
-    img = x.foto ? `<img class="pcimg foto" src="${esc(x.foto)}" alt="" loading="lazy">` : `<div class="pcimg"><span class="head crest-f" style="width:64px;height:64px">${esc(sigla({ n: x.jugador }))}</span></div>`;
-    lab = `JUGADOR · NBA`; tit = x.jugador; sub = `${esc(x.partido || "")} · ${hora(x.at)}`;
+    const eq = x.eq || { n: x.equipo };
+    jug = true; img = fotoJug(x.foto, x.jugador, eq, lgLogo("nba", 22));
+    lab = `${crest(eq, 16)}${esc(abT(eq))}`; tit = x.jugador; sub = `${esc(x.partido || "")} · ${hora(x.at)}`;
     pill = `${up ? "Más" : "Menos"} de ${x.linea} ${x.tipo.toLowerCase()}`; attr = `data-pr="${D.props.indexOf(x)}"`; cuota = x.cuota; liga = "NBA";
   }
-  return `<button class="pcard" ${attr}>${img}<div class="pcm"><div class="pcl">${esc(lab)}</div><div class="pct">${esc(tit)}</div><div class="pcs">${esc(sub)}</div>
+  return `<button class="pcard ${jug ? "jg" : ""}" ${attr}>${img}<div class="pcm"><div class="pcl">${jug ? lab : esc(lab)}</div><div class="pct">${esc(tit)}</div><div class="pcs">${esc(sub)}</div>
     <span class="pcpill ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(pill)}</span></span></div>
     <div class="pcr"><span class="pcp"><i></i>${pct(e.p)}</span><span class="pcc">cuota ${odd(cuota)}</span></div></button>`;
 }
