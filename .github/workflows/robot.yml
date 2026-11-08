@@ -1,0 +1,90 @@
+name: Robot CASHBET
+
+on:
+  schedule:
+    - cron: "17 */2 * * *"   # cada 2 horas
+  workflow_dispatch:          # botón "Run workflow"
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: robot
+  cancel-in-progress: false
+
+jobs:
+  robot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Traer los datos guardados (rama datos)
+        run: |
+          if git ls-remote --exit-code --heads origin datos >/dev/null; then
+            git clone --depth 1 --branch datos "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" data
+            rm -rf data/.git
+          else
+            mkdir -p data
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Bajar partidos, cuotas y líneas de jugadores
+        working-directory: robot
+        run: |
+          python fetch.py
+          python props.py || echo "props falló, se sigue"
+          python detail.py || echo "detalle falló, se sigue"
+
+      - name: Prueba de acierto (una vez al día o si falta)
+        working-directory: robot
+        run: |
+          if [ ! -f ../data/model/report.json ] || [ "$(date -u +%H)" = "08" ]; then python model.py > /dev/null; fi
+
+      - name: Pronósticos
+        working-directory: robot
+        run: python predict.py
+
+      - name: Guardar los datos (rama datos, sin historial para no crecer)
+        run: |
+          cd data
+          git init -q -b datos
+          git config user.name "robot-cashbet"
+          git config user.email "robot-cashbet@users.noreply.github.com"
+          git add -A
+          git commit -q -m "datos $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" datos
+          rm -rf .git
+
+      - name: Armar la app
+        run: |
+          mkdir -p _site/data
+          cp -r web/* _site/
+          rm -rf _site/data/*
+          cp data/picks.json _site/data/
+          cp -r data/img _site/data/ 2>/dev/null || true
+          touch _site/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  publicar:
+    needs: robot
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
