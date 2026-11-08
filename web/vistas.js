@@ -102,7 +102,7 @@ function heroPick(e) {
   if (e.k === "g") {
     const g = e.g; up = isUp(g.pick.m);
     chip = g.liga; lk = g.lg; small = "Pick del partido"; big = `${g.h.n} vs ${g.a.n}`; sub = `${abT(g.h)} vs ${abT(g.a)} · ${hora(g.at)}`;
-    pick = g.pick.txt; cuota = g.pick.cuota || g.pick.justa; img = `<div class="hpimg dos">${crest(g.h, 84)}${crest(g.a, 84)}</div>`; attr = `data-g="${g.id}"`;
+    pick = g.pick.txt; cuota = g.pick.cuota || g.pick.justa; img = `<div class="hpimg dos">${crest(g.h, 84)}${crest(g.a, 84)}</div>`; attr = `data-mp="${g.id}"`;
   } else if (e.k === "x") {
     const g = e.g, x = e.x, P = pkFind(g.id, x.m), tm = pkTeam(P); up = P.lado === "mas";
     chip = g.liga; lk = g.lg; small = P.sc === "j" ? tm.n : P.sc === "t" ? "Total del partido" : "Total equipo";

@@ -125,7 +125,7 @@ function route() {
   const dentro = typeof cuentaActiva !== "function" || cuentaActiva();
   document.body.classList.toggle("sincuenta", !dentro);
   if (!dentro && !libre) { tab = "cuenta"; arg = typeof cuentaPendiente === "function" && cuentaPendiente() ? "verificar" : ""; }
-  const views = { inicio: (a) => inicio(a), calendario: (a) => calendario(a), picks: (a) => picks(a), seguidos, bankroll, ajustes: (a) => ajustes(a), historial: (a) => historial(a), cuenta: (a) => cuenta(a) };
+  const views = { inicio: (a) => inicio(a), calendario: (a) => calendario(a), picks: (a) => picks(a), seguidos, bankroll, ajustes: (a) => ajustes(a), historial: (a) => historial(a), cuenta: (a) => cuentaVista(a) };
   const v = views[tab] || inicio;
   const clave = tab + "/" + (arg || "");
   if ($("#app").dataset.tab !== clave) {
@@ -160,9 +160,10 @@ function after(tab) {
 }
 window.addEventListener("hashchange", route);
 document.addEventListener("click", (e) => {
-  const t = e.target.closest("[data-go],[data-g],[data-pr],[data-pk],[data-act]");
+  const t = e.target.closest("[data-go],[data-g],[data-mp],[data-pr],[data-pk],[data-act]");
   if (!t) return;
   if (t.dataset.go) { location.hash = t.dataset.go; }
+  else if (t.dataset.mp && typeof openMatchPick === "function") openMatchPick(t.dataset.mp);
   else if (t.dataset.g) openGame(t.dataset.g, t.dataset.t || "resumen");
   else if (t.dataset.pk) openPick(t.dataset.pk, t.dataset.m);
   else if (t.dataset.pr) openProp(+t.dataset.pr);
@@ -524,6 +525,7 @@ function act(a, el) {
   if (typeof actPriv === "function" && actPriv(a, el)) return;
   if (typeof actCuentaSync === "function" && actCuentaSync(a)) return;
   if (typeof actSeguidos === "function" && actSeguidos(a, el)) return;
+  if (typeof actMatchPick === "function" && a.startsWith("mp") && actMatchPick(a, el)) return;
   if (typeof actVistas === "function" && actVistas(a, el)) return;
   if (typeof actPick === "function" && actPick(a, el)) return;
   if (a === "close") return closeSheet();

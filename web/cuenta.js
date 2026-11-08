@@ -92,7 +92,7 @@ const ERR = {
 const errTxt = (e) => ERR[e && e.code] || "No se pudo completar. Intenta otra vez.";
 
 // ---------------------------------------------------------------- pantallas
-function cuenta(arg) {
+function cuentaVista(arg) {
   if (!FB) fb().then(() => { $("#app").dataset.tab = ""; route(); }).catch(() => { $("#app").innerHTML = `<div class="cta cini"><h1 class="cth">Sin conexión</h1><p class="ctp">Para entrar a CASHBET necesitas internet. Revisa tu conexión y vuelve a abrir la app.</p><button class="cbtn" onclick="location.reload()">Reintentar</button></div>`; });
   if (!AUTH_LISTO) return `<div class="cta cini"><div class="cload"></div></div>`;
   const atras = (go) => `<div class="ctop"><button class="cback" data-go="${go}" aria-label="Atrás">${ic("left")}</button></div>`;

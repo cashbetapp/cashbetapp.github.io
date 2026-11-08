@@ -77,7 +77,7 @@ function seguidos() {
     const v = completar(id, v0);
     const [lab, cls] = e.st ? ESTADO[e.st] : ["Pendiente", "pe"];
     const pk = id.startsWith("pk|") ? id.slice(3) : null, gid = pk ? pk.slice(0, pk.indexOf("|")) : id;
-    const at = pk ? (D.byId[gid] ? `data-pk="${gid}" data-m="${esc(pk.slice(pk.indexOf("|") + 1))}"` : "") : (D.byId[id] ? `data-g="${id}"` : "");
+    const at = pk ? (D.byId[gid] ? `data-pk="${gid}" data-m="${esc(pk.slice(pk.indexOf("|") + 1))}"` : "") : (D.byId[id] ? `data-mp="${id}"` : "");
     const img = v.foto ? `<img class="sgf" src="${esc(v.foto)}" alt="" loading="lazy">`
       : v.tl ? `<div class="sgx1">${crest({ logo: v.tl, n: v.nom }, 92)}</div>`
       : `<div class="sgx2">${crest({ logo: v.hl, n: v.h }, 64)}${crest({ logo: v.al, n: v.a }, 64)}</div>`;

@@ -1267,3 +1267,6 @@ body.sincuenta #app { padding-bottom: calc(env(safe-area-inset-bottom) + 24px); 
 .sgv { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 12px; color: var(--tx3); }
 .sgv em { font-style: normal; font-weight: 800; color: var(--ptx); }
 @media (min-width: 900px) { .sggrid { grid-template-columns: repeat(3, 1fr); } }
+.mpb .c { align-items: stretch; }
+.mpb .mp0 { position: absolute; left: -4px; right: -4px; border-top: 1px solid var(--tx3); opacity: .5; pointer-events: none; }
+.mpfull { margin: 18px 0 6px; }

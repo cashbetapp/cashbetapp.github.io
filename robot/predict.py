@@ -748,7 +748,7 @@ def images(partidos, props_):
                 jobs.setdefault(rel, (u, 320))
                 lg[ab] = "data/" + rel
         for s in ("h", "a"):
-            for r in (g.get("forma") or {}).get(s, []):
+            for r in (g.get("forma") or {}).get(s, []) + (g.get("ult") or {}).get(s, []):
                 if r.get("logo") and not r["logo"].startswith("data/"):
                     rel = f"img/e/{_h(r['logo'])}.png"
                     jobs.setdefault(rel, (r["logo"], 320))
@@ -804,7 +804,7 @@ def images(partidos, props_):
                 g[s]["logo"] = None
             if (g[s].get("ld") or "")[5:] in bad:
                 g[s].pop("ld", None)
-            for r in (g.get("forma") or {}).get(s, []):
+            for r in (g.get("forma") or {}).get(s, []) + (g.get("ult") or {}).get(s, []):
                 if (r.get("logo") or "")[5:] in bad:
                     r["logo"] = None
         lg = (g.get("extra") or {}).get("lg") or {}
@@ -852,6 +852,7 @@ def main():
         for s in g["mercados"]:
             s["txt"] = pick_name(s["m"], g)
         g["forma"] = {s: [dict(r) for r in tab.get(g[s]["id"], [])[-5:][::-1]] for s in ("h", "a")}
+        g["ult"] = {s: [dict(r) for r in tab.get(g[s]["id"], [])[-20:][::-1]] for s in ("h", "a")}   # ficha del pick: 5G/10G/20G
         g["h2h"] = h2h(g["lg"], g["h"]["id"], g["a"]["id"])
     # equipos de los jugadores (logo y sigla)
     teams = {}

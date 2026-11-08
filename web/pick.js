@@ -445,7 +445,7 @@ function pcCard(e) {
     const g = e.g; up = isUp(g.pick.m);
     img = `<div class="pcimg dos">${crest(g.h, 46)}${crest(g.a, 46)}</div>`;
     lab = g.dep === "nba" ? "PARTIDO · NBA" : "PARTIDO"; tit = `${g.h.n} vs ${g.a.n}`; sub = `${abT(g.h)} vs ${abT(g.a)} · ${hora(g.at)}`;
-    pill = g.pick.txt; attr = `data-g="${g.id}"`; cuota = g.pick.cuota || g.pick.justa; liga = g.liga;
+    pill = g.pick.txt; attr = `data-mp="${g.id}"`; cuota = g.pick.cuota || g.pick.justa; liga = g.liga;
   } else if (e.k === "x") {
     const g = e.g, x = e.x, P = pkFind(g.id, x.m); up = P.lado === "mas" || pkPill(P) === "Recibe tarjeta";
     const tm = pkTeam(P);
