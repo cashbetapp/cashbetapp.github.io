@@ -48,10 +48,10 @@ function ppResumen(x, g) {
   if (v10.length) lc.push([h10 / v10.length >= 0.6 ? "ok" : "warn", `Cumplió en ${h10} de los últimos ${v10.length} · promedia ${n1(media(v10.map((e) => e.v)))} (línea ${x.linea})`]);
   const casa = ppCasa(x, g);
   if (casa != null) { const lv = all.filter((e) => e.l === casa); if (lv.length >= 3) { const hl = lv.filter((e) => ppHit(x, e.v)).length; lc.push([hl / lv.length >= 0.5 ? "ok" : "warn", `De ${casa ? "local" : "visitante"}: ${Math.round((100 * hl) / lv.length)}% de acierto en ${lv.length} partidos (promedio ${n1(media(lv.map((e) => e.v)))})`]); } }
-  return `<div class="pk3">
+  return `<div class="pk3 ${x.valor > 0 ? "cuatro" : ""}">
       <div class="pkbox dir ${x.lado === "mas" ? "" : "bad"}"><div class="k">Dirección</div><b>${x.lado === "mas" ? "MÁS DE" : "MENOS DE"}</b></div>
       <div class="pkbox"><div class="k">Línea</div><b>${x.linea}</b></div>
-      <div class="pkbox"><div class="k">Cuota casa</div><b>${odd(x.cuota)}</b></div></div>
+      <div class="pkbox"><div class="k">Cuota</div><b>${odd(x.cuota)}</b></div>${x.valor > 0 ? `<div class="pkbox ven"><div class="k">Ventaja ${ic("info")}</div><b>+${((x.valor) * 100).toFixed(1)}%</b></div>` : ""}</div>
     <div class="pkvale ${x.valor >= (D.valor_min || 0.05) ? "v" : ""}">${ic(x.valor >= (D.valor_min || 0.05) ? "bolt" : "info")}<span>${x.valor >= (D.valor_min || 0.05) ? `<b>Error de la casa:</b> paga ${odd(x.cuota)} y le damos ${pct(x.p)}: valor +${Math.round(x.valor * 100)}%.` : `<b>En prueba:</b> la casa paga ${odd(x.cuota)}; el modelo de jugadores NBA todavía no le gana a la casa en el registro real, por eso su probabilidad se mezcla con la de la casa.`}</span></div>
     <hr class="pkhr">
     ${lc.length ? `<div class="pkcard ol"><h4>Lo clave</h4><div class="small">Lo que dicen sus últimos partidos sobre el de hoy</div>${clvList(lc)}</div>` : ""}
@@ -107,17 +107,18 @@ function ppAnalisis(x, g, rival) {
   const mx = Math.max(q(0.95), x.linea * 1.6, 1);
   const fila = (lab, v, cls) => `<div class="mcr ${cls || ""}"><span>${lab}</span><i><s style="width:${Math.max(3, (100 * v) / mx)}%"></s><u style="left:${(100 * x.linea) / mx}%"></u></i><b>${n1(v)}</b></div>`;
   const txt = `${x.jugador} ${x.lado === "mas" ? "superó" : "se quedó por debajo de"} ${x.linea} ${x.tipo.toLowerCase()} en ${h10} de sus últimos ${v10.length} partidos, promediando ${n1(avg)}. El modelo espera ${n1(x.esperado)} hoy${rival ? ` frente a ${rival.n}` : ""}. La casa paga ${odd(x.cuota)}.`;
-  return `<div class="iac"><div class="iah"><span class="iaic">${ic("bolt2")}</span><div><b>Análisis IA</b><small>Modelo CASHBET v2</small></div><em><i></i>MODELO EN VIVO</em></div>
+  return `<div class="iac"><div class="iatop"><div class="iah"><span class="iaic">${ic("bolt2")}</span><div><b>Análisis IA</b><small>Modelo CASHBET v2</small></div><em><i></i>MODELO EN VIVO</em></div>
       <div class="iaconf"><span>CONFIANZA DEL MODELO</span><b>${pct(x.p)}</b></div><div class="iabar"><s style="width:${x.p * 100}%"></s></div>
-      <div class="iapk">${esc(`${x.lado === "mas" ? "MÁS" : "MENOS"} DE ${x.linea} ${x.tipo}`.toUpperCase())}</div>
+      <div class="iapk">${esc(`${x.lado === "mas" ? "MÁS" : "MENOS"} DE ${x.linea} ${x.tipo}`.toUpperCase())}</div></div>
       <div class="iaf"><div class="fl">FACTORES CLAVE</div><div class="chips2">${fact.map(([i, s]) => `<span>${ic(i)}${esc(s)}</span>`).join("")}</div></div>
       <p class="iatx">${esc(txt)}</p>
       <div class="ia3"><div><span>SEÑAL</span><b>${tr}</b></div><div><span>CONFIANZA</span><b>${x.p >= 0.7 ? "Alta" : x.p >= 0.58 ? "Media" : "Baja"}</b></div><div><span>MUESTRA</span><b>${v10.length} juegos</b></div></div></div>
-    <div class="mcc"><div class="iah"><span class="iaic mc">${ic("pulse")}</span><div><b>Simulaciones Monte Carlo</b><small>100.000 simulaciones</small></div><em class="mc">${ic("sparkle")}CASHBET</em></div>
+    <div class="mcc"><div class="mctop"><div class="iah"><span class="iaic mc">${ic("pulse")}</span><div><b>Simulaciones Monte Carlo</b><small>100.000 simulaciones</small></div><em class="mc">${ic("sparkle")}CASHBET</em></div>
       <div class="mcp"><div class="fl">PROBABILIDAD DE ACERTAR</div><div class="mcpp"><span>${ic("target")}${esc(`${x.lado === "mas" ? "Más" : "Menos"} de ${x.linea}`)}</span><b>${((100 * ok) / N).toFixed(1)}%</b></div><div class="mcbar"><s style="width:${(100 * ok) / N}%"></s></div>
-        <div class="mcrc">Sin mezclar con la casa (solo el modelo del jugador).</div></div>
+        <div class="mcrc">Sin mezclar con la casa (solo el modelo del jugador).</div></div></div>
       <div class="mcz"><div class="mch"><div><div class="fl" style="margin:0">RANGO PROYECTADO</div></div><span><u></u>OBJETIVO ${x.linea}</span></div>
-        ${fila("Peor caso", q(0.05), "lo")}${fila("Rango bajo", q(0.25), "lo")}${fila("MÁS PROBABLE", q(0.5), "mp")}${fila("Rango alto", q(0.75))}${fila("Mejor caso", q(0.95))}</div></div>`;
+        ${fila("Peor caso", q(0.05), "lo")}${fila("Rango bajo", q(0.25), "lo")}${fila("MÁS PROBABLE", q(0.5), "mp")}${fila("Rango alto", q(0.75))}${fila("Mejor caso", q(0.95))}</div>
+      ${mcAnalisis(ok / N, q(0.25), q(0.75), x.esperado, x.linea, x.lado === "mas", x.valor, N)}</div>`;
 }
 
 function actProp(a, el) {

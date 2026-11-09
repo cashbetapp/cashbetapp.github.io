@@ -80,9 +80,9 @@ function mpResumen(g, I, sd, p) {
   if (v10.length) lc.push([h10 / v10.length >= 0.6 ? "ok" : "warn", `Cumplió en ${h10} de sus últimos ${v10.length} (promedio ${n1(media(v10.map((e) => e.v)))} ${I.U})`]);
   const casa = sd === "h", lv = all.filter((e) => e.l === casa).slice(0, 10);
   if (lv.length >= 3) lc.push([lv.filter((e) => I.hit(e.v)).length / lv.length >= 0.5 ? "ok" : "warn", `De ${casa ? "local" : "visitante"}, como hoy: cumplió ${lv.filter((e) => I.hit(e.v)).length} de ${lv.length}`]);
-  const cuotaBox = g.pick.tipo === "valor" ? `<div class="pkbox"><div class="k">Cuota casa</div><b>${odd(g.pick.cuota)}</b></div>` : `<div class="pkbox"><div class="k">Vale desde</div><b>${odd(g.pick.minima || vale(g.pick.justa))}</b></div>`;
+  const cuotaBox = g.pick.tipo === "valor" ? `<div class="pkbox"><div class="k">Cuota</div><b>${odd(g.pick.cuota)}</b></div><div class="pkbox ven"><div class="k">Ventaja ${ic("info")}</div><b>+${((g.pick.valor) * 100).toFixed(1)}%</b></div>` : `<div class="pkbox"><div class="k">Vale desde</div><b>${odd(g.pick.minima || vale(g.pick.justa))}</b></div>`;
   const sideSw = !I.side ? `<div class="pkhint">Partidos de</div><div class="pk5 wide">${["h", "a"].map((s) => `<button class="${sd === s ? "on" : ""}" data-act="mpside" data-k="${s}">${esc(abT(g[s]))}</button>`).join("")}</div>` : "";
-  return `<div class="pk3">
+  return `<div class="pk3 ${g.pick.tipo === "valor" ? "cuatro" : ""}">
       <div class="pkbox dir ${I.up ? "" : "bad"}"><div class="k">Dirección</div><b>${I.dir}</b></div>
       <div class="pkbox"><div class="k">Línea</div><b>${esc(I.lin)}</b></div>${cuotaBox}</div>
     ${g.pick.tipo === "valor" ? `<div class="pkvale v">${ic("bolt")}<span><b>Error de la casa:</b> paga ${odd(g.pick.cuota)} y según el modelo (mezclado con la propia casa) pasa ${pct(p)} de las veces. La cuota justa sería ${odd(1 / p)}.</span></div>`
@@ -105,10 +105,10 @@ function mpAnalisis(g, I, sd, p) {
   const fact = [["trend", `Tendencia: ${tr}`], ["bars2", `10J prom: ${n1(avg)}`], ["home2", sd === "h" ? "Juega de local" : "Juega de visitante"], ["shield", `Forma ${gw}-${f.length - gw}`]];
   if (g.dep === "nba") { const b = (g.bajas?.[sd] || []).filter((x) => x.s === "Out").length; fact.push(["warn", b ? `${b} baja${b > 1 ? "s" : ""} confirmada${b > 1 ? "s" : ""}` : "Sin bajas confirmadas"]); }
   const cTxt = p >= 0.7 ? "Alta" : p >= 0.58 ? "Media" : "Baja";
-  return `<div class="iac">
+  return `<div class="iac"><div class="iatop">
       <div class="iah"><span class="iaic">${ic("bolt2")}</span><div><b>Análisis IA</b><small>Modelo CASHBET v2</small></div><em><i></i>MODELO EN VIVO</em></div>
       <div class="iaconf"><span>CONFIANZA DEL MODELO</span><b>${pct(p)}</b></div>
-      <div class="iabar"><s style="width:${p * 100}%"></s></div><div class="iapk">${esc(I.txt.toUpperCase())}</div>
+      <div class="iabar"><s style="width:${p * 100}%"></s></div><div class="iapk">${esc(I.txt.toUpperCase())}</div></div>
       <div class="iaf"><div class="fl">FACTORES CLAVE</div><div class="chips2">${fact.map(([i, s]) => `<span>${ic(i)}${esc(s)}</span>`).join("")}</div></div>
       <p class="iatx">${iaPartido(g)}</p>
       <div class="ia3"><div><span>SEÑAL</span><b>${tr}</b></div><div><span>CONFIANZA</span><b>${cTxt}</b></div><div><span>MUESTRA</span><b>${v10.length} juegos</b></div></div></div>

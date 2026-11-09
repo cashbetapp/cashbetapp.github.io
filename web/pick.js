@@ -345,21 +345,31 @@ function pkAnalisis(P) {
   const mc = montecarlo(P);
   const mx = Math.max(mc.q95, P.ln * 1.6, 1);
   const fila = (lab, v, cls) => `<div class="mcr ${cls || ""}"><span>${lab}</span><i><s style="width:${Math.max(3, (100 * v) / mx)}%"></s><u style="left:${(100 * P.ln) / mx}%"></u></i><b>${n1(v)}</b></div>`;
-  return `<div class="iac">
+  return `<div class="iac"><div class="iatop">
       <div class="iah"><span class="iaic">${ic("bolt2")}</span><div><b>Análisis IA</b><small>CASHBET v2</small></div><em><i></i>MODELO EN VIVO</em></div>
       <div class="iaconf"><span>CONFIANZA DEL MODELO</span><b>${pct(x.p)}</b></div>
-      <div class="iabar"><s style="width:${x.p * 100}%"></s></div><div class="iapk">${esc(pick.toUpperCase())}</div>
+      <div class="iabar"><s style="width:${x.p * 100}%"></s></div><div class="iapk">${esc(pick.toUpperCase())}</div></div>
       <div class="iaf"><div class="fl">FACTORES CLAVE</div><div class="chips2">${fact.map(([i, s]) => `<span>${ic(i)}${esc(s)}</span>`).join("")}</div></div>
       <p class="iatx">${t.map(esc).join(" ")}</p>
       <div class="ia3"><div><span>SEÑAL</span><b>${sTxt}</b></div><div><span>CONFIANZA</span><b>${cTxt}</b></div><div><span>MUESTRA</span><b>${v10.length} juegos</b></div></div></div>
-    <div class="mcc">
+    <div class="mcc"><div class="mctop">
       <div class="iah"><span class="iaic mc">${ic("pulse")}</span><div><b>Simulaciones Monte Carlo</b><small>${mc.N.toLocaleString("es-CO")} simulaciones</small></div><em class="mc">${ic("sparkle")}CASHBET</em></div>
       <div class="mci">${ic("info")}<span>Nuestra IA simuló este juego ${mc.N.toLocaleString("es-CO")} veces para predecir el resultado más probable</span></div>
       <div class="mcp"><div class="fl">PROBABILIDAD DE ACERTAR</div><div class="mcpp"><span>${ic("target")}${esc(pick.toUpperCase())}</span><b>${(mc.p * 100).toFixed(1)}%</b></div>
-        <div class="mcbar"><s style="width:${mc.p * 100}%"></s></div><div class="mcrc">Rango de confianza: ${Math.round(mc.lo * 100)}% — ${Math.round(mc.hi * 100)}%</div></div>
+        <div class="mcbar"><s style="width:${mc.p * 100}%"></s></div><div class="mcrc">Rango de confianza: ${Math.round(mc.lo * 100)}% — ${Math.round(mc.hi * 100)}%</div></div></div>
       <div class="mcz"><div class="mch"><div><div class="fl" style="margin:0">RANGO PROYECTADO</div><small>Lo que nuestra IA predice que podría pasar</small></div><span><u></u>OBJETIVO ${P.ln}</span></div>
         ${fila("Peor caso", mc.q05, "lo")}${fila("Rango bajo", mc.q25, "lo")}${fila("MÁS PROBABLE", mc.q50, "mp")}${fila("Rango alto", mc.q75)}${fila("Mejor caso", mc.q95)}</div>
+      ${mcAnalisis(mc.p, mc.q25, mc.q75, mc.mean, P.ln, up, x.valor, mc.N)}
       <div class="mc4"><div><span>RESULTADO ESPERADO</span><b>${n1(mc.mean)}</b></div><div><span>RESULTADO MÁS TÍPICO</span><b>${n1(mc.moda)}</b></div><div><span>CUÁNTO VARÍA</span><b>±${n1(mc.sd)}</b></div><div><span>MÉTODO DE CÁLCULO</span><b>IA Sim</b></div></div></div>`;
+}
+
+// pastilla de ventaja + texto "ANÁLISIS IA" dentro de la tarjeta Monte Carlo (como la referencia)
+function mcAnalisis(p, q25, q75, media, ln, up, valor, N) {
+  const sup = Math.round(p * 100), lado = up ? "superan" : "quedan por debajo de";
+  const tx = `En ${N.toLocaleString("es-CO")} simulaciones, el ${sup}% ${lado} la línea de ${ln}. El resultado esperado es ${n1(media)} y la mitad central de las simulaciones va de ${n1(q25)} a ${n1(q75)}. `
+    + (ln >= q25 && ln <= q75 ? "La línea cae dentro de esa franja central: el riesgo real es la dispersión, un partido raro la puede tumbar. " : `La línea queda ${ln < q25 ? "por debajo" : "por encima"} de esa franja central, lo que ${(ln < q25) === up ? "respalda" : "va en contra de"} el pick. `)
+    + (valor > 0 ? `La cuota de la casa paga más de lo que vale según el modelo (+${(valor * 100).toFixed(1)}%).` : "Sin cuota de la casa para este mercado: vale la pena solo si tu casa paga al menos lo que dice “vale desde”.");
+  return `${valor > 0 ? `<div class="mcven"><span>${ic("trend")}+${(valor * 100).toFixed(1)}% Ventaja</span></div>` : ""}<div class="mcia"><div class="fl">${ic("bars2")}ANÁLISIS IA</div><p>${esc(tx)}</p></div>`;
 }
 
 // ------------------------------------------------------------ lista de Predicciones
