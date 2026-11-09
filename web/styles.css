@@ -1402,3 +1402,7 @@ button.tile { text-align: left; font: inherit; color: inherit; cursor: pointer; 
 .ernum small { display: block; font-size: 10px; color: var(--tx3); } .ernum b { font-size: 15px; } .ernum b.g { color: #22c55e; }
 .erc p { margin: 7px 0 0; font-size: 11.5px; color: var(--tx3); line-height: 1.35; }
 .erbad { flex: none; font-weight: 800; font-size: 17px; color: #22c55e; text-align: center; } .erbad small { display: block; font-size: 10px; color: var(--tx3); font-weight: 700; }
+
+/* ===== Notificaciones push ===== */
+.tog { transition: background .2s; } .tog::after { transition: left .2s; } .tog.on { background: var(--p, #22c55e); } .tog.on::after { left: 21px; }
+button.ajrow { background: none; color: inherit; font: inherit; border-left: 0; border-right: 0; border-bottom: 0; cursor: pointer; }

@@ -68,6 +68,13 @@ jobs:
         working-directory: robot
         run: python previa.py || echo "previa falló, se sigue"
 
+      - name: Notificaciones push (picks del día, errores de cuota, resultados de seguidos)
+        working-directory: robot
+        env:
+          VAPID_PRIVATE: ${{ secrets.VAPID_PRIVATE }}
+          ROBOT_PASS: ${{ secrets.ROBOT_PASS }}
+        run: python avisos.py || echo "avisos falló, se sigue"
+
       - name: Sellar el registro (rama sellos, CON historial) y verificarlo contra todos los sellos anteriores
         run: |
           URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"

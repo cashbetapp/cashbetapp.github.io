@@ -272,7 +272,7 @@ function ajustes(arg) {
     ${typeof tarjetaCuenta === "function" ? tarjetaCuenta() : ""}
     <div class="ajsec">AJUSTES</div><div class="ajlist">
       ${row("nombre", "pen", "Tu nombre", nom ? esc(nom) : "Para el saludo de Inicio")}
-      ${row("notificaciones", "bellR", "Notificaciones", "Alertas de picks")}
+      ${row("notificaciones", "bellR", "Notificaciones", typeof pushOn === "function" && pushOn() ? "Activadas" : "Avisos en tu celular")}
       ${row("cuotas", "money", "Formato de cuotas", `${FMT[fmt]} · Americano · Fraccional`)}
       ${row("tema", "moon", "Tema", TEMA[tema])}
       ${row("idioma", "globe", "Idioma", "Español")}
@@ -299,9 +299,7 @@ function ajustes(arg) {
     `<div class="ajsec">SELECCIONAR IDIOMA <em>ES</em></div>
     ${opt("noop", "es", true, "ES", "Español", "España / Latinoamérica")}${opt("noop", "en", false, "EN", "Inglés", "Próximamente")}${opt("noop", "pt", false, "PT", "Portugués", "Próximamente")}
     <div class="ajnote" style="text-align:center">Más idiomas próximamente.</div>`;
-  if (arg === "notificaciones") return subTop("Notificaciones") + heroAj("bellR", "Notificaciones", "Administra tus alertas") +
-    `<div class="ajnote"><b>Próximamente.</b> Para avisarte con la app cerrada hace falta un servicio de envío de notificaciones; lo activaremos en una próxima versión. Mientras tanto, los picks se actualizan solos cada 2 horas.</div>
-    <div class="ajsec">ALERTAS DE PICKS</div><div class="ajlist">${[["Nuevos picks", "Cuando haya nuevos picks del día"], ["Picks de alta confianza", "Solo picks de 75 % o más"], ["Resultados de picks", "Cuando tus picks seguidos ganen o pierdan"], ["Alertas de rachas", "Rachas ganadoras y perdedoras"]].map(([t, s]) => `<div class="ajrow dis"><div><b>${t}</b><small>${s}</small></div><span class="tog"></span></div>`).join("")}</div>`;
+  if (arg === "notificaciones") return notifAjustes();
   if (arg === "nombre") return subTop("Tu nombre") + heroAj("pen", "Tu nombre", "Para el saludo de Inicio") + `<div class="pkcard"><input class="inp" id="nom" placeholder="Tu nombre" value="${esc(nom)}"><button class="bigbtn" data-act="nom">Guardar</button></div>`;
   if (arg === "acierto") {
     const cal = (rows) => `<table class="tbl"><tr><th>Cuando dice</th><th>Picks</th><th>Acertó</th></tr>${rows.map((r) => `<tr><td>${r.rango}</td><td>${r.n.toLocaleString("es-CO")}</td><td><b>${r.paso}%</b></td></tr>`).join("")}</table>`;

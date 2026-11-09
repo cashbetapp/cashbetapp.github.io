@@ -530,6 +530,7 @@ function act(a, el) {
   if (typeof actRes === "function" && actRes(a, el)) return;
   if (typeof actBank === "function" && actBank(a, el)) return;
   if (typeof actErr === "function" && actErr(a, el)) return;
+  if (typeof actPush === "function" && actPush(a, el)) return;
   if (typeof actPrev === "function" && actPrev(a, el)) return;
   if (typeof actPerfil2 === "function" && actPerfil2(a, el)) return;
   if (typeof actProp === "function" && a.startsWith("pp") && actProp(a, el)) return;
