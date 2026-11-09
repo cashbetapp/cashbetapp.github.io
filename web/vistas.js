@@ -98,7 +98,7 @@ function inicio() {
     <div class="tiles t2">
       <div class="tile"><div class="k">Efectividad</div><div class="v">${real ? Math.round(rec.ef) : Math.round(efPrueba)}%<small>${real ? "real" : "prueba"}</small></div></div>
       <div class="tile"><div class="k">Racha</div><div class="v">${rec.n ? rec.racha.replace(" ", "") : "—"}</div></div>
-      <div class="tile"><div class="k">Errores de cuota</div><div class="v">${its.filter((e) => e.val != null).length}<small>hoy</small></div></div></div>
+      <button class="tile" data-go="errores"><div class="k">Errores de cuota</div><div class="v">${typeof erroresCuota === "function" ? erroresCuota().length : 0}<small>ver ${ic("right")}</small></div></button></div>
     ${top.length ? `<div class="sec"><h2 class="ih">${ic("bolt")}Picks destacados (${top.length})</h2><button class="pill dk" data-go="picks">Top picks</button></div>
       <div class="car">${top.map(heroPick).join("")}</div><div class="dots">${top.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</div>` : ""}
     <div class="sec"><h2 class="ih">${ic("trend")}Picks principales</h2><button class="pill dk" data-go="picks">Ver todo ${ic("right")}</button></div>

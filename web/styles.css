@@ -1390,3 +1390,15 @@ body.sincuenta #app { padding-bottom: calc(env(safe-area-inset-bottom) + 24px); 
 .cstars button svg { width: 24px; height: 24px; } .cstars button.on { color: #ffd21f; border-color: rgba(255,210,31,.5); background: rgba(255,210,31,.12); }
 .cstars button.on svg { fill: currentColor; }
 textarea.inp { resize: vertical; font: inherit; }
+
+/* ===== Errores de cuota ===== */
+button.tile { text-align: left; font: inherit; color: inherit; cursor: pointer; } button.tile .v small svg { width: 11px; height: 11px; vertical-align: -1px; }
+.erow { display: flex; gap: 12px; width: 100%; text-align: left; align-items: flex-start; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 12px; margin-top: 10px; box-shadow: var(--glow); color: inherit; font: inherit; }
+.erimg { width: 56px; height: 56px; flex: none; border-radius: 14px; background: var(--card2); display: grid; place-items: center; overflow: hidden; }
+.erimg img { width: 100%; height: 100%; object-fit: cover; object-position: top; } .erimg.dos { grid-template-columns: 1fr 1fr; gap: 0; padding: 4px; }
+.erc { flex: 1; min-width: 0; } .erc > small { display: block; color: var(--tx3); font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .erc > small em { font-style: normal; color: var(--atx); font-weight: 700; }
+.erc > b { display: block; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .erpk { display: inline-block; margin-top: 4px; font-size: 12.5px; font-weight: 800; padding: 3px 9px; border-radius: 99px; background: var(--asoft); color: var(--atx); }
+.ernum { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; } .ernum span { background: var(--card2); border-radius: 10px; padding: 6px 4px; text-align: center; }
+.ernum small { display: block; font-size: 10px; color: var(--tx3); } .ernum b { font-size: 15px; } .ernum b.g { color: #22c55e; }
+.erc p { margin: 7px 0 0; font-size: 11.5px; color: var(--tx3); line-height: 1.35; }
+.erbad { flex: none; font-weight: 800; font-size: 17px; color: #22c55e; text-align: center; } .erbad small { display: block; font-size: 10px; color: var(--tx3); font-weight: 700; }
