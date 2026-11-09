@@ -280,6 +280,8 @@ def nba(par):
         o_h = {i["id"] for i in outs.get(g["h"]["id"], []) if i["s"] == "Out"}
         o_a = {i["id"] for i in outs.get(g["a"]["id"], []) if i["s"] == "Out"}
         injured |= o_h | o_a
+        # props: "Doubtful" (casi seguro no juega) también cuenta como baja
+        injured |= {i["id"] for t_ in outs.values() for i in t_ if i["s"] == "Doubtful"}
         h, a = teams[g["h"]["id"]], teams[g["a"]["id"]]
         ph = beta[0] + beta[1] + beta[2 + h] - beta[2 + n + a]
         pa = beta[0] + beta[2 + a] - beta[2 + n + h]
@@ -328,25 +330,77 @@ NOMBRE = {"Total Points": "Puntos", "Total Rebounds": "Rebotes", "Total Assists"
           "Total Points, Rebounds, and Assists": "Pts+Reb+Ast"}
 
 
+# Compañeros ausentes: medido en model (prueba hacia adelante, 15.331 actuaciones):
+# media x (1 + B x delta), delta = % de la estadística del equipo que hacen los
+# habituales que faltan HOY menos el % que faltaba en los partidos de la ventana.
+# Acierto más/menos: PTS 53,2->56,6 %, REB 56,3->57,1, AST 57,4->58,9, 3PM 64,3->64,7.
+B_AUS = {"PTS": 0.62, "REB": 0.64, "AST": 0.66, "3PM": 0.35}
+
+
+def _miss(prev, presentes, k):
+    """% de la estadística k (últimos 10 del equipo) que hacen habituales no presentes."""
+    prev = prev[-10:]
+    if len(prev) < 3:
+        return 0.0
+    tot = sum(sum(x[k] for x in b.values()) for b in prev) or 1
+    acc, gin = {}, {}
+    for b in prev:
+        for p, x in b.items():
+            acc[p] = acc.get(p, 0) + x[k]; gin[p] = gin.get(p, 0) + (x["MIN"] >= 15)
+    return sum(v / tot for p, v in acc.items() if not presentes(p) and gin[p] >= len(prev) / 2)
+
+
 def player_models(games, det, before):
-    """Por jugador: lista de partidos previos a 'before' (AAAA-MM-DD)."""
-    seq, names = {}, {}
+    """Por jugador: lista de partidos previos a 'before' (AAAA-MM-DD).
+    También devuelve los box scores por equipo (para saber quién falta)."""
+    seq, names, team, tempo = {}, {}, {}, {}
     for g in games:
         if g["at"][:10] >= before:
             break
         if is_preseason(g["at"][:10]):
             continue
-        for pid, v in ((det.get(g["id"]) or {}).get("pl") or {}).items():
-            if (v.get("MIN") or 0) > 0:
-                loc = str(v.get("t")) == str(g["h"]["id"])
+        pl = (det.get(g["id"]) or {}).get("pl") or {}
+        for s_ in ("h", "a"):
+            t = str(g[s_]["id"])
+            box = {pid: {"MIN": v["MIN"], **{k: stat_val(v, k) or 0 for k in STATS}}
+                   for pid, v in pl.items() if str(v.get("t")) == t and (v.get("MIN") or 0) > 0}
+            if not box:
+                continue
+            # cada temporada empieza de cero (si no, los que se fueron cuentan como bajas)
+            temp = g["at"][:4] if g["at"][5:7] >= "08" else str(int(g["at"][:4]) - 1)
+            if tempo.get(t) != temp:
+                tempo[t] = temp; team[t] = []
+            prev = team.get(t, [])
+            m = {k: _miss(prev, box.__contains__, k) for k in STATS}
+            for pid, x in box.items():
+                v = pl[pid]
+                loc = s_ == "h"
                 rv = g["a"] if loc else g["h"]
-                seq.setdefault(pid, []).append({"MIN": v["MIN"], "_at": g["at"][:10], "_l": loc, "_vs": rv.get("ab") or rv.get("n"),
-                                                **{k: stat_val(v, k) or 0 for k in STATS}})
+                seq.setdefault(pid, []).append({**x, "_at": g["at"][:10], "_l": loc, "_vs": rv.get("ab") or rv.get("n"), "_m": m})
                 names[pid] = (v.get("n"), v.get("t"))
-    return seq, names
+            team.setdefault(t, []).append(box)
+    return seq, names, team
 
 
-def prop_prob(prev, keys, line):
+def factor_ausencias(prev, team_prev, injured, keys):
+    """Multiplicador de la media del jugador por compañeros fuera hoy."""
+    last = prev[-15:]
+    w = np.array([0.88 ** (len(last) - 1 - i) for i in range(len(last))])
+    num = den = 0.0
+    # fuera hoy: lesionado "Out" o habitual que no jugó los 2 últimos partidos del equipo
+    rec = set().union(*team_prev[-2:]) if team_prev else set()
+    for k in keys:
+        hoy = _miss(team_prev, lambda p: p not in injured and p in rec, k)
+        antes = float(np.sum(w * np.array([x.get("_m", {}).get(k, 0) for x in last])) / w.sum())
+        sh = float(np.sum(w * np.array([x[k] for x in last])) / w.sum())
+        d = hoy - antes
+        if d < 0:   # hoy solo se conocen las bajas anunciadas (no los descansos sorpresa): bajar a la mitad
+            d *= 0.5
+        num += sh * (1 + B_AUS[k] * d); den += sh
+    return max(0.7, min(1.4, num / den)) if den > 0 else 1.0
+
+
+def prop_prob(prev, keys, line, fac=1.0):
     """P(más de la línea). Media: minutos esperados x producción por minuto
     reciente. Forma: binomial negativa con la dispersión real del jugador."""
     last = prev[-15:]
@@ -354,7 +408,7 @@ def prop_prob(prev, keys, line):
     mins = np.array([p["MIN"] for p in last])
     vals = np.array([sum(p[k] for k in keys) for p in last])
     mu = float(np.sum(w * mins) / w.sum()) * float(np.sum(w * vals) / max(np.sum(w * mins), 1))
-    mu = max(mu, 0.05)
+    mu = max(mu * fac, 0.05)
     var = max(float(np.var(vals)), mu * 1.05, 0.5)
     k = np.arange(0, int(line) + 1)
     if var <= mu * 1.0001:
@@ -375,7 +429,7 @@ def props(injured, days=None):
     files = sorted(f for f in os.listdir(pdir) if f.endswith(".json") and (days and f[:10] in days or not days and f[:10] >= hoy))
     for fn in files:
         db = json.load(open(os.path.join(pdir, fn), encoding="utf-8"))
-        seq, names = player_models(games, det, fn[:10])
+        seq, names, team = player_models(games, det, fn[:10])
         for e, ev in db.items():
             if not days and ev["at"] <= now().strftime("%Y-%m-%dT%H:%MZ"):
                 continue
@@ -387,7 +441,8 @@ def props(injured, days=None):
                 prev = seq.get(pid, [])
                 if len(prev) < 5 or pid in injured:
                     continue
-                mu, p_over = prop_prob(prev, PROP_TYPES[t], ln)
+                fac = factor_ausencias(prev, team.get(str(names[pid][1]), []), injured, PROP_TYPES[t])
+                mu, p_over = prop_prob(prev, PROP_TYPES[t], ln, fac)
                 side = "mas" if p_over >= 0.5 else "menos"
                 p = max(p_over, 1 - p_over)
                 worst = min(odds)  # no se sabe cuál cuota es "más" y cuál "menos": se usa la peor
@@ -396,7 +451,7 @@ def props(injured, days=None):
                 pv = PESO["props"] * p + (1 - PESO["props"]) * q
                 out.append({"ev": e, "at": ev["at"], "partido": ev["name"], "pl": pid, "jugador": names[pid][0],
                             "equipo": names[pid][1], "tipo": NOMBRE[t], "t": t, "linea": ln, "lado": side,
-                            "esperado": round(mu, 1), "p": round(pv, 4), "pm": round(p, 4), "cuota": worst,
+                            "esperado": round(mu, 1), "aus": round(fac - 1, 3), "p": round(pv, 4), "pm": round(p, 4), "cuota": worst,
                             "casa": round(1 / worst, 4), "valor": round(pv * worst - 1, 3),
                             "ult": [sum(x[k] for k in ks) for x in prev[-10:]],
                             # ficha del jugador (como IABET): últimos 40 partidos [valor, rival, local, fecha, minutos]
