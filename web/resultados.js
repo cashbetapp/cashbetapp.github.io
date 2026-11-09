@@ -91,7 +91,7 @@ function rPrevia(r, gid) {
   const [lab, cls] = pr.st ? ESTADO[pr.st] : ["Pendiente", "pe"];
   return `<div class="pkcard rpk"><div class="small">PICK DEL MODELO</div><b>${esc(pr.sel)}</b>
       <div class="rpkr"><span>Probabilidad <b>${Math.round(pr.p * 100)}%</b></span><span>Cuota <b>${pr.cu ? odd(pr.cu) : "—"}</b> ${pr.cr ? "casa" : "justa"}</span><span class="st ${cls}">${lab}</span></div>
-      <div class="small" style="margin-top:8px">Publicado ${pr.pub ? new Date(pr.pub).toLocaleString("es-CO", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }) : "antes del sello"} · huella ${esc(pr.h || "")}. Está en el Historial público.</div></div>`;
+      <div class="small" style="margin-top:8px">Publicado ${pr.pub ? new Date(pr.pub).toLocaleString("es-CO", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }) : "antes del sello"} · huella ${esc(pr.h || "")}.${esAdmin() ? " Está en el Historial." : ""}</div></div>`;
 }
 function rStats(r) {
   if (!r.stats || !r.stats.length) return `<div class="empty">ESPN todavía no publica las estadísticas de este partido.</div>`;

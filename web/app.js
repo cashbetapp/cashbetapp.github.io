@@ -129,6 +129,7 @@ function route() {
   const dentro = typeof cuentaActiva !== "function" || cuentaActiva();
   document.body.classList.toggle("sincuenta", !dentro);
   if (!dentro && !libre) { tab = "cuenta"; arg = typeof cuentaPendiente === "function" && cuentaPendiente() ? "verificar" : ""; }
+  if (tab === "historial" && !(typeof esAdmin === "function" && esAdmin())) { tab = "inicio"; arg = ""; }
   const views = { inicio: (a) => inicio(a), calendario: (a) => calendario(a), picks: (a) => picks(a), seguidos, bankroll, ajustes: (a) => ajustes(a), historial: (a) => historial(a), cuenta: (a) => cuentaVista(a), notificaciones: () => notificaciones() };
   const v = views[tab] || inicio;
   const clave = tab + "/" + (arg || "");
@@ -315,7 +316,7 @@ function seguidos() {
   const rp = rec.partidos || { n: 0 };
   return header("Seguidos", `${ids.length} picks que sigues`) + `
   ${mine.length ? mine.map((m) => m.g ? rowCard(m.g) : histRow(m.s, m.r)).join("") : `<div class="box small" style="margin-top:14px">Toca el corazón en cualquier pick para seguirlo. Aquí verás si acertó cuando termine el partido.</div>`}
-  <div class="sec"><h2>Resultados del robot</h2><button class="pill dk" data-go="historial">Historial ${ic("right")}</button></div>
+  <div class="sec"><h2>Resultados del robot</h2>${typeof esAdmin === "function" && esAdmin() ? `<button class="pill dk" data-go="historial">Historial ${ic("right")}</button>` : ""}</div>
   <div class="tiles" style="margin-top:0">
     <div class="tile"><div class="k">Acierto real</div><div class="v g">${rp.n ? Math.round(rp.ef) + "%" : "—"}</div><div class="n">${rp.n || 0} calificados</div></div>
     <div class="tile"><div class="k">Racha</div><div class="v">${rp.racha || "—"}</div></div>

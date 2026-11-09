@@ -63,7 +63,7 @@ function avisos() {
     const ay = new Date(); ay.setDate(ay.getDate() - 1); const k = ay.toLocaleDateString("en-CA");
     const fs = HIST.filas.filter((r) => new Date(r.at).toLocaleDateString("en-CA") === k && (r.st === "acierto" || r.st === "fallo"));
     if (fs.length) { const g = fs.filter((r) => r.st === "acierto").length; const t = new Date(); t.setHours(7, 0, 0, 0);
-      L.push({ t: t.toISOString(), i: "chart", c: "g", h: "Resultados de ayer", s: `El modelo acertó ${g} de ${fs.length} picks calificados (${Math.round((100 * g) / fs.length)}%). Míralos en el Historial.`, go: "historial" }); }
+      L.push({ t: t.toISOString(), i: "chart", c: "g", h: "Resultados de ayer", s: `El modelo acertó ${g} de ${fs.length} picks calificados (${Math.round((100 * g) / fs.length)}%). ${esAdmin() ? " Míralos en el Historial." : ""}`, go: esAdmin() ? "historial" : "inicio" }); }
   }
   return L.filter((x) => new Date(x.t) <= Date.now()).sort((a, b) => new Date(b.t) - new Date(a.t));
 }

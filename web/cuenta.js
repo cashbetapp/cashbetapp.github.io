@@ -14,6 +14,9 @@ const SYNC = ["seg", "bank", "kelly", "nombre", "fmt", "tema"];
 let FB = null, USER = null, fbCargando = null, AUTH_LISTO = false;
 // la app exige cuenta: hasta saber si hay sesión se muestra "cargando"
 const cuentaActiva = () => !!USER;
+// el Historial solo lo ve la cuenta administradora (pedido del usuario)
+const ADMIN = "cashbetsia@gmail.com";
+const esAdmin = () => !!(USER && (USER.email || "").toLowerCase() === ADMIN && USER.emailVerified !== false);
 const cuentaPendiente = () => !!(FB && FB.auth.currentUser && !USER);
 I.mail = '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>';
 I.shieldOk = '<path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z"/><path d="m8.5 12 2.5 2.5 4.5-5"/>';
