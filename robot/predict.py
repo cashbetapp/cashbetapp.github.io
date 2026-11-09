@@ -474,7 +474,7 @@ def form_table():
                 me, op = g[s]["s"], g[o]["s"]
                 tab.setdefault(g[s]["id"], []).append({
                     "at": g["at"], "lg": key, "r": "G" if me > op else ("E" if me == op else "P"),
-                    "m": f"{me}-{op}", "vs": g[o]["ab"] or g[o]["n"], "logo": g[o]["logo"], "loc": s == "h"})
+                    "m": f"{me}-{op}", "vs": g[o]["ab"] or g[o]["n"], "vsn": g[o]["n"], "logo": g[o]["logo"], "loc": s == "h"})
     for v in tab.values():
         v.sort(key=lambda x: x["at"])
     return tab
@@ -813,7 +813,25 @@ def images(partidos, props_):
     """Escudos y fotos servidos desde la propia app (data/img/...)."""
     from concurrent.futures import ThreadPoolExecutor
     jobs = {}
+    # fútbol: escudos reales y actualizados de FotMob (si la coincidencia es segura)
+    try:
+        import escudos
+        FM = escudos.mapa(partidos, _recorte)
+    except Exception as e:
+        print("escudos FotMob:", e); FM = {}
+    def fm(u):
+        k = escudos.espn_id(u) if FM else None
+        return FM.get(k) if k else None
     def team(t):
+        if t and t.get("logo") and not t["logo"].startswith("data/") and fm(t["logo"]):
+            x, u = fm(t["logo"]), t["logo"]
+            t["logo"] = "data/" + x["logo"]
+            t.pop("ld", None)
+            if x["osc"]:   # escudo casi negro: en tema oscuro se usa la versión clara oficial de ESPN
+                reld = f"img/e5/{_h(u)}d.png"
+                jobs[reld] = (u.replace("/500/scoreboard/", "/500-dark/").replace("/500/", "/500-dark/"), 500, True)
+                t["ld"] = "data/" + reld
+            return
         if t and t.get("logo") and not t["logo"].startswith("data/"):
             u = t["logo"]
             rel = f"img/e5/{_h(u)}.png"
@@ -829,13 +847,17 @@ def images(partidos, props_):
         team(g["h"]); team(g["a"])
         lg = (g.get("extra") or {}).get("lg") or {}
         for ab, u in list(lg.items()):
-            if u and not u.startswith("data/"):
+            if u and not u.startswith("data/") and fm(u):
+                lg[ab] = "data/" + fm(u)["logo"]
+            elif u and not u.startswith("data/"):
                 rel = f"img/e5/{_h(u)}.png"
                 jobs.setdefault(rel, (u, 500, True))
                 lg[ab] = "data/" + rel
         for s in ("h", "a"):
             for r in (g.get("forma") or {}).get(s, []) + (g.get("ult") or {}).get(s, []):
-                if r.get("logo") and not r["logo"].startswith("data/"):
+                if r.get("logo") and not r["logo"].startswith("data/") and fm(r["logo"]):
+                    r["logo"] = "data/" + fm(r["logo"])["logo"]
+                elif r.get("logo") and not r["logo"].startswith("data/"):
                     rel = f"img/e5/{_h(r['logo'])}.png"
                     jobs.setdefault(rel, (r["logo"], 500, True))
                     r["logo"] = "data/" + rel
@@ -900,6 +922,7 @@ def images(partidos, props_):
     for x in props_:
         if (x["foto"] or "")[5:] in bad:
             x["foto"] = None
+    return {k: "data/" + v["logo"] for k, v in FM.items() if not v["osc"]}
 
 
 def liga_logos():
@@ -955,8 +978,8 @@ def main():
     print("estadios nuevos buscados:", completar(f + nb))
     rec = ledger(f + nb, pr)
     xrep = json.load(open(os.path.join(DATA, "model", "extra.json"), encoding="utf-8"))
-    images(f + nb, pr)
-    res = {
+    esc_fm = images(f + nb, pr)
+    res = {"escudos": esc_fm,
         "generado": now().strftime("%Y-%m-%dT%H:%MZ"),
         "aviso": "Pronósticos estadísticos. No garantizan resultados. Apuesta con responsabilidad.",
         "acierto": {
