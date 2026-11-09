@@ -5,12 +5,14 @@ function ppSerie(x) {
   return (x.hist || []).map(([v, vs, l, at, mn]) => ({ v, vs, l: !!l, at, mn }));
 }
 const ppHit = (x, v) => (x.lado === "mas" ? v > x.linea : v < x.linea);
+// ¿el jugador juega de local? (el equipo del jugador se compara por sigla o nombre)
+const ppCasa = (x, g) => (g && x.eq ? g.h.ab === x.eq.ab || g.h.n === x.eq.n : null);
 
 function openProp(i, keep) {
   const x = D.props[i]; if (!x) return;
   if (!keep || sheetState.pp !== i) sheetState = { pp: i, n: 10, tab: "resumen" };
   const g = D.byId[x.ev], up = x.lado === "mas", tab = sheetState.tab, seg = store.get("seg", {}), sid = ppId(x);
-  const eq = x.eq || { n: x.equipo }, rival = g ? (g.h.id === (x.eq && x.eq.id) ? g.a : g.h) : null;
+  const eq = x.eq || { n: x.equipo }, rival = g ? (ppCasa(x, g) ? g.a : g.h) : null;
   const pill = `${up ? "Más" : "Menos"} de ${x.linea} ${x.tipo.toLowerCase()}`;
   const big = x.foto ? `<img class="pkbig foto" src="${esc(x.foto)}" alt="">` : sinFoto(x.jugador, eq, 130, "pkbig");
   const html = `<div class="pkh"><div class="pkl">
@@ -44,7 +46,7 @@ function ppResumen(x, g) {
   if (racha >= 2) lc.push(["ok", `Cumplió la línea en sus últimos ${racha} partidos seguidos`]);
   else if (all.length && !ppHit(x, all[0].v)) lc.push(["warn", `No cumplió en su último partido (${all[0].v} contra ${all[0].vs})`]);
   if (v10.length) lc.push([h10 / v10.length >= 0.6 ? "ok" : "warn", `Cumplió en ${h10} de los últimos ${v10.length} · promedia ${n1(media(v10.map((e) => e.v)))} (línea ${x.linea})`]);
-  const casa = g && x.eq ? g.h.id === x.eq.id : null;
+  const casa = ppCasa(x, g);
   if (casa != null) { const lv = all.filter((e) => e.l === casa); if (lv.length >= 3) { const hl = lv.filter((e) => ppHit(x, e.v)).length; lc.push([hl / lv.length >= 0.5 ? "ok" : "warn", `De ${casa ? "local" : "visitante"}: ${Math.round((100 * hl) / lv.length)}% de acierto en ${lv.length} partidos (promedio ${n1(media(lv.map((e) => e.v)))})`]); } }
   return `<div class="pk3">
       <div class="pkbox dir ${x.lado === "mas" ? "" : "bad"}"><div class="k">Dirección</div><b>${x.lado === "mas" ? "MÁS DE" : "MENOS DE"}</b></div>
@@ -85,7 +87,7 @@ function ppContexto(x, g, rival) {
   const m5 = mn(5), m10 = mn(10), mt = mn(40);
   if (m5 != null) out.push(`<h4 class="pksub">Minutos</h4><div class="pkcard m3b"><div><b>${n1(m5)}</b><span>Últimos 5</span></div><div><b>${n1(m10)}</b><span>Últimos 10</span></div><div><b>${n1(mt)}</b><span>Muestra (${Math.min(all.length, 40)} p)</span></div></div>
     <div class="small" style="margin:6px 2px 0">${m5 < mt - 2 ? "Su rol baja: juega menos minutos que su promedio." : m5 > mt + 2 ? "Su rol sube: juega más minutos que su promedio." : "Juega sus minutos habituales."}</div>`);
-  if (g) { const sd = x.eq && g.h.id === x.eq.id ? "h" : "a", bj = (g.bajas?.[sd] || []);
+  if (g) { const sd = ppCasa(x, g) ? "h" : "a", bj = (g.bajas?.[sd] || []);
     out.push(`<h4 class="pksub">Bajas de su equipo</h4><div class="pkcard">${bj.map((b) => `<div class="les"><b>${esc(b.n)}</b><em class="${b.s === "Out" ? "out" : "dd"}">${b.s === "Out" ? "Fuera" : esc(b.s)}</em></div>`).join("") || `<div class="small">Sin lesionados reportados.</div>`}</div>`); }
   return out.join("");
 }
@@ -94,7 +96,7 @@ function ppAnalisis(x, g, rival) {
   const all = ppSerie(x), v10 = all.slice(0, 10), w = v10.map((e) => e.v), h10 = v10.filter((e) => ppHit(x, e.v)).length, avg = media(w);
   const sup = (v) => (x.lado === "mas" ? v > x.linea : v < x.linea);
   const tr = sup(media(all.slice(0, 5).map((e) => e.v))) && h10 / Math.max(v10.length, 1) >= 0.6 ? "Fuerte" : sup(avg) ? "Media" : "Débil";
-  const casa = g && x.eq ? g.h.id === x.eq.id : null;
+  const casa = ppCasa(x, g);
   const fact = [["trend", `Tendencia: ${tr}`], ["bars2", `10J prom: ${n1(avg)}`], ...(casa != null ? [["home2", casa ? "Juega de local" : "Juega de visitante"]] : []), ["clock", `${n1(media(all.slice(0, 5).map((e) => e.mn || 0)))} min (últ. 5)`]];
   // Monte Carlo: binomial negativa con la media del modelo y la dispersión real del jugador
   const N = 100000, mu = Math.max(x.esperado || avg || 0.1, 0.1), va = Math.max(desv(all.slice(0, 15).map((e) => e.v)) ** 2, mu * 1.05);
