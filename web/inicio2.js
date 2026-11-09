@@ -47,7 +47,7 @@ function avisos() {
   if (hoy.length) L.push({ t: gen, i: "bolt", c: "g", h: "¡Los picks de hoy ya están!", s: `Hoy tienes ${nMej} picks listos. Revísalos antes de los partidos.`, go: "picks" });
   (typeof erroresCuota === "function" ? erroresCuota() : []).slice(0, 3).forEach((e) => {
     const n = e.k === "g" ? `${e.g.h.n} vs ${e.g.a.n}` : e.x.jugador;
-    L.push({ t: gen, i: "spark", c: "v", h: "Error de cuota detectado", s: `${n}: ${pct(e.p)} de probabilidad y la casa paga ${odd(e.cuota)} (debería pagar ${odd(1 / e.p)}).`, go: "errores" });
+    L.push({ t: gen, i: "spark", c: "v", h: "Error de cuota detectado", s: `${n}: ${pct(e.p)} de probabilidad y la casa paga ${odd(e.cuota)} (debería pagar ${odd(1 / e.p)}).`, go: "inicio" });
   });
   const seg = store.get("seg", {});
   for (const [id, v] of Object.entries(seg)) {

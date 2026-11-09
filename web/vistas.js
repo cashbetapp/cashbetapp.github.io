@@ -87,7 +87,8 @@ function inicio() {
   const cuotas = its.slice(0, 30).map((e) => e.k === "g" ? (e.g.pick.cuota || e.g.pick.justa) : e.k === "x" ? e.x.justa : e.x.cuota);
   const cprom = cuotas.length ? cuotas.reduce((s, x) => s + x, 0) / cuotas.length : 0;
   // destacados: el mejor de partido, el mejor de equipo (estadística) y el mejor jugador
-  const top = its.filter((e, i, a) => a.findIndex((y) => y.gid === e.gid) === i).slice(0, 3);   // destacados de partidos distintos
+  const errs = (typeof erroresCuota === "function" ? erroresCuota() : []).slice(0, 3).map((e) => ({ ...e, gid: e.k === "g" ? e.g.id : e.x.ev + "|" + e.x.pl }));
+  const top = [...errs, ...its].filter((e, i, a) => a.findIndex((y) => y.gid === e.gid) === i).slice(0, errs.length ? 5 : 3);   // errores de cuota + destacados, partidos distintos
   const resto = its.filter((e) => !top.includes(e)).slice(0, 10);
   const dia = new Date().toLocaleDateString("es-CO", { weekday: "long" });
   const nom = store.get("nombre", "");
@@ -106,7 +107,11 @@ function inicio() {
 }
 function heroPick(e) {
   let chip, small, big, sub, pick, cuota, img, attr, up, lk;
-  if (e.k === "g") {
+  if (e.err != null && e.k === "g") {
+    const g = e.g; up = isUp(e.x.m);
+    chip = g.liga; lk = g.lg; small = "Error de cuota"; big = `${g.h.n} vs ${g.a.n}`; sub = `${abT(g.h)} vs ${abT(g.a)} · ${hora(g.at)}`;
+    pick = e.x.txt; cuota = e.cuota; img = `<div class="hpimg dos">${crest(g.h, 84)}${crest(g.a, 84)}</div>`; attr = `data-g="${g.id}"`;
+  } else if (e.k === "g") {
     const g = e.g; up = isUp(g.pick.m);
     chip = g.liga; lk = g.lg; small = "Pick del partido"; big = `${g.h.n} vs ${g.a.n}`; sub = `${abT(g.h)} vs ${abT(g.a)} · ${hora(g.at)}`;
     pick = g.pick.txt; cuota = g.pick.cuota || g.pick.justa; img = `<div class="hpimg dos">${crest(g.h, 84)}${crest(g.a, 84)}</div>`; attr = `data-mp="${g.id}"`;
@@ -118,13 +123,13 @@ function heroPick(e) {
     img = P.sc === "j" ? (x.foto ? `<img class="hpimg foto" src="${esc(x.foto)}" alt="">` : sinFoto(x.jugador, tm, 120, "hpimg")) : P.sc === "t" ? `<div class="hpimg dos">${crest(g.h, 84)}${crest(g.a, 84)}</div>` : `<div class="hpimg">${crest(tm, 130)}</div>`;
   } else {
     const x = e.x; up = x.lado === "mas";
-    chip = "NBA"; lk = "nba"; small = x.eq ? x.eq.n : "NBA"; big = x.jugador; sub = `${x.partido || ""} · ${hora(x.at)}`;
+    chip = "NBA"; lk = "nba"; small = e.err != null ? "Error de cuota" : x.eq ? x.eq.n : "NBA"; big = x.jugador; sub = `${x.partido || ""} · ${hora(x.at)}`;
     pick = `${up ? "Más" : "Menos"} de ${x.linea} ${x.tipo.toLowerCase()}`; cuota = x.cuota; attr = `data-pr="${D.props.indexOf(x)}"`;
     img = x.foto ? `<img class="hpimg foto" src="${esc(x.foto)}" alt="">` : "";
   }
   const pk = esc(pick).replace(/(\d+(?:\.\d+)?)/, "<em>$1</em>");
-  return `<button class="hp" ${attr}><span class="hpchip">${lk ? lgLogo(lk, 16) : ""}${esc(chip)}</span><div class="hpt"><small>${esc(small)}</small><h3>${esc(big)}</h3><span>${esc(sub)}</span>
-      <div class="hpk">${pk}</div><div class="hpb"><span class="hc">${e.val != null ? `casa ${odd(e.casa)} · <b>valor ${valTxt(e.val)}</b>` : `vale desde ${odd(e.min || cuota)}`}</span><span class="ha">${pct(e.p)} · Análisis ${ic("right")}</span></div></div>${img}</button>`;
+  return `<button class="hp${e.err != null ? " herr" : ""}" ${attr}><span class="hpchip">${lk ? lgLogo(lk, 16) : ""}${esc(chip)}</span><div class="hpt"><small>${esc(small)}</small><h3>${esc(big)}</h3><span>${esc(sub)}</span>
+      <div class="hpk">${pk}</div><div class="hpb"><span class="hc">${e.err != null ? `casa ${odd(e.cuota)} · justa ${odd(1 / e.p)} · <b>+${Math.round(e.err * 100)}%</b>` : e.val != null ? `casa ${odd(e.casa)} · <b>valor ${valTxt(e.val)}</b>` : `vale desde ${odd(e.min || cuota)}`}</span><span class="ha">${pct(e.p)} · Análisis ${ic("right")}</span></div></div>${img}</button>`;
 }
 
 // ------------------------------------------------------------ FICHA DE PARTIDO

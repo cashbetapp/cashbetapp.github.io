@@ -1408,3 +1408,5 @@ button.tile { text-align: left; font: inherit; color: inherit; cursor: pointer; 
 button.ajrow { background: none; color: inherit; font: inherit; border-left: 0; border-right: 0; border-bottom: 0; cursor: pointer; }
 
 .tiles.dos { grid-template-columns: 1fr 1fr; }
+
+.hp.herr .hpt > small { color: #ffb020; font-weight: 800; letter-spacing: .3px; }

@@ -125,7 +125,7 @@ function route() {
   const dentro = typeof cuentaActiva !== "function" || cuentaActiva();
   document.body.classList.toggle("sincuenta", !dentro);
   if (!dentro && !libre) { tab = "cuenta"; arg = typeof cuentaPendiente === "function" && cuentaPendiente() ? "verificar" : ""; }
-  const views = { inicio: (a) => inicio(a), calendario: (a) => calendario(a), picks: (a) => picks(a), seguidos, bankroll, ajustes: (a) => ajustes(a), historial: (a) => historial(a), cuenta: (a) => cuentaVista(a), notificaciones: () => notificaciones(), errores: () => errores() };
+  const views = { inicio: (a) => inicio(a), calendario: (a) => calendario(a), picks: (a) => picks(a), seguidos, bankroll, ajustes: (a) => ajustes(a), historial: (a) => historial(a), cuenta: (a) => cuentaVista(a), notificaciones: () => notificaciones() };
   const v = views[tab] || inicio;
   const clave = tab + "/" + (arg || "");
   if ($("#app").dataset.tab !== clave) {

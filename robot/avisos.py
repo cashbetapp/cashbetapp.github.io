@@ -148,7 +148,7 @@ def mensajes(u, D, H, errs, enviados, ahora):
             e = nuevos[0]
             det = f"{e['n']}: {e['txt']}. {round(e['p'] * 100)}% de probabilidad y la casa paga {e['c']:.2f} (debería pagar {1 / e['p']:.2f})."
             t = "Error de cuota detectado" if len(nuevos) == 1 else f"{len(nuevos)} errores de cuota nuevos"
-            out.append(([f"err|{x['k']}" for x in nuevos], {"t": t, "b": det, "u": "./#errores", "tag": "err"}))
+            out.append(([f"err|{x['k']}" for x in nuevos], {"t": t, "b": det, "u": "./#inicio", "tag": "err"}))
     if pref.get("res", True):
         filas, gan, per = H.get("filas") or [], [], []
         for sid, v in (u.get("seg") or {}).items():
