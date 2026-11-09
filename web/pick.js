@@ -466,7 +466,7 @@ function pcCard(e) {
   return `<button class="pcard ${jug ? "jg" : ""}" ${attr}>${img}<div class="pcm"><div class="pcl">${jug ? lab : esc(lab)}</div><div class="pct">${esc(tit)}</div><div class="pcs">${esc(sub)}</div>
     <span class="pcpill ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(pill)}</span></span></div>
     <div class="pcr"><span class="pcp"><i></i>${pct(e.p)}</span></div>
-    <div class="pcb">${e.val != null ? `<span class="pcval">+${Math.round(e.val * 100)}%</span><span class="pcc">${odd(e.casa)}</span>` : e.prueba ? `<span class="pcc" title="Cuota de la casa (en prueba)">${odd(e.casa)}</span>` : `<span class="pcc" title="Vale la pena desde esta cuota">≥${odd(e.min || cuota)}</span>`}</div></button>`;
+    <div class="pcb">${e.val != null ? `<span class="pcval">+${Math.round(e.val * 100)}%</span><span class="pcc">${odd(e.casa)}</span>` : e.prueba ? `<span class="pcc" title="Cuota de la casa (en prueba)">${odd(e.casa)}</span>` : `<span class="pcc" title="Vale la pena desde esta cuota">${odd(e.min || cuota)}</span>`}</div></button>`;
 }
 // ---- orden de la lista (como IABET; aquí todas las opciones son gratis)
 const ORDS = [["conf", "Confianza"], ["tasa", "Tasa de acierto (últimos 10)"], ["cuota", "Cuota"], ["edge", "Edge (ventaja sobre la cuota)"], ["mc", "Monte Carlo"]];
