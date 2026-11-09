@@ -6,8 +6,8 @@ I.ball = '<circle cx="12" cy="12" r="9"/><path d="m12 7 4 3-1.5 4.5h-5L8 10z"/><
 I.spark = '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>';
 I.left = '<path d="M15 18l-6-6 6-6"/>';
 
-const UN = { cor: "córners", sot: "tiros a puerta", tir: "tiros", fal: "faltas", tar: "tarjetas" };
-const MK = [["todos", "Todos los mercados"], ["res", "Ganador y goles"], ["cor", "Córners"], ["sot", "Tiros a puerta"], ["tir", "Tiros"], ["fal", "Faltas"], ["tar", "Tarjetas"]];
+const UN = { cor: "córners", sot: "tiros a puerta", tir: "tiros", fal: "faltas", tar: "tarjetas", pts: "puntos" };
+const MK = [["todos", "Todos los mercados"], ["res", "Ganador y goles"], ["cor", "Córners"], ["sot", "Tiros a puerta"], ["tir", "Tiros"], ["fal", "Faltas"], ["tar", "Tarjetas"], ["pts", "Puntos de equipo (NBA)"]];
 ui.pseg = ui.pseg || "todos"; ui.pdep = ui.pdep || "todos"; ui.pmk = ui.pmk || "todos";
 
 const abT = (t) => (t && (t.ab || (t.n || "").slice(0, 3).toUpperCase())) || "?";
@@ -244,7 +244,7 @@ function pkContexto(P) {
   const tres = [[`${abT(g.h)} prob. victoria`, pm["1"]], ["Empate", pm["X"]], [`${abT(g.a)} prob. victoria`, pm["2"]]];
   const best = Math.max(...tres.map(([, s]) => (s ? s.p : 0)));
   const dots = (xs) => xs.map((e) => `<span class="wl ${e.r}">${e.r}</span>`).join("");
-  return `${elPartido(g)}
+  const head = `${elPartido(g)}
     <div class="pkcard ol" style="margin-top:14px"><h4>Calendario</h4>${cal("h")}${cal("a")}${desc}<div class="small">Cuenta solo partidos de esta liga.</div></div>
     <div class="pkcard ol"><h4>Claves de la predicción</h4><div class="small">Lo que dicen los datos de esta apuesta</div>${clvList(cl)}</div>
     ${est}
@@ -255,7 +255,9 @@ function pkContexto(P) {
     <div class="pkcard ol"><h4>Contra ${esc(abT(rival))}</h4>${vr.length ? vr.map((e) => `<div class="vr"><span>${fDia(e.d)}</span><b>${n1(e.v)}</b><em class="${hit(e.v) ? "ok" : "no"}">${hit(e.v) ? "Acierto" : "Fallo"}</em></div>`).join("") +
       `<div class="small">Acertó en ${vrHits} de sus últimos ${vr.length} partidos contra ellos.</div>` : `<div class="small">No hay partidos contra ${esc(rival.n)} desde agosto de 2025.</div>`}</div>
     <h4 class="pksub">Tendencia reciente</h4><div class="pk3">${trend(7)}${trend(15)}${trend(30)}</div>
-    ${ult ? `<div class="pkcard ol"><h4>Último juego</h4><div class="uj">${crest({ logo: lg[ult.vs], n: ult.vs, ab: ult.vs }, 34)}<div><b>${ult.l ? "vs" : "@"} ${esc(ult.vs)}</b>${ult.d ? `<span>${fDia(ult.d)}</span>` : ""}</div><div class="r"><b>${n1(ult.v)}</b><span class="${hit(ult.v) ? "g" : "o"}">${hit(ult.v) ? "Cumplió" : "Falló"}</span></div></div></div>` : ""}
+    ${ult ? `<div class="pkcard ol"><h4>Último juego</h4><div class="uj">${crest({ logo: lg[ult.vs], n: ult.vs, ab: ult.vs }, 34)}<div><b>${ult.l ? "vs" : "@"} ${esc(ult.vs)}</b>${ult.d ? `<span>${fDia(ult.d)}</span>` : ""}</div><div class="r"><b>${n1(ult.v)}</b><span class="${hit(ult.v) ? "g" : "o"}">${hit(ult.v) ? "Cumplió" : "Falló"}</span></div></div></div>` : ""}`;
+  if (g.dep === "nba" && typeof nbaContexto === "function") return head + nbaContexto(g, sd, { rival: true, linea: P.ln, pick: P });
+  return head + `
     <h2 class="pkh2">Los equipos</h2><h4 class="pksub">Posiciones</h4><div class="pkcard ol pos">${posCol("h")}${posCol("a")}</div>
     <h4 class="pksub">Forma del equipo (Ú10)</h4><div class="pkcard ol pos">${u10("h")}${u10("a")}</div>
     <h4 class="pksub">Forma reciente <small>Últimos 5 juegos</small></h4><div class="pkcard ol">${["h", "a"].map((s) => { const r = rec(H5(s)); return `<div class="fo">${crest(g[s], 24)}<b>${esc(abT(g[s]))}</b><span class="rc">${r.G}-${r.E}-${r.P}</span><span class="wls">${dots(H5(s))}</span></div>
@@ -289,7 +291,7 @@ function gamma(r, k) {   // Marsaglia-Tsang, media k
 }
 function poisson(r, l) { if (l > 30) return Math.max(0, Math.round(l + Math.sqrt(l) * gauss(r))); const L = Math.exp(-l); let k = 0, p = 1; do { k++; p *= r(); } while (p > L); return k - 1; }
 function montecarlo(P, N = 100000) {
-  const m = Math.max(pkEsp(P) || 0.05, 0.05), disp = P.x.disp || 1, nObs = Math.max(pkSerie(P).length, 5);
+  const m = Math.max(pkEsp(P) || 0.05, 0.05), disp = P.x.disp || 1, nObs = P.s === "pts" ? 5000 : Math.max(pkSerie(P).length, 5);   // puntos NBA: la desviación del robot ya trae la incertidumbre del modelo
   let seed = 0; for (const ch of P.g.id + P.x.m) seed = (seed * 31 + ch.charCodeAt(0)) | 0;
   const r = rngDe(seed);
   const rr = disp > 1.001 ? m / (disp - 1) : 0;          // binomial negativa = Poisson con media gamma
@@ -380,7 +382,7 @@ function pickItems() {
     if (!g.pick.bajo) it.push({ k: "g", g, p: g.pick.tipo === "valor" ? g.pick.pv : g.pick.p, mk: "res", dep: g.dep, eq: 1,
       val: g.pick.tipo === "valor" ? g.pick.valor : null, casa: g.pick.tipo === "valor" ? g.pick.cuota : null, min: g.pick.minima || vale(g.pick.justa) });
     if (g.extra) {
-      g.extra.picks.forEach((x) => it.push({ k: "x", g, x, p: x.p, mk: x.s, dep: "futbol", eq: 1, min: vale(x.justa) }));
+      g.extra.picks.forEach((x) => it.push({ k: "x", g, x, p: x.p, mk: x.s, dep: g.dep, eq: 1, min: vale(x.justa) }));
       g.extra.jug.forEach((x) => it.push({ k: "x", g, x, p: x.p, mk: x.s, dep: "futbol", eq: 0, min: vale(x.justa) }));
     }
   }

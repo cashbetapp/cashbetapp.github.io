@@ -259,6 +259,8 @@ def nba(par):
     # 2a etapa con todo lo ya jugado (sin inicios de temporada)
     rows, _, _ = nba_walk(par["xi"], par["ridge"])
     rows = [r for r in rows if not (r["d"][5:7] == "10" or "11-01" <= r["d"][5:] <= "11-19")]
+    global NBA_ROWS
+    NBA_ROWS = rows      # para la prueba de puntos de equipo (nbaextra)
     F = np.array([[r["ph"] - r["pa"], r["mh"] - r["ma"], float(r["b2b_h"]) - float(r["b2b_a"])] for r in rows])
     ym = np.array([r["g"]["h"]["s"] - r["g"]["a"]["s"] for r in rows])
     yt = np.array([r["g"]["h"]["s"] + r["g"]["a"]["s"] for r in rows])
@@ -275,7 +277,10 @@ def nba(par):
         sm = get(f"https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event={g['id']}") or {}
         outs = {}
         for t in sm.get("injuries", []):
-            outs[t["team"]["id"]] = [{"id": i["athlete"]["id"], "n": i["athlete"]["displayName"], "s": i.get("status")}
+            outs[t["team"]["id"]] = [{"id": i["athlete"]["id"], "n": i["athlete"]["displayName"], "s": i.get("status"),
+                                      "pos": ((i["athlete"].get("position") or {}).get("abbreviation")),
+                                      "tipo": (i.get("details") or {}).get("type"), "lado": (i.get("details") or {}).get("side"),
+                                      "ret": (i.get("details") or {}).get("returnDate")}
                                      for i in t.get("injuries", []) if i.get("athlete")]
         o_h = {i["id"] for i in outs.get(g["h"]["id"], []) if i["s"] == "Out"}
         o_a = {i["id"] for i in outs.get(g["a"]["id"], []) if i["s"] == "Out"}
@@ -309,7 +314,7 @@ def nba(par):
             "h": {k: g["h"][k] for k in ("id", "n", "ab", "logo", "rec")},
             "a": {k: g["a"][k] for k in ("id", "n", "ab", "logo", "rec")},
             "puntos_esperados": [round(marg / 2 + tot / 2, 1), round(tot / 2 - marg / 2, 1)],
-            "margen": round(marg, 1), "total": round(tot, 1),
+            "margen": round(marg, 1), "total": round(tot, 1), "sd": [round(sd_m, 2), round(sd_t, 2)],
             "bajas": {"h": outs.get(g["h"]["id"], []), "a": outs.get(g["a"]["id"], [])},
             "mercados": sels, "pick": pick,
             "valor_sin_probar": max(val, key=lambda s: s["valor"]) if val else None, "odds": od or None,
@@ -522,7 +527,7 @@ def outcome(m, hs, as_):
 
 
 FUENTE = "ESPN (site.api.espn.com)"
-MODELO = {"partidos_futbol": "futbol-poisson-v2+casa", "partidos_nba": "nba-logit-v2+casa",
+MODELO = {"nba_equipo": "nba-puntos-equipo-v1", "partidos_futbol": "futbol-poisson-v2+casa", "partidos_nba": "nba-logit-v2+casa",
           "extra": "estadisticas-nb-v2", "props": "nba-jugadores-v1+casa"}
 
 
@@ -576,7 +581,7 @@ def ledger(partidos, props_, extras=None):
                 vivos.add(("extra", k))
                 R.anotar(L, "extra", k, dict(base, hid=g["h"]["id"], aid=g["a"]["id"], m=x["m"], s=x["s"], sc=x["sc"],
                                             txt=x["txt"], p=x["p"], cuota=x["justa"], casa_real=False,
-                                            modelo=MODELO["extra"]), ahora)
+                                            modelo=MODELO["nba_equipo"] if x["s"] == "pts" else MODELO["extra"]), ahora)
         pk = g.get("pick")
         if pk and not pk.get("bajo"):
             viejo = L["partidos"].get(g["id"])      # registro anterior al sello (clave = id del partido)
@@ -638,6 +643,10 @@ def ledger(partidos, props_, extras=None):
                 tot = sum(stat_val(v, kk) or 0 for kk in PROP_TYPES[e["t"]])
                 est = "push" if tot == e["linea"] else "acierto" if ((tot > e["linea"]) == (e["lado"] == "mas")) else "fallo"
                 R.calificar(L, coll, k, est, real=tot)
+            elif coll == "extra" and e.get("s") == "pts" and gid in res:
+                _, sc_, lado_, ln_ = e["m"].split("|")
+                real = res[gid][0] if sc_ == "h" else res[gid][1]
+                R.calificar(L, coll, k, "acierto" if (real > float(ln_)) == (lado_ == "mas") else "fallo", real=real)
             elif coll == "extra" and gid in res and res[gid][2]:
                 ok, real = extra_outcome(e["m"], res[gid][2], e["hid"], e["aid"])
                 if ok is None:
@@ -959,6 +968,13 @@ def main():
             g["extra"] = x
     nb, injured = nba(par["nba"])
     pr = props(injured)
+    try:
+        import nbaextra
+        nbaextra.completar(nb, globals().get("NBA_ROWS") or [])       # puntos de equipo, defensa del rival, líderes, bajas
+    except Exception as e:
+        print("nbaextra:", e)
+    import lineas
+    lineas.movimiento(f + nb)        # primera y última cuota vista de cada partido
     tab = form_table()
     for g in f + nb:
         g["pick"]["txt"] = pick_name(g["pick"]["m"], g)

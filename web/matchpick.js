@@ -62,7 +62,7 @@ function openMatchPick(gid, keep) {
       </div>${big}</div>
     <button class="pkseg ${seg[gid] ? "on" : ""}" data-act="mpfollow">${ic(seg[gid] ? "check" : "heart")}${seg[gid] ? "Siguiendo" : "Seguir Predicción"}</button>
     <div class="pktabs">${[["resumen", "Resumen"], ["contexto", "Contexto"], ["analisis", "Análisis IA"]].map(([k, l]) => `<button class="${tab === k ? "on" : ""}" data-act="mptab" data-k="${k}">${l}</button>`).join("")}</div>
-    ${tab === "resumen" ? mpResumen(g, I, sd, p) : tab === "contexto" ? gPrevia(g) : mpAnalisis(g, I, sd, p)}
+    ${tab === "resumen" ? mpResumen(g, I, sd, p) : tab === "contexto" ? gPrevia(g) + (g.dep === "nba" && typeof nbaContexto === "function" ? nbaContexto(g, sd, { solo: true }) : "") : mpAnalisis(g, I, sd, p)}
     <button class="cbtn2 mpfull" data-g="${gid}">${ic("cal")}Ver ficha completa del partido</button>`;
   const cur = $(".sheet.on");
   if (keep && cur) { const yy = cur.scrollTop; cur.innerHTML = `<div class="grab"></div><button class="x" data-act="close" aria-label="Cerrar">${ic("x")}</button>` + html; cur.scrollTop = yy; }
