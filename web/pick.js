@@ -441,18 +441,22 @@ function fotoJug(foto, nombre, tm, liga) {
   const f = foto ? `<img src="${esc(foto)}" alt="" loading="lazy">` : `<span class="pjs">${esc(sigla({ n: nombre }))}</span>`;
   return `<div class="pjf ${foto ? "" : "sin"}">${f}<span class="pjl">${liga}</span></div>`;
 }
+// escudo(s) grandes en el mismo espacio que la foto del jugador, con el logo de la liga
+function escPanel(teams, liga) {
+  return `<div class="pjf esc ${teams.length > 1 ? "dos" : ""}">${teams.map((t) => crest(t, 92)).join("")}<span class="pjl">${liga}</span></div>`;
+}
 function pcCard(e) {
-  let img, lab, tit, sub, pill, up, attr, cuota, liga, jug = false;
+  let img, lab, tit, sub, pill, up, attr, cuota, liga, jug = false, pan = false;
   if (e.k === "g") {
     const g = e.g; up = isUp(g.pick.m);
-    img = `<div class="pcimg dos">${crest(g.h, 46)}${crest(g.a, 46)}</div>`;
+    img = escPanel([g.h, g.a], lgLogo(g.lg, 22)); pan = true;
     lab = g.dep === "nba" ? "PARTIDO · NBA" : "PARTIDO"; tit = `${g.h.n} vs ${g.a.n}`; sub = `${abT(g.h)} vs ${abT(g.a)} · ${hora(g.at)}`;
     pill = g.pick.txt; attr = `data-mp="${g.id}"`; cuota = g.pick.cuota || g.pick.justa; liga = g.liga;
   } else if (e.k === "x") {
     const g = e.g, x = e.x, P = pkFind(g.id, x.m); up = P.lado === "mas" || pkPill(P) === "Recibe tarjeta";
     const tm = pkTeam(P);
     if (P.sc === "j") { jug = true; img = fotoJug(x.foto, x.jugador, tm, lgLogo(g.lg, 22)); }
-    else img = P.sc === "t" ? `<div class="pcimg dos">${crest(g.h, 46)}${crest(g.a, 46)}</div>` : `<div class="pcimg">${crest(tm, 74)}</div>`;
+    else { img = escPanel(P.sc === "t" ? [g.h, g.a] : [tm], lgLogo(g.lg, 22)); pan = true; }
     lab = P.sc === "j" ? `${crest(tm, 16)}${esc(abT(tm))}` : P.sc === "t" ? "TOTAL DEL PARTIDO" : "TOTAL EQUIPO";
     tit = P.sc === "j" ? x.jugador : P.sc === "t" ? `Total de ${UN[P.s]}` : tm.n;
     sub = `${abT(g.h)} vs ${abT(g.a)} · ${hora(g.at)}`; pill = pkPill(P); attr = `data-pk="${g.id}" data-m="${esc(x.m)}"`; cuota = x.justa; liga = g.liga;
@@ -463,7 +467,7 @@ function pcCard(e) {
     lab = `${crest(eq, 16)}${esc(abT(eq))}`; tit = x.jugador; sub = `${esc(x.partido || "")} · ${hora(x.at)}`;
     pill = `${up ? "Más" : "Menos"} de ${x.linea} ${x.tipo.toLowerCase()}`; attr = `data-pr="${D.props.indexOf(x)}"`; cuota = x.cuota; liga = "NBA";
   }
-  return `<button class="pcard ${jug ? "jg" : ""}" ${attr}>${img}<div class="pcm"><div class="pcl">${jug ? lab : esc(lab)}</div><div class="pct">${esc(tit)}</div><div class="pcs">${esc(sub)}</div>
+  return `<button class="pcard ${jug || pan ? "jg" : ""}" ${attr}>${img}<div class="pcm"><div class="pcl">${jug ? lab : esc(lab)}</div><div class="pct">${esc(tit)}</div><div class="pcs">${esc(sub)}</div>
     <span class="pcpill ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(pill)}</span></span></div>
     <div class="pcr"><span class="pcp"><i></i>${pct(e.p)}</span></div>
     <div class="pcb">${e.val != null ? `<span class="pcval">+${Math.round(e.val * 100)}%</span><span class="pcc">${odd(e.casa)}</span>` : e.prueba ? `<span class="pcc" title="Cuota de la casa (en prueba)">${odd(e.casa)}</span>` : `<span class="pcc" title="Vale la pena desde esta cuota">${odd(e.min || cuota)}</span>`}</div></button>`;

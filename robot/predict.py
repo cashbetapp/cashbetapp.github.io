@@ -763,7 +763,22 @@ def historial(L, ahora, n, h):
         json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
 
 
-def _img(url, path, size):
+def _recorte(im, size):
+    """Escudo: quita el borde transparente y lo centra en un cuadrado con 4 % de
+    margen, así todos los escudos se ven del mismo tamaño."""
+    from PIL import Image
+    bb = im.getchannel("A").point(lambda a: 255 if a > 10 else 0).getbbox()
+    if bb:
+        im = im.crop(bb)
+    lado = int(max(im.size) * 1.08)
+    c = Image.new("RGBA", (lado, lado), (0, 0, 0, 0))
+    c.paste(im, ((lado - im.width) // 2, (lado - im.height) // 2))
+    if lado > size:
+        c = c.resize((size, size), Image.LANCZOS)
+    return c
+
+
+def _img(url, path, size, recorte=False):
     """Baja una imagen una sola vez, la achica y la guarda como PNG."""
     if os.path.exists(path):
         return True
@@ -773,7 +788,10 @@ def _img(url, path, size):
         try:
             with urllib.request.urlopen(url, timeout=20) as r:
                 im = Image.open(io.BytesIO(r.read())).convert("RGBA")
-            im.thumbnail((size, size), Image.LANCZOS)
+            if recorte:
+                im = _recorte(im, size)
+            else:
+                im.thumbnail((size, size), Image.LANCZOS)
             os.makedirs(os.path.dirname(path), exist_ok=True)
             im.save(path, optimize=True)
             return True
@@ -798,28 +816,28 @@ def images(partidos, props_):
     def team(t):
         if t and t.get("logo") and not t["logo"].startswith("data/"):
             u = t["logo"]
-            rel = f"img/e/{_h(u)}.png"
-            jobs[rel] = (u, 320)
+            rel = f"img/e5/{_h(u)}.png"
+            jobs[rel] = (u, 500, True)
             t["logo"] = "data/" + rel
             # versión oficial para fondo oscuro (escudos negros se ven en blanco)
             ud = u.replace("/500/scoreboard/", "/500-dark/").replace("/500/", "/500-dark/")
             if ud != u:
-                reld = f"img/e/{_h(u)}d.png"
-                jobs[reld] = (ud, 320)
+                reld = f"img/e5/{_h(u)}d.png"
+                jobs[reld] = (ud, 500, True)
                 t["ld"] = "data/" + reld
     for g in partidos:
         team(g["h"]); team(g["a"])
         lg = (g.get("extra") or {}).get("lg") or {}
         for ab, u in list(lg.items()):
             if u and not u.startswith("data/"):
-                rel = f"img/e/{_h(u)}.png"
-                jobs.setdefault(rel, (u, 320))
+                rel = f"img/e5/{_h(u)}.png"
+                jobs.setdefault(rel, (u, 500, True))
                 lg[ab] = "data/" + rel
         for s in ("h", "a"):
             for r in (g.get("forma") or {}).get(s, []) + (g.get("ult") or {}).get(s, []):
                 if r.get("logo") and not r["logo"].startswith("data/"):
-                    rel = f"img/e/{_h(r['logo'])}.png"
-                    jobs.setdefault(rel, (r["logo"], 320))
+                    rel = f"img/e5/{_h(r['logo'])}.png"
+                    jobs.setdefault(rel, (r["logo"], 500, True))
                     r["logo"] = "data/" + rel
     # futbolistas: solo partidos de las próximas 36 h; las que no existen se recuerdan
     nofoto_p = os.path.join(DATA, "img", "nofoto.json")
@@ -840,7 +858,7 @@ def images(partidos, props_):
         if x.get("eq"):
             team(dict(x["eq"]))
     with ThreadPoolExecutor(4) as ex:
-        ok = list(ex.map(lambda kv: (kv[0], _img(kv[1][0], os.path.join(DATA, kv[0]), kv[1][1])), jobs.items()))
+        ok = list(ex.map(lambda kv: (kv[0], _img(kv[1][0], os.path.join(DATA, kv[0]), *kv[1][1:])), jobs.items()))
     bad = {k for k, v in ok if not v}
     with ThreadPoolExecutor(6) as ex:
         okf = list(ex.map(lambda kv: (kv[0], _img(kv[1][0], os.path.join(DATA, kv[0]), kv[1][1])), fjobs.items()))
