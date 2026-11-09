@@ -88,7 +88,7 @@ function inicio() {
   const cprom = cuotas.length ? cuotas.reduce((s, x) => s + x, 0) / cuotas.length : 0;
   // destacados: el mejor de partido, el mejor de equipo (estadística) y el mejor jugador
   const errs = (typeof erroresCuota === "function" ? erroresCuota() : []).slice(0, 3).map((e) => ({ ...e, gid: e.k === "g" ? e.g.id : e.x.ev + "|" + e.x.pl }));
-  const top = [...errs, ...its].filter((e, i, a) => a.findIndex((y) => y.gid === e.gid) === i).slice(0, errs.length ? 5 : 3);   // errores de cuota + destacados, partidos distintos
+  const top = [...errs, ...its].filter((e, i, a) => a.findIndex((y) => y.gid === e.gid) === i).slice(0, 3);   // 3 destacados como IABET: errores de cuota primero, partidos distintos
   const resto = its.filter((e) => !top.includes(e)).slice(0, 10);
   const dia = new Date().toLocaleDateString("es-CO", { weekday: "long" });
   const nom = store.get("nombre", "");

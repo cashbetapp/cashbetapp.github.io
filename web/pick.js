@@ -427,6 +427,17 @@ function mejores(xs, n) {
     c[k]++; mk[k].add(t); return true;
   });
 }
+// Todos: los mejores (regla de arriba) y, si no llegan a 15, los siguientes de más confianza (máx. 3 por partido)
+function top15(xs) {
+  const base = mejores(xs, 3).slice(0, 15), c = {};
+  base.forEach((e) => (c[e.gid] = (c[e.gid] || 0) + 1));
+  for (const e of ordenar(xs)) {
+    if (base.length >= 15) break;
+    if (base.includes(e) || (c[e.gid] || 0) >= 3) continue;
+    base.push(e); c[e.gid] = (c[e.gid] || 0) + 1;
+  }
+  return ordenar(base);
+}
 function picks() {
   let it = pickItems();
   if (ui.pseg === "jugadores") it = it.filter((e) => !e.eq);
@@ -435,7 +446,7 @@ function picks() {
   if (ui.pmk !== "todos") it = it.filter((e) => e.mk === ui.pmk);
   if (ui.pgame && ui.pgame !== "todos") it = it.filter((e) => e.gid === ui.pgame);
   // Todos: 1 por partido y sin jugadores NBA en prueba; Jugadores/Equipos o con filtro: 2 por partido
-  if (ui.pseg === "todos" && ui.pmk === "todos") it = mejores(it.filter((e) => e.k !== "pr"), 3);
+  if (ui.pseg === "todos" && ui.pmk === "todos") it = top15(it.filter((e) => e.k !== "pr"));   // Todos: los 15 mejores del día (como IABET)
   else it = ordenar([...mejores(it.filter((e) => e.k !== "pr"), 3), ...it.filter((e) => e.k === "pr")]);   // NBA: hasta 3 jugadores por partido
   if (ui.pord && ui.pord !== "conf") it = ordenPor(it, ui.pord);
   const total = it.length;
