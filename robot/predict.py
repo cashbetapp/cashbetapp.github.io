@@ -338,7 +338,10 @@ def player_models(games, det, before):
             continue
         for pid, v in ((det.get(g["id"]) or {}).get("pl") or {}).items():
             if (v.get("MIN") or 0) > 0:
-                seq.setdefault(pid, []).append({"MIN": v["MIN"], **{k: stat_val(v, k) or 0 for k in STATS}})
+                loc = str(v.get("t")) == str(g["h"]["id"])
+                rv = g["a"] if loc else g["h"]
+                seq.setdefault(pid, []).append({"MIN": v["MIN"], "_at": g["at"][:10], "_l": loc, "_vs": rv.get("ab") or rv.get("n"),
+                                                **{k: stat_val(v, k) or 0 for k in STATS}})
                 names[pid] = (v.get("n"), v.get("t"))
     return seq, names
 
@@ -396,6 +399,8 @@ def props(injured, days=None):
                             "esperado": round(mu, 1), "p": round(pv, 4), "pm": round(p, 4), "cuota": worst,
                             "casa": round(1 / worst, 4), "valor": round(pv * worst - 1, 3),
                             "ult": [sum(x[k] for k in ks) for x in prev[-10:]],
+                            # ficha del jugador (como IABET): últimos 40 partidos [valor, rival, local, fecha, minutos]
+                            "hist": [[sum(x[k] for k in ks), x.get("_vs"), 1 if x.get("_l") else 0, x.get("_at"), round(x["MIN"])] for x in prev[-40:]][::-1],
                             "prom": round(float(np.mean([sum(x[k] for k in ks) for x in prev[-10:]])), 1)})
     out.sort(key=lambda x: -x["valor"])
     return out

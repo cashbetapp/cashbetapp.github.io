@@ -24,7 +24,7 @@ const esPartido = (r) => r.c === "g" || (r.c === "p" && (/^\d+$/.test(r.k) || r.
 function estadoSeguido(id, v) {
   const filas = (HIST && HIST.filas) || [];
   let f = null;
-  if (id.startsWith("pk|")) { const k = id.slice(3); f = filas.find((r) => r.k === k); }   // k = "partido|mercado|lado|línea"
+  if (id.startsWith("pk|") || id.startsWith("pr|")) { const k = id.slice(3); f = filas.find((r) => r.k === k); }   // k = "partido|mercado|lado|línea"
   else f = filas.find((r) => esPartido(r) && (r.k === id || r.k.startsWith(id + "|")) && (!v.m || r.k === id || r.k.endsWith("|" + v.m)));
   if (f && f.st && f.st !== "retirado") return { st: f.st, r: f.r, cu: f.cu };
   if (new Date(v.at) < Date.now() - 3 * 3600e3 && !f) return { st: null, r: null };
@@ -52,7 +52,7 @@ function seguidos() {
   const lgDe = (v) => v.lg || (Object.entries(D.ligas || {}).find(([, L]) => L.n === v.liga) || [])[0] || (v.liga === "NBA" ? "nba" : null);
   // seguidos guardados antes de las tarjetas nuevas: se completan con los datos del partido si siguen disponibles
   const completar = (id, v) => {
-    if (v.nom && id.startsWith("pk|")) return v;
+    if (v.nom && (id.startsWith("pk|") || id.startsWith("pr|"))) return v;
     const pk = id.startsWith("pk|") ? id.slice(3) : null;
     if (pk && !v.nom) {
       const gid = pk.slice(0, pk.indexOf("|")), P = D.byId[gid] && pkFind(gid, pk.slice(pk.indexOf("|") + 1));
@@ -77,7 +77,8 @@ function seguidos() {
     const v = completar(id, v0);
     const [lab, cls] = e.st ? ESTADO[e.st] : ["Pendiente", "pe"];
     const pk = id.startsWith("pk|") ? id.slice(3) : null, gid = pk ? pk.slice(0, pk.indexOf("|")) : id;
-    const at = pk ? (D.byId[gid] ? `data-pk="${gid}" data-m="${esc(pk.slice(pk.indexOf("|") + 1))}"` : "") : (D.byId[id] ? `data-mp="${id}"` : "");
+    const pri = id.startsWith("pr|") ? D.props.findIndex((x) => `pr|${x.ev}_${x.pl}_${x.t}_${x.linea}` === id) : -1;
+    const at = id.startsWith("pr|") ? (pri >= 0 ? `data-pr="${pri}"` : "") : pk ? (D.byId[gid] ? `data-pk="${gid}" data-m="${esc(pk.slice(pk.indexOf("|") + 1))}"` : "") : (D.byId[id] ? `data-mp="${id}"` : "");
     const img = v.foto ? `<img class="sgf" src="${esc(v.foto)}" alt="" loading="lazy">`
       : v.tl ? `<div class="sgx1">${crest({ logo: v.tl, n: v.nom }, 92)}</div>`
       : `<div class="sgx2">${crest({ logo: v.hl, n: v.h }, 64)}${crest({ logo: v.al, n: v.a }, 64)}</div>`;
