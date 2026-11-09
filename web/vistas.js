@@ -95,10 +95,9 @@ function inicio() {
       <button class="icb" data-go="notificaciones" aria-label="Notificaciones">${ic("bell")}${typeof campana === "function" ? campana() : ""}</button><button class="icb" data-go="ajustes" aria-label="Perfil">${ic("user")}</button></div></div>
     <h1>Buen ${esc(dia)}${nom ? `, ${esc(nom)}` : ""}</h1><div class="sub2">${fmtD.format(new Date())} · ${its.length} mejores picks</div>
     <div class="ban">${ic("star")}<div>${sem.n ? `<b>CASHBET acertó ${sem.g}/${sem.n}</b><span>Últimos 7 días · picks reales</span>` : `<b>Registro real en marcha</b><span>Cada pick se califica al terminar el partido</span>`}</div><button data-go="historial">Historial ${ic("right")}</button></div>
-    <div class="tiles t2">
+    <div class="tiles t2 dos">
       <div class="tile"><div class="k">Efectividad</div><div class="v">${real ? Math.round(rec.ef) : Math.round(efPrueba)}%<small>${real ? "real" : "prueba"}</small></div></div>
-      <div class="tile"><div class="k">Racha</div><div class="v">${rec.n ? rec.racha.replace(" ", "") : "—"}</div></div>
-      <button class="tile" data-go="errores"><div class="k">Errores de cuota</div><div class="v">${typeof erroresCuota === "function" ? erroresCuota().length : 0}<small>ver ${ic("right")}</small></div></button></div>
+      <div class="tile"><div class="k">Racha</div><div class="v">${rec.n ? rec.racha.replace(" ", "") : "—"}</div></div></div>
     ${top.length ? `<div class="sec"><h2 class="ih">${ic("bolt")}Picks destacados (${top.length})</h2><button class="pill dk" data-go="picks">Top picks</button></div>
       <div class="car">${top.map(heroPick).join("")}</div><div class="dots">${top.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</div>` : ""}
     <div class="sec"><h2 class="ih">${ic("trend")}Picks principales</h2><button class="pill dk" data-go="picks">Ver todo ${ic("right")}</button></div>

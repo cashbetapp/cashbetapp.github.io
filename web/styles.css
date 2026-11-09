@@ -1406,3 +1406,5 @@ button.tile { text-align: left; font: inherit; color: inherit; cursor: pointer; 
 /* ===== Notificaciones push ===== */
 .tog { transition: background .2s; } .tog::after { transition: left .2s; } .tog.on { background: var(--p, #22c55e); } .tog.on::after { left: 21px; }
 button.ajrow { background: none; color: inherit; font: inherit; border-left: 0; border-right: 0; border-bottom: 0; cursor: pointer; }
+
+.tiles.dos { grid-template-columns: 1fr 1fr; }
