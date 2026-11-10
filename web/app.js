@@ -532,6 +532,7 @@ function act(a, el) {
   if (typeof actCuentaSync === "function" && actCuentaSync(a)) return;
   if (typeof actSeguidos === "function" && actSeguidos(a, el)) return;
   if (typeof actInicio2 === "function" && actInicio2(a)) return;
+  if (typeof actVivo === "function" && a.startsWith("vv") && actVivo(a, el)) return;
   if (typeof actRes === "function" && actRes(a, el)) return;
   if (typeof actBank === "function" && actBank(a, el)) return;
   if (typeof actErr === "function" && actErr(a, el)) return;

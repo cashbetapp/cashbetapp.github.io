@@ -63,10 +63,14 @@ def detalle(key, sp, code, e):
                     stats.append([lab, H[lab], A[lab]])
     vid = next(({"tit": v.get("headline"), "img": v.get("thumbnail"), "dur": v.get("duration"),
                  "url": ((v.get("links") or {}).get("web") or {}).get("href")} for v in d.get("videos") or [] if v.get("thumbnail")), None)
-    nombres = [w.lower() for c in cs for w in ((c.get("team") or {}).get("displayName") or "").split() if len(w) > 3]
+    # la crónica tiene que nombrar a los DOS equipos (antes "Los Angeles" metía notas de Clippers en juegos de Lakers)
+    def _claves(c):
+        t = c.get("team") or {}
+        return {w.lower() for w in [t.get("name"), t.get("shortDisplayName"), (t.get("displayName") or "").split()[-1:] and (t.get("displayName") or "").split()[-1]] if w and len(w) > 2}
+    eqs = [_claves(c) for c in cs]
     art = next(({"tit": a.get("headline"), "txt": a.get("description"), "url": ((a.get("links") or {}).get("web") or {}).get("href")}
                 for a in ((d.get("news") or {}).get("articles") or [])
-                if a.get("headline") and any(n in (a.get("headline") + " " + (a.get("description") or "")).lower() for n in nombres)), None)
+                if a.get("headline") and eqs and all(any(n in (a.get("headline") + " " + (a.get("description") or "")).lower() for n in ks) for ks in eqs)), None)
     ht = {side.get(c.get("team", {}).get("id")): ((c.get("linescores") or [{}])[0]).get("displayValue") for c in cs}
     stt = ((comp.get("status") or {}).get("type") or {})
     lid = []

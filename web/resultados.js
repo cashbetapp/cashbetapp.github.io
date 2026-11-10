@@ -77,12 +77,13 @@ function openResultado(gid, keep) {
       ${r.dep === "futbol" ? `<div class="rgol"><div>${goles("h")}</div><div>${goles("a")}</div></div>` : ""}
       ${r.ven || (r.tv && r.tv.length) ? `<div class="rven">${r.tv && r.tv.length ? `${ic("tv")}${esc(r.tv.join(", "))} · ` : ""}${r.ven ? `${ic("pin")}${esc(r.ven)}` : ""}</div>` : ""}</div>
     ${r.video ? `<h4 class="pksub">Destacados</h4><a class="rvid" href="${esc(r.video.url)}" target="_blank" rel="noopener"><div class="rvi"><img src="${esc(r.video.img)}" alt="" loading="lazy"><span class="nwp">${ic("play")}</span>${r.video.dur ? `<em>${dur(r.video.dur)}</em>` : ""}</div><b>${esc(r.video.tit || "")}</b></a>` : ""}
-    <div class="pktabs dark gtabs">${[["previa", "Previa"], ["stats", "Estadísticas"], ["resumen", "Resumen"], ["eventos", r.dep === "nba" ? "Líderes" : "Eventos"]].map(([k, l]) => `<button class="${tab === k ? "on" : ""}" data-act="rtab" data-k="${k}">${l}</button>`).join("")}</div>
-    ${tab === "previa" ? rPrevia(r, gid) : tab === "stats" ? rStats(r) : tab === "resumen" ? rResumen(r) : r.dep === "nba" ? rLideres(r) : rEventos(r)}`;
+    <div class="pktabs dark gtabs">${[["previa", "Previa"], ["stats", "Estadísticas"], ["resumen", "Resumen"], ["eventos", r.dep === "nba" && !(typeof VS !== "undefined" && VS[gid]) ? "Líderes" : "Eventos"]].map(([k, l]) => `<button class="${tab === k ? "on" : ""}" data-act="rtab" data-k="${k}">${l}</button>`).join("")}</div>
+    ${(typeof vvTab === "function" && vvTab(r, gid, tab)) || (tab === "previa" ? rPrevia(r, gid) : tab === "stats" ? rStats(r) : tab === "resumen" ? rResumen(r) : r.dep === "nba" ? rLideres(r) : rEventos(r))}`;
   const cur = $(".sheet.on");
   if (keep && cur) { const y = cur.scrollTop; cur.innerHTML = `<div class="grab"></div><button class="x" data-act="close" aria-label="Cerrar">${ic("x")}</button>` + html; cur.scrollTop = y; }
   else { openSheet(html); $(".sheet").classList.add("pk"); }
-  if (r.st === "in" && !keep) vivo(true).then(() => { if ($(".sheet.on") && sheetState.res === gid) openResultado(gid, true); });
+  if (!keep && typeof vvAbrir === "function") vvAbrir(gid, r);   // resumen en vivo de ESPN (cada 30 s)
+  else if (r.st === "in" && !keep) vivo(true).then(() => { if ($(".sheet.on") && sheetState.res === gid) openResultado(gid, true); });
 }
 function rPrevia(r, gid) {
   if (!HIST && typeof cargarHist === "function") cargarHist().then(() => { if (sheetState.res === gid) openResultado(gid, true); });
