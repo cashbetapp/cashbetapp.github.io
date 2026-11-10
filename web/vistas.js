@@ -101,7 +101,7 @@ function inicio() {
     <div class="ban">${ic("star")}<div>${sem.n ? `<b>CASHBET acertó ${sem.g}/${sem.n}</b><span>Últimos 7 días · picks reales</span>` : `<b>Registro real en marcha</b><span>Cada pick se califica al terminar el partido</span>`}</div>${esAdmin() ? `<button data-go="historial">Historial ${ic("right")}</button>` : ""}</div>
     <div class="tiles t2">
       <div class="tile"><div class="k">Efectividad</div><div class="v">${real ? Math.round(rec.ef) : Math.round(efPrueba)}%<small>${real ? "real" : "prueba"}</small></div></div>
-      <div class="tile"><div class="k">Racha</div><div class="v">${rec.n ? rec.racha.replace(" ", "") : "—"}</div></div>
+      <div class="tile"><div class="k">Racha</div><div class="v">${rec.n ? (/G$/.test(rec.racha) ? rec.racha.replace(" ", "") : "0") : "—"}</div></div>
       <div class="tile"><div class="k">Cuota prom.</div><div class="v">${cprom ? odd(cprom) : "—"}</div></div></div>
     ${top.length ? `<div class="sec"><h2 class="ih">${ic("bolt")}Picks destacados (${top.length})</h2><button class="pill dk" data-go="picks">Top picks</button></div>
       <div class="car">${top.map(heroPick).join("")}</div><div class="dots">${top.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</div>` : ""}
