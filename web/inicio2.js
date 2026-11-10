@@ -42,7 +42,7 @@ function noticiasSec() {
 function avisos() {
   const L = [], hoy = (D.partidos || []).filter((g) => esHoy(g.at));
   const gen = D.generado.replace("Z", ":00Z");
-  const its = typeof pickItems === "function" ? pickItems() : [];
+  const its = typeof pickItems === "function" ? (typeof soloNba20 === "function" ? soloNba20(pickItems()) : pickItems()) : [];
   const nMej = typeof mejores === "function" ? mejores(its.filter((e) => e.k !== "pr"), 3).length : its.length;
   if (hoy.length) L.push({ t: gen, i: "bolt", c: "g", h: "¡Los picks de hoy ya están!", s: `Hoy tienes ${nMej} picks listos. Revísalos antes de los partidos.`, go: "picks" });
   (typeof erroresCuota === "function" ? erroresCuota() : []).slice(0, 3).forEach((e) => {

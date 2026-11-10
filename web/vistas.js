@@ -78,7 +78,7 @@ function openCalFiltros() {
 
 // ------------------------------------------------------------ INICIO
 function inicio() {
-  const its = mejores(pickItems().filter((e) => e.k !== "pr"), 3);   // el mejor de cada partido (+ fuertes)
+  const its = mejores((typeof soloNba20 === "function" ? soloNba20(pickItems()) : pickItems()).filter((e) => e.k !== "pr"), 3);   // el mejor de cada partido (+ fuertes)
   const rec = (D.registro && D.registro.partidos) || { n: 0 }, sem = (D.registro && D.registro.semana) || { n: 0 };
   const a = D.acierto, nPrueba = a.futbol_partidos + a.nba_partidos;
   const efPrueba = (a.futbol_1x2 * a.futbol_partidos + a.nba_ganador * a.nba_partidos) / nPrueba;

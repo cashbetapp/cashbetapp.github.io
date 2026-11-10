@@ -438,33 +438,29 @@ function top15(xs, lim = 15) {
   }
   return ordenar(base);
 }
-// Todos como IABET: equipos y jugadores juntos. Hasta 5 jugadores (NBA en prueba incluidos, >= 60 %, 1 por partido),
-// el resto los mejores de equipo; nunca más de 3 picks del mismo partido
+// NBA: solo 20 picks al día en toda la app: hasta 15 de jugadores (los de mayor probabilidad, 1 por jugador,
+// máx. 3 por partido) y el resto de equipos (mínimo 5 si hay); si faltan jugadores, se completa con equipos
+const NBA_TOTAL = 20, NBA_JUG_MAX = 15, NBA_EQ_MIN = 5;
+function nba20(it) {
+  const ord = ordenar(it.filter((e) => e.dep === "nba"));
+  const jug = ord.filter((e) => e.k === "pr"), eq = top15(ord.filter((e) => e.k !== "pr"), Infinity);
+  const nJ = Math.min(jug.length, NBA_JUG_MAX, NBA_TOTAL - Math.min(NBA_EQ_MIN, eq.length));
+  return [...jug.slice(0, nJ), ...eq.slice(0, NBA_TOTAL - nJ)];
+}
+// deja solo los 20 de NBA elegidos (el fútbol no cambia)
+function soloNba20(it) { const sel = new Set(nba20(it)); return it.filter((e) => e.dep !== "nba" || sel.has(e)); }
+// Todos: los 20 de NBA + los mejores de fútbol (máx. 15), de mayor a menor
 function mezclaTodos(it, lim = 15) {
-  const conf = top15(it.filter((e) => !(e.k === "pr" && e.prueba)), lim);
-  const yaJug = conf.filter((e) => !e.eq).length, c = {};
-  const jug = [];
-  for (const e of ordenar(it.filter((e) => e.k === "pr" && e.prueba && e.p >= 0.6))) {
-    if (jug.length >= Math.max(0, 5 - yaJug) || jug.some((y) => y.gid === e.gid)) continue;
-    jug.push(e);
-  }
-  const out = [];
-  for (const e of [...jug, ...conf]) {
-    if (out.length >= lim || (c[e.gid] || 0) >= 3) continue;
-    out.push(e); c[e.gid] = (c[e.gid] || 0) + 1;
-  }
-  return ordenar(out);
+  return ordenar([...nba20(it), ...top15(it.filter((e) => e.dep !== "nba"), lim)]);
 }
 function picks() {
-  let it = pickItems();
+  let it = soloNba20(pickItems());
   if (ui.pseg === "jugadores") it = it.filter((e) => !e.eq);
   if (ui.pseg === "equipos") it = it.filter((e) => e.eq);
   if (ui.pdep !== "todos") it = it.filter((e) => e.dep === ui.pdep);
   if (ui.pmk !== "todos") it = it.filter((e) => e.mk === ui.pmk);
   if (ui.pgame && ui.pgame !== "todos") it = it.filter((e) => e.gid === ui.pgame);
-  // Todos: 1 por partido y sin jugadores NBA en prueba; Jugadores/Equipos o con filtro: 2 por partido
-  // como IABET: Todos = los 15 mejores del día, equipos y jugadores juntos (mezclaTodos)
-  // Jugadores / Equipos: sin límite, hasta 3 por partido
+  // NBA: solo los 20 del día (soloNba20); Todos = esos 20 + lo mejor de fútbol; Jugadores / Equipos = su parte
   if (ui.pseg === "todos" && ui.pmk === "todos") it = mezclaTodos(it);
   else it = [...top15(it.filter((e) => e.k !== "pr"), Infinity), ...it.filter((e) => e.k === "pr")];
   // como IABET: la lista va de mayor a menor confianza (%); los errores de cuota llevan su etiqueta +X%
