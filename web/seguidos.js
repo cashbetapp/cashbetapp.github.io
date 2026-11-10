@@ -31,8 +31,92 @@ function estadoSeguido(id, v) {
   return { st: f ? f.st : null, r: f ? f.r : null, cu: f ? f.cu : null };
 }
 
+
+// ---------------------------------------------------------------- EN VIVO (como IABET)
+// Mientras se juega el partido de un pick seguido, la tarjeta muestra "EN VIVO" parpadeando y la barra
+// avanza con el valor real (puntos que lleva el jugador, córners, goles…) contra la línea. Datos: ESPN, cada 45 s.
+const SGV = {};          // gid -> { t, d }
+let SGV_T = null;
+const sgUrl = (lg) => (lg === "nba" ? "basketball/nba" : `soccer/${lg}`);
+function sgGid(id) { return id.startsWith("pr|") ? id.slice(3).split("_")[0] : id.startsWith("pk|") ? id.slice(3).split("|")[0] : id; }
+async function sgCargar(seg) {
+  const ahora = Date.now(), pend = {};
+  for (const [id, v] of Object.entries(seg)) {
+    const t = new Date(v.at).getTime(), gid = sgGid(id), c = SGV[gid];
+    if (t > ahora || t < ahora - 8 * 3600e3) continue;                 // solo empezados en las últimas 8 h
+    const st = c && c.d && ((((c.d.header || {}).competitions || [{}])[0].status || {}).type || {}).state;
+    if (c && (st === "post" || ahora - c.t < 40e3)) continue;          // terminado ya guardado o pedido hace poco
+    pend[gid] = v.lg || (v.dep === "nba" ? "nba" : null);
+  }
+  const ids = Object.keys(pend).filter((g) => pend[g]);
+  if (!ids.length) return false;
+  await Promise.all(ids.map(async (gid) => {
+    try { const d = await (await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sgUrl(pend[gid])}/summary?event=${gid}`)).json(); if (d && d.header) SGV[gid] = { t: Date.now(), d }; } catch (e) {}
+  }));
+  return true;
+}
+function sgTick() {
+  clearInterval(SGV_T); SGV_T = 1;
+  const seg = store.get("seg", {});
+  const run = () => sgCargar(store.get("seg", {})).then((ok) => { if (ok && location.hash.startsWith("#seguidos") && !$(".sheet.on")) { const y = window.scrollY; $("#app").dataset.tab = ""; route(); window.scrollTo(0, y); } });
+  if (Object.values(seg).some((v) => { const t = new Date(v.at).getTime(); return t <= Date.now() && t > Date.now() - 8 * 3600e3; })) {
+    run(); SGV_T = setInterval(() => { if (!location.hash.startsWith("#seguidos")) { clearInterval(SGV_T); SGV_T = null; return; } if (!document.hidden) run(); }, 45e3);
+  } else SGV_T = null;
+}
+const NBA_T = { "Total Points": ["PTS"], "Total Rebounds": ["REB"], "Total Assists": ["AST"], "Total 3-Point Field Goals": ["3PT"], "Total Points and Rebounds": ["PTS", "REB"],
+  "Total Points and Assists": ["PTS", "AST"], "Total Assists and Rebounds": ["AST", "REB"], "Total Points, Rebounds, and Assists": ["PTS", "REB", "AST"] };
+const FUT_S = { cor: ["wonCorners"], sot: ["shotsOnTarget"], tir: ["totalShots"], fal: ["foulsCommitted"], tar: ["yellowCards", "redCards"] };
+// valor actual del pick seguido: { val, ln, mas, st: "in"|"post", det, marcador } o null
+function sgVivo(id, v) {
+  const S = SGV[sgGid(id)]; if (!S) return null;
+  const d = S.d, c = (d.header.competitions || [])[0] || {}, ty = (c.status || {}).type || {};
+  if (!["in", "post"].includes(ty.state)) return null;
+  const L = {}; (c.competitors || []).forEach((x) => (L[x.homeAway === "home" ? "h" : "a"] = x));
+  const sc = { h: +((L.h || {}).score || 0), a: +((L.a || {}).score || 0) };
+  const dep = v.dep || (v.lg === "nba" ? "nba" : "futbol");
+  const det = typeof detEs === "function" ? detEs(ty, dep) : ty.shortDetail;
+  const marcador = dep === "nba" ? `${v.aab || ""} ${sc.a} – ${sc.h} ${v.hab || ""}` : `${v.hab || ""} ${sc.h} – ${sc.a} ${v.aab || ""}`;
+  const base = { st: ty.state, det, marcador: marcador.trim() };
+  const num = (x) => { const m = /^(\d+)-\d+$/.exec(String(x)); return m ? +m[1] : parseFloat(x) || 0; };
+  if (id.startsWith("pr|")) {               // jugador NBA: pr|evento_jugador_tipo_línea
+    const [, pl, t, ln] = id.slice(3).split("_"), keys = NBA_T[t] || [];
+    for (const tm of (d.boxscore || {}).players || []) for (const gr of tm.statistics || []) {
+      const names = gr.names || gr.labels || [], a = (gr.athletes || []).find((x) => x.athlete && x.athlete.id === pl);
+      if (a) return Object.assign(base, { val: (a.stats || []).length ? keys.reduce((s, k) => s + num(a.stats[names.indexOf(k)]), 0) : 0, ln: +ln, mas: v.up !== false });
+    }
+    return Object.assign(base, { val: 0, ln: +ln, mas: v.up !== false });
+  }
+  if (id.startsWith("pk|")) {               // estadística: pts|h|mas|103.5 · cor|t|menos|8.5 · tir|j:123|mas|1.5
+    const [s, quien, lado, ln] = id.slice(3).split("|").slice(1);
+    let val = null;
+    if (s === "pts") val = sc[quien];
+    else if (quien.startsWith("j:")) {
+      const pid = quien.slice(2);
+      for (const ro of d.rosters || []) { const p = (ro.roster || []).find((x) => x.athlete && x.athlete.id === pid);
+        if (p) val = (FUT_S[s] || []).reduce((t, k) => t + (+(((p.stats || []).find((x) => x.name === k) || {}).displayValue) || 0), 0); }
+    } else {
+      const tms = (d.boxscore || {}).teams || [], by = {};
+      tms.forEach((t) => { const sd = L.h && t.team && t.team.id === L.h.team.id ? "h" : "a"; by[sd] = {}; (t.statistics || []).forEach((x) => (by[sd][x.name] = +x.displayValue || 0)); });
+      const vv = (sd) => (FUT_S[s] || []).reduce((t, k) => t + ((by[sd] || {})[k] || 0), 0);
+      if (by.h || by.a) val = quien === "t" ? vv("h") + vv("a") : vv(quien);
+    }
+    return val == null ? base : Object.assign(base, { val, ln: +ln, mas: lado === "mas" });
+  }
+  // pick de partido: totales con el marcador; ganador / hándicap: solo marcador
+  const x = /^(mas|menos)_([\d.]+)/.exec(v.m || "");
+  if (x) return Object.assign(base, { val: sc.h + sc.a, ln: +x[2], mas: x[1] === "mas" });
+  return base;
+}
+// ¿cómo va? ok = ya se cumple, no = ya no se puede, vivo = en juego
+function sgVa(L) {
+  if (L.val == null) return "vivo";
+  if (L.mas) return L.val > L.ln ? "ok" : L.st === "post" ? "no" : "vivo";
+  return L.val > L.ln ? "no" : L.st === "post" ? "ok" : "vivo";
+}
+
 function seguidos() {
   if (!HIST && typeof cargarHist === "function") cargarHist();
+  if (!SGV_T) sgTick();
   const seg = store.get("seg", {});
   const [ini, fin] = rangoFechas();
   let xs = Object.entries(seg).map(([id, v]) => ({ id, v, e: estadoSeguido(id, v) }))
@@ -85,7 +169,13 @@ function seguidos() {
     const icono = e.st === "acierto" ? ic("check") : e.st === "fallo" ? ic("x") : e.st ? "" : "–";
     const lg = lgDe(v);
     const up = v.up != null ? v.up : !/^menos/i.test(v.txt || "");
-    const bar = e.st === "acierto" ? 100 : e.st === "fallo" ? 100 : Math.round((v.p || 0) * 100);
+    // en vivo (o terminado): barra con el valor real contra la línea, como IABET
+    const L = sgVivo(id, v), va = L ? sgVa(L) : null;
+    const lnF = L && L.ln != null ? L.ln : v.ln != null ? +v.ln : null;
+    const real = L && L.val != null ? L.val : e.r != null && !isNaN(parseFloat(e.r)) && lnF != null ? parseFloat(e.r) : null;
+    const bar = real != null && lnF ? Math.min(100, Math.round((real / (+lnF * 1.25)) * 100)) : e.st === "acierto" || e.st === "fallo" ? 100 : Math.round((v.p || 0) * 100);
+    const vivo = L && L.st === "in";
+    const bcls = e.st ? cls : va === "ok" ? "ok" : va === "no" ? "no" : vivo ? "vi" : cls;
     return `<div class="sgt ${cls}" ${at} role="button">
       <div class="sgtop">${img}${puedeQuitar(v0) ? `<button class="sgq" data-act="sgx" data-k="${esc(id)}" aria-label="Dejar de seguir">${ic("x")}</button>` : `<span class="sgq lock" title="Ya empezó: no se puede quitar">${ic("lock")}</span>`}<span class="sgs ${cls}">${icono}</span></div>
       <div class="sgbody"><div class="sgty"><span>${esc(v.tipo || "Pick")}</span>${lg ? lgLogo(lg, 26) : ""}</div>
@@ -93,8 +183,10 @@ function seguidos() {
         <small>${esc(v.hab || (v.h || "").slice(0, 3).toUpperCase())} @ ${esc(v.aab || (v.a || "").slice(0, 3).toUpperCase())}</small>
         <small>${new Date(v.at).toLocaleDateString("es-CO", { month: "short", day: "numeric" }).replace(".", "")} · ${hora(v.at)}</small>
         <span class="sgp ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc((v.pill || v.txt || "").toUpperCase())}</span></span>
-        <i class="sgbar ${cls}"><s style="width:${bar}%"></s></i>
-        <div class="sgv"><span>${e.r != null ? `Final ${esc(String(e.r))}` : lab}</span><em>${pct(v.p)}</em></div></div></div>`;
+        <i class="sgbar ${bcls}"><s style="width:${bar}%"></s>${real != null && lnF ? `<u style="left:80%" title="Línea ${esc(String(lnF))}"></u>` : ""}</i>
+        ${real != null ? `<div class="sgnum ${bcls}" style="--x:${bar}%"><b>${esc(String(real))}</b>${lnF ? `<small>de ${esc(String(lnF))}</small>` : ""}</div>` : ""}
+        ${vivo ? `<div class="sgvivo"><i></i>EN VIVO · ${esc(L.det || "")}</div><div class="sgmar">${esc(L.marcador || "")}</div>` : ""}
+        <div class="sgv"><span>${e.st ? (e.r != null ? `Final ${esc(String(e.r))}` : lab) : vivo ? (va === "ok" ? "Va cumpliendo" : va === "no" ? "Ya no se cumple" : "En juego") : L && L.st === "post" ? "Terminado · calificando" : lab}</span><em>${pct(v.p)}</em></div></div></div>`;
   };
   return `<div class="top"><div class="logo">CASH<b>BET</b></div><div class="ic"><button class="icb" data-go="ajustes" aria-label="Perfil">${ic("user")}</button></div></div>
     <div class="sgh"><div><h1>Seguidos</h1><div class="sub2"><i class="sgdot"></i>${activos} ${activos === 1 ? "activo" : "activos"}</div></div>
