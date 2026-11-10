@@ -129,7 +129,7 @@ def estado(filas, sid, v):
 
 def mensajes(u, D, H, errs, enviados, ahora):
     """Lista de (clave, payload) que le tocan a este usuario y aún no se le enviaron."""
-    pref = u["push"].get("pref") or {"dia": True, "err": True, "res": True}
+    pref = u["push"].get("pref") or {"dia": True, "err": True, "res": True, "alta": True, "racha": True}
     loc = ahora.astimezone(COL)
     hoy, out = loc.strftime("%Y-%m-%d"), []
     despierto = 7 <= loc.hour <= 23
@@ -149,6 +149,38 @@ def mensajes(u, D, H, errs, enviados, ahora):
             det = f"{e['n']}: {e['txt']}. {round(e['p'] * 100)}% de probabilidad y la casa paga {e['c']:.2f} (debería pagar {1 / e['p']:.2f})."
             t = "Error de cuota detectado" if len(nuevos) == 1 else f"{len(nuevos)} errores de cuota nuevos"
             out.append(([f"err|{x['k']}" for x in nuevos], {"t": t, "b": det, "u": "./#inicio", "tag": "err"}))
+    if pref.get("alta", True) and despierto:
+        # picks de alta confianza (>= 70 %) de hoy que aún no se avisaron (como "Picks de Alta Confianza" de IABET)
+        pp = lambda g: g["pick"].get("pv") if g["pick"].get("tipo") == "valor" else g["pick"].get("p", 0)
+        altos = [g for g in D.get("partidos") or [] if (g.get("pick") or {}).get("txt") and not g["pick"].get("bajo") and pp(g) >= 0.70
+                 and dt.datetime.fromisoformat(g["at"].replace("Z", "+00:00")).astimezone(COL).strftime("%Y-%m-%d") == hoy
+                 and dt.datetime.fromisoformat(g["at"].replace("Z", "+00:00")) > ahora and f"alta|{g['id']}" not in enviados]
+        if altos:
+            altos.sort(key=lambda g: -pp(g))
+            t = "Pick de alta confianza" if len(altos) == 1 else f"{len(altos)} picks de alta confianza"
+            b = " · ".join(f"{g['pick']['txt']} ({round(pp(g) * 100)}%)" for g in altos[:3])
+            out.append(([f"alta|{g['id']}" for g in altos], {"t": t, "b": b, "u": "./#picks", "tag": "alta"}))
+    if pref.get("racha", True):
+        # racha de tus picks seguidos: avisa al llegar a 3, 5, 7… aciertos o fallos seguidos
+        filas = H.get("filas") or []
+        hechos = []
+        for sid, v in (u.get("seg") or {}).items():
+            if isinstance(v, dict) and v.get("at"):
+                st = estado(filas, sid, v)
+                if st in ("acierto", "fallo"):
+                    hechos.append((v["at"], sid, st))
+        hechos.sort()
+        if hechos:
+            ult, n = hechos[-1][2], 0
+            for h in reversed(hechos):
+                if h[2] != ult:
+                    break
+                n += 1
+            clave = f"racha|{ult}|{n}|{hechos[-1][1]}"
+            if n >= 3 and n % 2 == 1 and clave not in enviados:
+                t = f"Racha de {n} aciertos seguidos" if ult == "acierto" else f"{n} fallos seguidos"
+                b = "Tus picks seguidos van en racha ganadora." if ult == "acierto" else "Tus picks seguidos van en racha perdedora: revisa tu bankroll y no persigas pérdidas."
+                out.append((clave, {"t": t, "b": b, "u": "./#seguidos", "tag": "racha"}))
     if pref.get("res", True):
         filas, gan, per = H.get("filas") or [], [], []
         for sid, v in (u.get("seg") or {}).items():

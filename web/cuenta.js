@@ -43,6 +43,9 @@ async function fb() {
 
 // ---------------------------------------------------------------- sincronización
 const docUsuario = () => FB.db.collection("usuarios").doc(USER.uid);
+// ---- referidos: tu código = 6 primeras letras de tu cuenta; el enlace de invitar lo lleva (?ref=CODIGO)
+const codigoRef = () => (USER ? USER.uid.replace(/[^a-z0-9]/gi, "").slice(0, 6).toUpperCase() : "");
+try { const r = new URLSearchParams(location.search).get("ref"); if (r && /^[A-Z0-9]{4,10}$/i.test(r)) store.set("ref", r.toUpperCase()); } catch (e) {}
 async function alCambiarUsuario(u) {
   const antes = USER;
   USER = u && (u.emailVerified || u.providerData.some((p) => p.providerId === "google.com")) ? u : null;
@@ -61,6 +64,12 @@ async function alCambiarUsuario(u) {
       }
       if (!store.get("nombre", "") && USER.displayName) { localStorage.setItem("cb_nombre", JSON.stringify(USER.displayName.split(" ")[0])); cambio = true; }
       await subir();
+      // código de referido (como IABET): se guarda una sola vez, nunca el propio
+      const ref = store.get("ref", ""), mio = codigoRef();
+      try {
+        if (ref && !nube.referido && ref !== mio) await docUsuario().set({ referido: ref, refAt: new Date().toISOString() }, { merge: true });
+        if (nube.miRef !== mio) await docUsuario().set({ miRef: mio }, { merge: true });
+      } catch (e) { console.warn("referido", e); }
       if (cambio && !sessionStorage.getItem("cb_sync")) { sessionStorage.setItem("cb_sync", "1"); location.reload(); return; }
     } catch (e) { console.warn("sync", e); }
   }
@@ -105,6 +114,8 @@ function cuentaVista(arg) {
       <label class="clab">Nombre</label><input class="cin" id="c_nom" autocomplete="given-name" placeholder="Tu nombre">
       <label class="clab">Email</label><input class="cin" id="c_mail" type="email" autocomplete="email" inputmode="email" placeholder="tu@email.com">
       <label class="clab">Contraseña</label><input class="cin" id="c_pass" type="password" autocomplete="new-password" placeholder="Al menos 8 caracteres">
+      <details class="cref" ${store.get("ref", "") ? "open" : ""}><summary>¿Tienes un código de referido? ${ic("chev")}</summary>
+        <input class="cin" id="c_ref" autocomplete="off" autocapitalize="characters" maxlength="10" placeholder="Código de quien te invitó" value="${esc(store.get("ref", ""))}"></details>
       <button class="cbtn" data-act="c_crear">${ic("right")}Continuar</button>${pie}</div>`;
   if (arg === "entrar") return `<div class="cta">${atras("cuenta")}
       <h1 class="cth">Bienvenido<br><em>de nuevo.</em></h1><p class="ctp">Entra y sigue justo donde lo dejaste.</p>
@@ -155,6 +166,9 @@ async function actCuenta(a) {
       const nom = val("c_nom").trim(), mail = val("c_mail").trim(), pass = val("c_pass");
       if (!nom) return toast("Escribe tu nombre"), true;
       if (pass.length < 8) return toast("La contraseña debe tener al menos 8 caracteres"), true;
+      const ref = val("c_ref").trim().toUpperCase();
+      if (ref && !/^[A-Z0-9]{4,10}$/.test(ref)) return toast("Ese código de referido no es válido"), true;
+      if (ref) store.set("ref", ref);
       const r = await auth.createUserWithEmailAndPassword(mail, pass);
       await r.user.updateProfile({ displayName: nom });
       store.set("nombre", nom);

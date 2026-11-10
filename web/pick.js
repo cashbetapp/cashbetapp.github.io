@@ -438,6 +438,23 @@ function top15(xs, lim = 15) {
   }
   return ordenar(base);
 }
+// Todos como IABET: equipos y jugadores juntos. Hasta 5 jugadores (NBA en prueba incluidos, >= 60 %, 1 por partido),
+// el resto los mejores de equipo; nunca más de 3 picks del mismo partido
+function mezclaTodos(it, lim = 15) {
+  const conf = top15(it.filter((e) => !(e.k === "pr" && e.prueba)), lim);
+  const yaJug = conf.filter((e) => !e.eq).length, c = {};
+  const jug = [];
+  for (const e of ordenar(it.filter((e) => e.k === "pr" && e.prueba && e.p >= 0.6))) {
+    if (jug.length >= Math.max(0, 5 - yaJug) || jug.some((y) => y.gid === e.gid)) continue;
+    jug.push(e);
+  }
+  const out = [];
+  for (const e of [...jug, ...conf]) {
+    if (out.length >= lim || (c[e.gid] || 0) >= 3) continue;
+    out.push(e); c[e.gid] = (c[e.gid] || 0) + 1;
+  }
+  return ordenar(out);
+}
 function picks() {
   let it = pickItems();
   if (ui.pseg === "jugadores") it = it.filter((e) => !e.eq);
@@ -446,10 +463,9 @@ function picks() {
   if (ui.pmk !== "todos") it = it.filter((e) => e.mk === ui.pmk);
   if (ui.pgame && ui.pgame !== "todos") it = it.filter((e) => e.gid === ui.pgame);
   // Todos: 1 por partido y sin jugadores NBA en prueba; Jugadores/Equipos o con filtro: 2 por partido
-  // como IABET: Todos = los 15 mejores del día (equipos y jugadores juntos; los jugadores NBA aún en prueba no entran)
+  // como IABET: Todos = los 15 mejores del día, equipos y jugadores juntos (mezclaTodos)
   // Jugadores / Equipos: sin límite, hasta 3 por partido
-  const conf = it.filter((e) => !(e.k === "pr" && e.prueba));
-  if (ui.pseg === "todos" && ui.pmk === "todos") it = top15(conf);
+  if (ui.pseg === "todos" && ui.pmk === "todos") it = mezclaTodos(it);
   else it = [...top15(it.filter((e) => e.k !== "pr"), Infinity), ...it.filter((e) => e.k === "pr")];
   // como IABET: la lista va de mayor a menor confianza (%); los errores de cuota llevan su etiqueta +X%
   it = ui.pord && ui.pord !== "conf" ? ordenPor(it, ui.pord) : porConfianza(it);

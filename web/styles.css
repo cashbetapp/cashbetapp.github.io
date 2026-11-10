@@ -1606,3 +1606,10 @@ button.ajrow { background: none; color: inherit; font: inherit; border-left: 0; 
   -webkit-mask-image: linear-gradient(90deg, #000 50%, transparent 98%); mask-image: linear-gradient(90deg, #000 50%, transparent 98%); }
 .light .pjf img { filter: drop-shadow(0 0 1px rgba(0,0,0,.22)) drop-shadow(0 4px 10px rgba(0,0,0,.08)); }
 .light .pjl { filter: none; }
+
+/* código de referido al crear la cuenta (como IABET) */
+.cref { margin: 4px 0 6px; }
+.cref summary { list-style: none; cursor: pointer; text-align: center; font-size: 13.5px; color: var(--tx3); padding: 8px 0; display: flex; justify-content: center; align-items: center; gap: 4px; }
+.cref summary::-webkit-details-marker { display: none; }
+.cref summary svg { width: 14px; height: 14px; transition: transform .2s; }
+.cref[open] summary svg { transform: rotate(180deg); }

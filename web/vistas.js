@@ -34,7 +34,7 @@ function gCard(g) {
   return `<button class="gc" data-g="${g.id}"><div class="gt">${t(L)}
       <div class="mid"><b>${hora(g.at)}</b><span class="lg">${esc((g.tv && g.tv.length ? [].concat(g.tv)[0] : "") || g.liga)}</span><div class="fm">${dotsF(f[L])}<i>FORMA</i>${dotsF(f[R])}</div><span class="det">Detalles</span></div>${t(R)}</div>
     <div class="godds">${nba ? `<span><em>${esc(abT(g.a))}</em><b>${odd(o2)}</b></span><span><em>${esc(abT(g.h))}</em><b>${odd(o1)}</b></span>` : `<span><em>${esc(abT(g.h))}</em><b>${odd(o1)}</b></span>${oX ? `<span><em>X</em><b>${odd(oX)}</b></span>` : ""}<span><em>${esc(abT(g.a))}</em><b>${odd(o2)}</b></span>`}</div>
-    ${g.pick.bajo ? `<div class="gpk low"><span>Sin pick: ${g.pick.p > 0.75 ? `favorito muy claro (${esc(g.pick.txt)})` : "la casa ya paga lo justo"}</span></div>` : `<div class="gpk ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(g.pick.txt)}</span><b>${pct(g.pick.p)}</b></div>`}</button>`;
+    ${g.pick.bajo ? "" : `<div class="gpk ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(g.pick.txt)}</span><b>${pct(g.pick.p)}</b></div>`}</button>`;
 }
 function calendario() {
   if (typeof cargarRes === "function") { if (!RES) cargarRes(); else vivo(); }
@@ -89,12 +89,15 @@ function inicio() {
   // destacados: el mejor de partido, el mejor de equipo (estadística) y el mejor jugador
   const errs = (typeof erroresCuota === "function" ? erroresCuota() : []).slice(0, 3).map((e) => ({ ...e, gid: e.k === "g" ? e.g.id : e.x.ev + "|" + e.x.pl }));
   const top = [...errs, ...its].filter((e, i, a) => a.findIndex((y) => y.gid === e.gid) === i).slice(0, 3);   // 3 destacados como IABET: errores de cuota primero, partidos distintos
-  const resto = its.filter((e) => !top.includes(e)).slice(0, 10);
+  // picks principales como IABET: jugadores y equipos mezclados, sin repetir partido (si faltan, se completa)
+  const lista = typeof mezclaTodos === "function" ? mezclaTodos(pickItems(), 30) : its, vistos = new Set(top.map((e) => e.gid));
+  let resto = lista.filter((e) => !top.includes(e) && !vistos.has(e.gid) && vistos.add(e.gid)).slice(0, 10);
+  if (resto.length < 6) resto = [...resto, ...lista.filter((e) => !top.includes(e) && !resto.includes(e))].slice(0, 10);
   const dia = new Date().toLocaleDateString("es-CO", { weekday: "long" });
   const nom = store.get("nombre", "");
   return `<div class="top"><div class="logo">CASH<b>BET</b></div><div class="ic">
       <button class="icb" data-go="notificaciones" aria-label="Notificaciones">${ic("bell")}${typeof campana === "function" ? campana() : ""}</button><button class="icb" data-go="ajustes" aria-label="Perfil">${ic("user")}</button></div></div>
-    <h1>Buen ${esc(dia)}${nom ? `, ${esc(nom)}` : ""}</h1><div class="sub2">${fmtD.format(new Date())} · ${typeof top15 === "function" ? top15(pickItems().filter((e) => !(e.k === "pr" && e.prueba))).length : its.length} picks listos</div>
+    <h1>Buen ${esc(dia)}${nom ? `, ${esc(nom)}` : ""}</h1><div class="sub2">${fmtD.format(new Date())} · ${typeof mezclaTodos === "function" ? mezclaTodos(pickItems()).length : its.length} picks listos</div>
     <div class="ban">${ic("star")}<div>${sem.n ? `<b>CASHBET acertó ${sem.g}/${sem.n}</b><span>Últimos 7 días · picks reales</span>` : `<b>Registro real en marcha</b><span>Cada pick se califica al terminar el partido</span>`}</div>${esAdmin() ? `<button data-go="historial">Historial ${ic("right")}</button>` : ""}</div>
     <div class="tiles t2">
       <div class="tile"><div class="k">Efectividad</div><div class="v">${real ? Math.round(rec.ef) : Math.round(efPrueba)}%<small>${real ? "real" : "prueba"}</small></div></div>
@@ -286,7 +289,7 @@ function ajustes(arg) {
       ${row("responsable", "heartP", "Juego responsable", "Apuesta solo lo que puedas perder")}
       ${row("privacidad", "shield", "Privacidad", "Qué datos usamos")}
       ${row("ayuda", "help", "Ayuda y soporte", "Preguntas frecuentes")}
-      <button class="ajrow" data-act="invitar"><span class="oi">${ic("heart")}</span><div><b>Invita a tus amigos</b><small>Comparte CASHBET por WhatsApp o donde quieras</small></div>${ic("right")}</button></div>
+      <button class="ajrow" data-act="invitar"><span class="oi">${ic("heart")}</span><div><b>Invita a tus amigos</b><small>${typeof codigoRef === "function" && codigoRef() ? `Tu código de referido: ${codigoRef()}` : "Comparte CASHBET por WhatsApp o donde quieras"}</small></div>${ic("right")}</button></div>
     ${typeof cuentaAcciones === "function" ? cuentaAcciones() : ""}
 `;
   if (arg === "tema") return subTop("Tema") + heroAj("moon", "Tema", "Elige cómo se ve CASHBET") +

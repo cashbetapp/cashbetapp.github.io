@@ -2,11 +2,13 @@
 // El celular se suscribe con la llave pública VAPID; la suscripción se guarda en tu cuenta (usuarios/{uid}.push)
 // y el robot (cada 2 h) envía: resumen de picks del día, errores de cuota nuevos y resultados de tus seguidos.
 const VAPID_PUB = "BKrTLfpmyS-tz7TVP1JhQwDOAVE07qSGOrHDZQn08ynpOO68zz-o_jg2J0gxN22eXeoUaf-MwV-oCMK8j5EzCkk";
-const PUSH_PREF = [["dia", "Picks del día", "Un resumen por la mañana con los picks de hoy"], ["err", "Errores de cuota", "Cuando el robot encuentra una casa pagando de más"], ["res", "Resultados de tus picks", "Cuando un pick que sigues gana o pierde"]];
+const PUSH_PREF = [["dia", "Picks del día", "Un resumen por la mañana con los picks de hoy"], ["alta", "Picks de alta confianza", "Solo picks con 70 % o más de probabilidad"],
+  ["err", "Errores de cuota", "Cuando el robot encuentra una casa pagando de más"], ["res", "Resultados de tus picks", "Cuando un pick que sigues gana o pierde"],
+  ["racha", "Alertas de rachas", "Cuando tus picks llevan 3 o más aciertos o fallos seguidos"]];
 const esIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
 const instalada = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
 const pushSoportado = () => "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
-const pushPref = () => store.get("pushpref", { dia: true, err: true, res: true });
+const pushPref = () => Object.assign({ dia: true, err: true, res: true, alta: true, racha: true }, store.get("pushpref", {}));
 const pushOn = () => !!store.get("pushon", 0) && typeof Notification !== "undefined" && Notification.permission === "granted";
 
 function b64u(s) {

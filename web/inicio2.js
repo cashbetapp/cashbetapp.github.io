@@ -61,9 +61,9 @@ function avisos() {
   }
   if (HIST && HIST.filas) {
     const ay = new Date(); ay.setDate(ay.getDate() - 1); const k = ay.toLocaleDateString("en-CA");
-    const fs = HIST.filas.filter((r) => new Date(r.at).toLocaleDateString("en-CA") === k && (r.st === "acierto" || r.st === "fallo"));
+    const fs = HIST.filas.filter((r) => new Date(r.at).toLocaleDateString("en-CA") === k && (r.st === "acierto" || r.st === "fallo") && r.c !== "n");   // igual que el banner del Inicio: sin jugadores NBA en prueba
     if (fs.length) { const g = fs.filter((r) => r.st === "acierto").length; const t = new Date(); t.setHours(7, 0, 0, 0);
-      L.push({ t: t.toISOString(), i: "chart", c: "g", h: "Resultados de ayer", s: `El modelo acertó ${g} de ${fs.length} picks calificados (${Math.round((100 * g) / fs.length)}%). ${esAdmin() ? " Míralos en el Historial." : ""}`, go: esAdmin() ? "historial" : "inicio" }); }
+      L.push({ t: t.toISOString(), i: "chart", c: "g", h: "Resultados de ayer", s: `CASHBET acertó ${g} de ${fs.length} picks de partidos y equipos (${Math.round((100 * g) / fs.length)}%). ${esAdmin() ? " Míralos en el Historial." : ""}`, go: esAdmin() ? "historial" : "inicio" }); }
   }
   return L.filter((x) => new Date(x.t) <= Date.now()).sort((a, b) => new Date(b.t) - new Date(a.t));
 }
@@ -91,10 +91,11 @@ function campana() { try { return sinLeer() ? `<i class="bdot"></i>` : ""; } cat
 
 // ---------------------------------------------------------------- Perfil: invitar y calificar (como IABET)
 async function invitar() {
-  const d = { title: "CASHBET", text: "Mira CASHBET: pronósticos de fútbol y NBA con IA, gratis y con historial público verificable.", url: "https://cashbetapp.github.io" };
+  const c = typeof codigoRef === "function" ? codigoRef() : "";
+  const d = { title: "CASHBET", text: `Mira CASHBET: pronósticos de fútbol y NBA con IA, gratis.${c ? ` Mi código de referido: ${c}` : ""}`, url: "https://cashbetapp.github.io/" + (c ? `?ref=${c}` : "") };
   try { if (navigator.share) { await navigator.share(d); return; } } catch (e) { return; }
   try { await navigator.clipboard.writeText(d.text + " " + d.url); toast("Enlace copiado: pégalo donde quieras"); }
-  catch (e) { toast("Comparte este enlace: cashbetapp.github.io"); }
+  catch (e) { toast("Comparte este enlace: " + d.url.replace("https://", "")); }
 }
 async function enviarOpinion() {
   const n = ui.estrellas || 0, t = (document.getElementById("cidea") || {}).value || "";
