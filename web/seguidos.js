@@ -102,10 +102,22 @@ function sgVivo(id, v) {
     }
     return val == null ? base : Object.assign(base, { val, ln: +ln, mas: lado === "mas" });
   }
-  // pick de partido: totales con el marcador; ganador / hándicap: solo marcador
-  const x = /^(mas|menos)_([\d.]+)/.exec(v.m || "");
+  // pick de partido: totales con el marcador; ganador / hándicap: puntos del equipo elegido contra los del rival
+  const m = v.m || "", x = /^(mas|menos)_([\d.]+)/.exec(m);
   if (x) return Object.assign(base, { val: sc.h + sc.a, ln: +x[2], mas: x[1] === "mas" });
+  const lado = /^(1|1X)$|^hcp_local/.test(m) ? "h" : /^(2|X2)$|^hcp_visita/.test(m) ? "a" : null;
+  if (lado) {
+    const otro = lado === "h" ? "a" : "h", hc = parseFloat((/^hcp_\w+?_([+-]?[\d.]+)/.exec(m) || [])[1]) || 0;
+    const ln = sc[otro] - hc - (/X/.test(m) ? 0.5 : 0);                 // lo que hay que superar
+    return Object.assign(base, { val: sc[lado], ln, mas: true, txt: `${sc[lado]}-${sc[otro]}`, vs: true });
+  }
   return base;
+}
+// línea del pick sacada de su identificador (sirve también para los ya calificados)
+function sgLinea(id, v) {
+  if (id.startsWith("pr|")) return +id.slice(3).split("_")[3] || null;
+  if (id.startsWith("pk|")) return +id.slice(3).split("|")[3] || null;
+  const x = /^(mas|menos)_([\d.]+)/.exec(v.m || ""); return x ? +x[2] : null;
 }
 // ¿cómo va? ok = ya se cumple, no = ya no se puede, vivo = en juego
 function sgVa(L) {
@@ -171,22 +183,22 @@ function seguidos() {
     const up = v.up != null ? v.up : !/^menos/i.test(v.txt || "");
     // en vivo (o terminado): barra con el valor real contra la línea, como IABET
     const L = sgVivo(id, v), va = L ? sgVa(L) : null;
-    const lnF = L && L.ln != null ? L.ln : v.ln != null ? +v.ln : null;
+    const lnF = L && L.ln != null ? L.ln : v.ln != null ? +v.ln : sgLinea(id, v);
     const real = L && L.val != null ? L.val : e.r != null && !isNaN(parseFloat(e.r)) && lnF != null ? parseFloat(e.r) : null;
-    const bar = real != null && lnF ? Math.min(100, Math.round((real / (+lnF * 1.25)) * 100)) : e.st === "acierto" || e.st === "fallo" ? 100 : Math.round((v.p || 0) * 100);
+    const bar = L && L.vs ? (L.val + Math.max(L.ln, 0) > 0 ? Math.min(100, Math.round((L.val / (Math.max(L.ln, 0.5) * 1.25)) * 100)) : 40)
+      : real != null && lnF ? Math.min(100, Math.round((real / (+lnF * 1.25)) * 100)) : e.st === "acierto" || e.st === "fallo" ? 100 : Math.round((v.p || 0) * 100);
     const vivo = L && L.st === "in";
     const bcls = e.st ? cls : va === "ok" ? "ok" : va === "no" ? "no" : vivo ? "vi" : cls;
     return `<div class="sgt ${cls}" ${at} role="button">
-      <div class="sgtop">${img}${puedeQuitar(v0) ? `<button class="sgq" data-act="sgx" data-k="${esc(id)}" aria-label="Dejar de seguir">${ic("x")}</button>` : `<span class="sgq lock" title="Ya empezó: no se puede quitar">${ic("lock")}</span>`}<span class="sgs ${cls}">${icono}</span></div>
+      <div class="sgtop">${img}${vivo ? `<span class="sglive"><i></i>EN VIVO</span>` : puedeQuitar(v0) ? `<button class="sgq" data-act="sgx" data-k="${esc(id)}" aria-label="Dejar de seguir">${ic("x")}</button>` : `<span class="sgq lock" title="Ya empezó: no se puede quitar">${ic("lock")}</span>`}<span class="sgs ${cls}">${icono}</span></div>
       <div class="sgbody"><div class="sgty"><span>${esc(v.tipo || "Pick")}</span>${lg ? lgLogo(lg, 26) : ""}</div>
         <b class="sgn">${esc(v.nom || v.txt || "")}</b>
-        <small>${esc(v.hab || (v.h || "").slice(0, 3).toUpperCase())} @ ${esc(v.aab || (v.a || "").slice(0, 3).toUpperCase())}</small>
+        <small>${esc(v.aab || (v.a || "").slice(0, 3).toUpperCase())} @ ${esc(v.hab || (v.h || "").slice(0, 3).toUpperCase())}</small>
         <small>${new Date(v.at).toLocaleDateString("es-CO", { month: "short", day: "numeric" }).replace(".", "")} · ${hora(v.at)}</small>
         <span class="sgp ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc((v.pill || v.txt || "").toUpperCase())}</span></span>
-        <i class="sgbar ${bcls}"><s style="width:${bar}%"></s>${real != null && lnF ? `<u style="left:80%" title="Línea ${esc(String(lnF))}"></u>` : ""}</i>
-        ${real != null ? `<div class="sgnum ${bcls}" style="--x:${bar}%"><b>${esc(String(real))}</b>${lnF ? `<small>de ${esc(String(lnF))}</small>` : ""}</div>` : ""}
-        ${vivo ? `<div class="sgvivo"><i></i>EN VIVO · ${esc(L.det || "")}</div><div class="sgmar">${esc(L.marcador || "")}</div>` : ""}
-        <div class="sgv"><span>${e.st ? (e.r != null ? `Final ${esc(String(e.r))}` : lab) : vivo ? (va === "ok" ? "Va cumpliendo" : va === "no" ? "Ya no se cumple" : "En juego") : L && L.st === "post" ? "Terminado · calificando" : lab}</span><em>${pct(v.p)}</em></div></div></div>`;
+        <i class="sgbar ${bcls}"><s style="width:${bar}%"></s></i>
+        ${real != null ? `<div class="sgnum ${bcls}" style="--x:${bar}%"><b>${esc(String(L && L.txt ? L.txt : real))}</b></div>` : ""}
+        ${vivo ? "" : `<div class="sgv"><span>${e.st ? (e.r != null ? `Final ${esc(String(e.r))}` : lab) : L && L.st === "post" ? "Terminado · calificando" : lab}</span><em>${pct(v.p)}</em></div>`}</div></div>`;
   };
   return `<div class="top"><div class="logo">CASH<b>BET</b></div><div class="ic"><button class="icb" data-go="ajustes" aria-label="Perfil">${ic("user")}</button></div></div>
     <div class="sgh"><div><h1>Seguidos</h1><div class="sub2"><i class="sgdot"></i>${activos} ${activos === 1 ? "activo" : "activos"}</div></div>
