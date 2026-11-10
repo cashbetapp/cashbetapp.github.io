@@ -1550,3 +1550,26 @@ button.ajrow { background: none; color: inherit; font: inherit; border-left: 0; 
 .vvpl i.gl svg { width: 14px; height: 14px; color: var(--p, var(--g)); } .vvpl i.ta, .vvpl i.tr { width: 9px; height: 13px; border-radius: 2px; background: #ffd21f; } .vvpl i.tr { background: #ff4d4d; }
 .vvpl i.in { color: var(--p, var(--g)); } .vvpl i.out { color: #ff6b6b; }
 .vvcm { display: grid; grid-template-columns: 44px 1fr; gap: 8px; padding: 9px 0; border-top: 1px solid var(--pkl); font-size: 13.5px; } .vvcm b { color: var(--tx2); }
+
+/* ===== Ficha de FÚTBOL en vivo (futvivo.js) ===== */
+.vvp3 { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; margin-bottom: 8px; align-items: end; }
+.vvp3 > div { text-align: center; } .vvp3 > div:first-child { text-align: left; } .vvp3 > div:last-child { text-align: right; }
+.vvp3 span { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--tx2); }
+.vvp3 > div:nth-child(2) span { justify-content: center; } .vvp3 > div:last-child span { justify-content: flex-end; }
+.vvp3 b { display: block; font-size: 24px; font-weight: 800; letter-spacing: -.5px; } .vvp3 > div:nth-child(2) b { font-size: 18px; color: var(--tx2); }
+.vvlg { display: block; font-size: 11px; font-weight: 500; color: var(--tx3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vvcl { display: grid; grid-template-columns: 34px 1fr auto 52px; gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid var(--pkl); }
+.vvcl b { display: block; font-size: 14.5px; } .vvcl small { color: var(--tx3); font-size: 12px; } .vvcl em { font-style: normal; font-weight: 800; color: var(--tx2); }
+.vvcl .pts { text-align: center; font-size: 20px; line-height: 1; } .vvcl .pts small { display: block; font-size: 10px; font-weight: 700; }
+.vvbtn { width: 100%; margin-top: 10px; padding: 11px; border-radius: 12px; background: var(--pkt); font-weight: 700; font-size: 13.5px; color: var(--tx); }
+.vvtab { margin-top: 10px; } .vvtab tr.yo td { font-weight: 800; color: var(--p, var(--g)); } .vvtab td:nth-child(2) { position: static; text-align: left; }
+.vvtab th:first-child, .vvtab td:first-child { min-width: 28px; }
+.vvh2r { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; text-align: center; }
+.vvh2r > div { background: var(--pkt); border-radius: 12px; padding: 8px 4px; } .vvh2r b { display: block; font-size: 22px; } .vvh2r span { font-size: 12px; color: var(--tx2); }
+.vvra { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 10px 0; border-top: 1px solid var(--pkl); }
+.vvra span { color: var(--tx2); font-size: 13.5px; } .vvra b { text-align: right; font-size: 15px; } .vvra small { grid-column: 1 / -1; color: var(--tx3); font-size: 12px; }
+.vvsc { display: block; font-style: normal; font-weight: 800; font-size: 12.5px; margin-top: 2px; }
+.rer small + small { display: block; }
+.vvtb { width: 100%; margin: 0; }
+.vvtbl td small.vvout, .vvtbl td small.vvin { font-size: 10.5px; font-weight: 800; margin-left: 5px; } .vvout { color: #ff6b6b; } .vvin { color: var(--p, var(--g)); }
+.vvpl span i.in, .vvpl span i.out { font-size: 11px; }

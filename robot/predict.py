@@ -17,6 +17,7 @@ from model import (DATA, SOCCER, Poi, load, soccer_markets, nba_teams, is_presea
 
 DIAS = 8  # cuántos días hacia adelante
 # Liga MX y Liga BetPlay: solo ganador, gana o empata, goles, ambos marcan, córners y tarjetas
+LIGAS_SIN_JUGADORES = {"mex.1", "col.1"}
 LIGAS_SIMPLES = {"mex.1", "col.1"}
 MERCADOS_SIMPLES = {"cor", "tar"}
 
@@ -964,6 +965,8 @@ def main():
                 x["grupos"] = [q for q in x["grupos"] if q.get("s") in MERCADOS_SIMPLES]
                 x["picks"] = [q for q in x["picks"] if q.get("s") in MERCADOS_SIMPLES]
                 x["jug"] = [q for q in x["jug"] if q.get("s") in MERCADOS_SIMPLES]
+            if g["lg"] in LIGAS_SIN_JUGADORES:   # pedido del usuario: sin picks de jugadores en Liga MX y BetPlay
+                x["jug"] = []
             x["jug"] = x["jug"][:30]
             g["extra"] = x
     nb, injured = nba(par["nba"])

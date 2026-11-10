@@ -64,7 +64,7 @@ function calendario() {
       return `<div class="lgg ${open ? "open" : ""}">${solo ? "" : `<button class="lgh" data-act="lgt" data-k="${k}">${lgLogo(k)}<b>${esc(D.ligas[k] ? D.ligas[k].n : (xs[0].g || xs[0].r).liga)}</b><span>${xs.length} ${xs.length === 1 ? "juego" : "juegos"}</span>${ic("chev")}</button>`}
         ${open ? `<div class="lgb">${xs.map((x) => (x.g ? gCard(x.g) : gCardRes(x.r, x.id))).join("")}</div>` : ""}</div>`;
     }).join("") || `<div class="empty">No hay partidos este día en las ligas que seguimos.</div>`}
-    ${keys.length ? `<div class="small" style="text-align:center;margin:12px 0">En vivo primero; los por jugarse, por confianza del pick</div>` : ""}`;
+`;
 }
 function openCalFiltros() {
   const dep = [["todos", "Todos"], ["futbol", "Fútbol"], ["nba", "Baloncesto"]];
@@ -94,11 +94,12 @@ function inicio() {
   const nom = store.get("nombre", "");
   return `<div class="top"><div class="logo">CASH<b>BET</b></div><div class="ic">
       <button class="icb" data-go="notificaciones" aria-label="Notificaciones">${ic("bell")}${typeof campana === "function" ? campana() : ""}</button><button class="icb" data-go="ajustes" aria-label="Perfil">${ic("user")}</button></div></div>
-    <h1>Buen ${esc(dia)}${nom ? `, ${esc(nom)}` : ""}</h1><div class="sub2">${fmtD.format(new Date())} · ${its.length} mejores picks</div>
+    <h1>Buen ${esc(dia)}${nom ? `, ${esc(nom)}` : ""}</h1><div class="sub2">${fmtD.format(new Date())} · ${typeof top15 === "function" ? top15(pickItems().filter((e) => !(e.k === "pr" && e.prueba))).length : its.length} picks listos</div>
     <div class="ban">${ic("star")}<div>${sem.n ? `<b>CASHBET acertó ${sem.g}/${sem.n}</b><span>Últimos 7 días · picks reales</span>` : `<b>Registro real en marcha</b><span>Cada pick se califica al terminar el partido</span>`}</div>${esAdmin() ? `<button data-go="historial">Historial ${ic("right")}</button>` : ""}</div>
-    <div class="tiles t2 dos">
+    <div class="tiles t2">
       <div class="tile"><div class="k">Efectividad</div><div class="v">${real ? Math.round(rec.ef) : Math.round(efPrueba)}%<small>${real ? "real" : "prueba"}</small></div></div>
-      <div class="tile"><div class="k">Racha</div><div class="v">${rec.n ? rec.racha.replace(" ", "") : "—"}</div></div></div>
+      <div class="tile"><div class="k">Racha</div><div class="v">${rec.n ? rec.racha.replace(" ", "") : "—"}</div></div>
+      <div class="tile"><div class="k">Cuota prom.</div><div class="v">${cprom ? odd(cprom) : "—"}</div></div></div>
     ${top.length ? `<div class="sec"><h2 class="ih">${ic("bolt")}Picks destacados (${top.length})</h2><button class="pill dk" data-go="picks">Top picks</button></div>
       <div class="car">${top.map(heroPick).join("")}</div><div class="dots">${top.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</div>` : ""}
     <div class="sec"><h2 class="ih">${ic("trend")}Picks principales</h2><button class="pill dk" data-go="picks">Ver todo ${ic("right")}</button></div>
@@ -275,20 +276,19 @@ function ajustes(arg) {
     ${typeof USER !== "undefined" && USER ? "" : `<div class="ajcard"><span class="av">${esc((nom || "C")[0].toUpperCase())}</span><div><b>${esc(nom || "Tu perfil")}</b><small>Todo gratis · sin cuenta, tus datos se quedan en este celular</small></div></div>`}
     ${typeof tarjetaCuenta === "function" ? tarjetaCuenta() : ""}
     <div class="ajsec">AJUSTES</div><div class="ajlist">
-      ${row("nombre", "pen", "Tu nombre", nom ? esc(nom) : "Para el saludo de Inicio")}
-      ${row("notificaciones", "bellR", "Notificaciones", typeof pushOn === "function" && pushOn() ? "Activadas" : "Avisos en tu celular")}
+      ${row("califica", "star", "Califica CASHBET", "Cuéntanos qué te parece")}
+      ${typeof USER !== "undefined" && USER ? "" : row("nombre", "pen", "Tu nombre", nom ? esc(nom) : "Para el saludo de Inicio")}
+      ${row("notificaciones", "bellR", "Notificaciones", typeof pushOn === "function" && pushOn() ? "Activadas" : "Alertas de picks y actualizaciones")}
       ${row("cuotas", "money", "Formato de cuotas", `${FMT[fmt]} · Americano · Fraccional`)}
       ${row("tema", "moon", "Tema", TEMA[tema])}
       ${row("idioma", "globe", "Idioma", "Español")}
-      ${row("acierto", "chart", "Cómo medimos el acierto", "Prueba honesta y registro real")}
       ${esAdmin() ? `<button class="ajrow" data-go="historial"><span class="oi">${ic("shield")}</span><div><b>Historial (solo admin)</b><small>Todos los picks, sellados y verificables</small></div>${ic("right")}</button>` : ""}
       ${row("responsable", "heartP", "Juego responsable", "Apuesta solo lo que puedas perder")}
       ${row("privacidad", "shield", "Privacidad", "Qué datos usamos")}
       ${row("ayuda", "help", "Ayuda y soporte", "Preguntas frecuentes")}
-      ${row("califica", "star", "Califica CASHBET", "Cuéntanos qué te parece")}
       <button class="ajrow" data-act="invitar"><span class="oi">${ic("heart")}</span><div><b>Invita a tus amigos</b><small>Comparte CASHBET por WhatsApp o donde quieras</small></div>${ic("right")}</button></div>
     ${typeof cuentaAcciones === "function" ? cuentaAcciones() : ""}
-    <div class="small" style="text-align:center;margin:16px 0">Datos actualizados: ${new Date(D.generado.replace("Z", ":00Z")).toLocaleString("es-CO")}</div>`;
+`;
   if (arg === "tema") return subTop("Tema") + heroAj("moon", "Tema", "Elige cómo se ve CASHBET") +
     `<div class="ajsec">SELECCIONAR TEMA <em>${TEMA[tema].toUpperCase()}</em></div>
     ${opt("tema", "claro", tema === "claro", ic("sun"), "Claro", "Siempre usar modo claro")}${opt("tema", "oscuro", tema === "oscuro", ic("moon"), "Oscuro", "Siempre usar modo oscuro")}${opt("tema", "auto", tema === "auto", ic("screen"), "Sistema", "Seguir ajustes del dispositivo")}

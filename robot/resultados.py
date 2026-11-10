@@ -84,8 +84,42 @@ def detalle(key, sp, code, e):
             "ven": ((d.get("gameInfo") or {}).get("venue") or {}).get("fullName")}
 
 
+PRE = os.path.join(DATA, "previas_cache.json")
+
+
+def _media(xs, k):
+    v = [x[k] for x in xs if isinstance(x.get(k), (int, float))]
+    return round(sum(v) / len(v), 2) if v else None
+
+
+def foto_previa():
+    """Copia de lo que sabíamos ANTES del partido (cuotas, mercados, forma, tabla, promedios),
+    para que la ficha en vivo / terminada lo siga mostrando cuando el partido sale de picks.json."""
+    cache = json.load(open(PRE, encoding="utf-8")) if os.path.exists(PRE) else {}
+    try:
+        pk = json.load(open(os.path.join(DATA, "picks.json"), encoding="utf-8"))
+    except Exception:
+        return cache
+    for g in pk.get("partidos") or []:
+        ex = g.get("extra") or {}
+        comp = {}
+        for sd in ("h", "a"):
+            hs = [x for x in ((ex.get("hist") or {}).get(sd) or [])][:10]
+            if hs and "gf" in hs[0]:
+                comp[sd] = {"n": len(hs), "gf": _media(hs, "gf"), "gc": _media(hs, "gc"), "tir": _media(hs, "tir"), "sot": _media(hs, "sot"),
+                            "cor": _media(hs, "cor"), "tar": _media(hs, "tar"), "cero": sum(1 for x in hs if x.get("gc") == 0)}
+        cache[g["id"]] = {"at": g.get("at"), "odds": g.get("odds"), "mov": g.get("mov"), "mercados": [m for m in g.get("mercados") or [] if isinstance(m, dict)][:12],
+                          "forma": g.get("forma"), "h2h": g.get("h2h"), "tabla": ex.get("tabla"), "comp": comp or None}
+    lim = (dt.datetime.utcnow() - dt.timedelta(days=4)).strftime("%Y-%m-%d")
+    cache = {k: v for k, v in cache.items() if (v.get("at") or "9") >= lim}
+    with open(PRE, "w", encoding="utf-8") as f:
+        json.dump(cache, f, ensure_ascii=False, separators=(",", ":"))
+    return cache
+
+
 def main():
     old = json.load(open(OUT, encoding="utf-8")) if os.path.exists(OUT) else {}
+    pre = foto_previa()
     hoy = dt.datetime.utcnow() - dt.timedelta(hours=5)
     dias = [(hoy - dt.timedelta(days=i)).strftime("%Y%m%d") for i in range(0, 3)] + [(hoy + dt.timedelta(days=1)).strftime("%Y%m%d")]
     juegos = []
@@ -104,13 +138,16 @@ def main():
         key, sp, code, name, gid, at, st, cs = j
         prev = old.get(gid)
         if prev and prev.get("st") == "post" and st.get("state") == "post" and prev.get("ev") is not None:
+            if not prev.get("pre") and pre.get(gid):
+                prev["pre"] = pre[gid]
             return gid, prev
         det = detalle(key, sp, code, gid)
         for s in ("h", "a"):
             if cs.get(s) and det.get("ht", {}).get(s) is not None:
                 cs[s]["ht"] = det["ht"][s]
         return gid, dict(det, lg=key, liga=name, dep="nba" if key == "nba" else "futbol", at=(at or "")[:16] + "Z",
-                         st=st.get("state"), det=det.pop("det_es", None) or st.get("shortDetail"), h=cs.get("h"), a=cs.get("a"))
+                         st=st.get("state"), det=det.pop("det_es", None) or st.get("shortDetail"), h=cs.get("h"), a=cs.get("a"),
+                         pre=pre.get(gid) or (prev or {}).get("pre"))
     with ThreadPoolExecutor(6) as ex:
         for gid, r in ex.map(uno, juegos):
             out[gid] = r

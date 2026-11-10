@@ -77,6 +77,12 @@ function vvTab(r, gid, tab) {
   const v = VS[gid]; if (!v) return null;
   const d = v.d, L = r.dep === "nba" ? "a" : "h", R = r.dep === "nba" ? "h" : "a";
   try {
+    if (r.dep !== "nba" && typeof fPrevia === "function") {   // fútbol: futvivo.js
+      if (tab === "previa") return rPrevia(r, gid) + fPrevia(r, gid, d);
+      if (tab === "stats") return fStats(r, gid, d);
+      if (tab === "resumen") return fResumen(r, gid, d);
+      return fEventos(r, d);
+    }
     if (tab === "previa") return rPrevia(r, gid) + vvPrevia(r, gid, d, L, R);
     if (tab === "stats") return vvStats(r, d, L, R);
     if (tab === "resumen") return vvResumen(r, gid, d, L, R);
@@ -366,6 +372,7 @@ function vvEventos(r, d, L, R) {
 }
 
 function actVivo(a, el) {
+  if (typeof actFut === "function" && actFut(a, el)) return true;
   const k = el.dataset.k, m = { vvsub: "sub", vveq: "eq", vvord: "ord", vvmeq: "meq", vvevf: "evf" }[a];
   if (!m) return false;
   sheetState[m] = k; openResultado(sheetState.res, true); return true;
