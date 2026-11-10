@@ -1597,3 +1597,12 @@ button.ajrow { background: none; color: inherit; font: inherit; border-left: 0; 
 .sgbar.vi s { background: #22c55e; }
 .sgnum.vi b { color: #22c55e; }
 .sgnum { justify-content: flex-start; }
+
+/* Foto de jugador como IABET: hombros que se desvanecen suave hacia la derecha y abajo (sin corte recto);
+   en tema claro, contorno muy leve para que las camisetas blancas no se pierdan en la tarjeta blanca */
+.pjf { width: 134px; }
+.pcard.jg { padding-left: 132px; }
+.pjf img { object-position: 50% 4%;
+  -webkit-mask-image: linear-gradient(90deg, #000 50%, transparent 98%); mask-image: linear-gradient(90deg, #000 50%, transparent 98%); }
+.light .pjf img { filter: drop-shadow(0 0 1px rgba(0,0,0,.22)) drop-shadow(0 4px 10px rgba(0,0,0,.08)); }
+.light .pjl { filter: none; }
