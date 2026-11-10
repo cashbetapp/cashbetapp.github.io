@@ -388,7 +388,7 @@ function pickItems() {
   }
   // jugadores NBA: solo con valor real contra la casa; 1 por jugador y 3 por partido
   const vistoJ = new Set(), porEv = {};
-  D.propsOk.filter((x) => esHoy(x.at) && x.cuota >= 1.4).forEach((x) => {
+  D.propsOk.filter((x) => esHoy(x.at) && new Date(x.at) > Date.now() && x.cuota >= 1.4).forEach((x) => {
     if (vistoJ.has(x.pl) || (porEv[x.ev] || 0) >= 3) return;
     vistoJ.add(x.pl); porEv[x.ev] = (porEv[x.ev] || 0) + 1;
     it.push({ k: "pr", x, p: x.p, mk: "nbaj", dep: "nba", eq: 0, val: x.prueba ? null : x.valor, casa: x.cuota, prueba: x.prueba });
@@ -428,11 +428,11 @@ function mejores(xs, n) {
   });
 }
 // Todos: los mejores (regla de arriba) y, si no llegan a 15, los siguientes de más confianza (máx. 3 por partido)
-function top15(xs) {
-  const base = mejores(xs, 3).slice(0, 15), c = {};
+function top15(xs, lim = 15) {
+  const base = mejores(xs, 3).slice(0, lim), c = {};
   base.forEach((e) => (c[e.gid] = (c[e.gid] || 0) + 1));
   for (const e of ordenar(xs)) {
-    if (base.length >= 15) break;
+    if (base.length >= lim) break;
     if (base.includes(e) || (c[e.gid] || 0) >= 3) continue;
     base.push(e); c[e.gid] = (c[e.gid] || 0) + 1;
   }
@@ -446,18 +446,22 @@ function picks() {
   if (ui.pmk !== "todos") it = it.filter((e) => e.mk === ui.pmk);
   if (ui.pgame && ui.pgame !== "todos") it = it.filter((e) => e.gid === ui.pgame);
   // Todos: 1 por partido y sin jugadores NBA en prueba; Jugadores/Equipos o con filtro: 2 por partido
-  if (ui.pseg === "todos" && ui.pmk === "todos") it = top15(it.filter((e) => e.k !== "pr"));   // Todos: los 15 mejores del día (como IABET)
-  else it = ordenar([...mejores(it.filter((e) => e.k !== "pr"), 3), ...it.filter((e) => e.k === "pr")]);   // NBA: hasta 3 jugadores por partido
-  if (ui.pord && ui.pord !== "conf") it = ordenPor(it, ui.pord);
+  // como IABET: Todos = los 15 mejores del día (equipos y jugadores juntos; los jugadores NBA aún en prueba no entran)
+  // Jugadores / Equipos: sin límite, hasta 3 por partido
+  const conf = it.filter((e) => !(e.k === "pr" && e.prueba));
+  if (ui.pseg === "todos" && ui.pmk === "todos") it = top15(conf);
+  else it = [...top15(it.filter((e) => e.k !== "pr"), Infinity), ...it.filter((e) => e.k === "pr")];
+  // como IABET: la lista va de mayor a menor confianza (%); los errores de cuota llevan su etiqueta +X%
+  it = ui.pord && ui.pord !== "conf" ? ordenPor(it, ui.pord) : porConfianza(it);
   const total = it.length;
   it = it.slice(0, 80);
   const fil = ui.pdep !== "todos" || ui.pmk !== "todos" || (ui.pgame && ui.pgame !== "todos") || (ui.pord && ui.pord !== "conf");
-  return header("Predicciones", `${total} mejores picks · ${fmtD.format(new Date())}`) + `
+  return header("Predicciones", `${total} picks · ${fmtD.format(new Date())}`) + `
     <div class="pkbar"><div class="pktabs dark">${[["todos", "Todos"], ["jugadores", "Jugadores"], ["equipos", "Equipos"]].map(([k, l]) => `<button class="${ui.pseg === k ? "on" : ""}" data-act="pseg" data-k="${k}">${l}</button>`).join("")}</div>
       <button class="pkfil ${fil ? "on" : ""}" data-act="pfil" aria-label="Filtros">${ic(fil ? "filtro" : "ball")}</button></div>
     ${fil ? `<div class="small" style="margin:-2px 2px 10px">Filtro: ${ui.pdep === "todos" ? "todos los deportes" : ui.pdep === "nba" ? "NBA" : "Fútbol"} · ${esc(MK.find(([k]) => k === ui.pmk)?.[1] || "")}${ui.pgame && ui.pgame !== "todos" && D.byId[ui.pgame] ? ` · ${esc(abT(D.byId[ui.pgame].h))} vs ${esc(abT(D.byId[ui.pgame].a))}` : ""} · orden: ${esc((ORDS.find(([k]) => k === (ui.pord || "conf")) || [])[1] || "")}</div>` : ""}
     <div class="pclist">${it.map(pcCard).join("") || `<div class="empty">Hoy ya no quedan picks con este filtro. Los de mañana aparecen aquí desde mañana; puedes verlos antes en el Calendario.</div>`}</div>
-    <div class="small" style="text-align:center;margin:14px 0">Primero los <b>errores de cuota</b>: la casa paga más de lo que vale (valor = probabilidad × cuota − 1, desde +${Math.round((D.valor_min || 0.05) * 100)}%).<br>Después los más probables donde no tenemos la cuota de la casa: valen la pena si tu casa paga al menos lo que dice "vale desde".</div>`;
+    <div class="small" style="text-align:center;margin:14px 0">Ordenados de mayor a menor confianza. Los que llevan <b>+X%</b> son <b>errores de cuota</b>: la casa paga más de lo que vale (en Filtros &gt; Ordenar por &gt; Edge salen primero).<br>Los demás valen la pena si tu casa paga al menos lo que dice "vale desde". Los partidos que ya empezaron salen de la lista.</div>`;
 }
 // foto del jugador recortada, pegada al borde izquierdo de la ficha, con el logo de la liga
 function fotoJug(foto, nombre, tm, liga) {
@@ -511,6 +515,7 @@ function tasaPick(e) {
 }
 const cuotaDe = (e) => e.casa || (e.k === "g" ? e.g.pick.cuota || e.g.pick.justa : e.k === "x" ? e.x.justa : e.x.cuota) || 0;
 const edgeDe = (e) => (e.val != null ? e.val : e.casa ? e.p * e.casa - 1 : e.p * (e.min || cuotaDe(e)) - 1);
+const porConfianza = (xs) => [...xs].sort((a, b) => Math.round(b.p * 100) - Math.round(a.p * 100) || (b.val || 0) - (a.val || 0) || b.pr - a.pr);
 function ordenPor(xs, o) {
   const f = o === "tasa" ? (e) => tasaPick(e) ?? -1 : o === "cuota" ? cuotaDe : o === "edge" ? edgeDe : (e) => e.p;   // Monte Carlo = la simulación reproduce la probabilidad del modelo
   return [...xs].sort((a, b) => f(b) - f(a) || b.p - a.p);
