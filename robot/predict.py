@@ -771,6 +771,12 @@ def historial(L, ahora, n, h):
            "filas": filas}
     with open(os.path.join(DATA, "historial.json"), "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
+    # público (la app de todos): solo el resultado de cada pick para "Seguidos" y avisos, y las
+    # métricas agregadas; el historial completo es privado (privado.py -> Firestore, solo admin)
+    pub = {"generado": ahora, "confianza": out["confianza"], "mercado": out["mercado"],
+           "filas": [{k: r[k] for k in ("c", "k", "at", "st", "r", "cu", "rt") if r.get(k) is not None} for r in filas]}
+    with open(os.path.join(DATA, "estados.json"), "w", encoding="utf-8") as f:
+        json.dump(pub, f, ensure_ascii=False, separators=(",", ":"))
 
 
 def _recorte(im, size):

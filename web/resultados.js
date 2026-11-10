@@ -44,7 +44,7 @@ async function vivo(forzar) {
 }
 setInterval(() => { if (!document.hidden && location.hash.startsWith("#calendario")) vivo(); }, 60e3);
 
-// resultado de nuestro pick para ese partido (registro sellado)
+// resultado de nuestro pick para ese partido (registro sellado; el detalle solo llega a la cuenta admin)
 function pickRes(gid) {
   const f = ((HIST && HIST.filas) || []).find((r) => (r.c === "g" || r.c === "p") && (r.k === gid || r.k.startsWith(gid + "|")) && !r.rt && r.st !== "retirado");
   return f || null;
@@ -58,7 +58,7 @@ function gCardRes(r, gid) {
   return `<button class="gc res ${r.st}" data-res="${gid}"><div class="gt">${t(L)}
       <div class="mid"><span class="rst ${r.st}">${r.st === "in" ? `<i></i>${esc(r.det || "En vivo")}` : "FINAL"}</span>
         <div class="rsc"><b>${esc(r[L].s ?? "-")}</b><em>-</em><b>${esc(r[R].s ?? "-")}</b></div><span class="det">Detalles</span></div>${t(R)}</div>
-    ${pr ? `<div class="gpk rp ${cls}"><span>Pick: ${esc(pr.sel)}</span><b class="st ${cls}">${lab}</b></div>` : ""}</button>`;
+    ${pr && pr.sel ? `<div class="gpk rp ${cls}"><span>Pick: ${esc(pr.sel)}</span><b class="st ${cls}">${lab}</b></div>` : ""}</button>`;
 }
 
 function openResultado(gid, keep) {
@@ -88,7 +88,7 @@ function openResultado(gid, keep) {
 function rPrevia(r, gid) {
   if (!HIST && typeof cargarHist === "function") cargarHist().then(() => { if (sheetState.res === gid) openResultado(gid, true); });
   const pr = pickRes(gid);
-  if (!pr) return `<div class="pkcard"><div class="small">No publicamos pick de partido para este juego (el modelo no encontró una opción que valiera la pena). Mira las estadísticas del partido en la siguiente pestaña.</div></div>`;
+  if (!pr || !pr.sel) return "";   // el detalle del pick sellado es del historial privado (solo admin); como IABET
   const [lab, cls] = pr.st ? ESTADO[pr.st] : ["Pendiente", "pe"];
   return `<div class="pkcard rpk"><div class="small">PICK DEL MODELO</div><b>${esc(pr.sel)}</b>
       <div class="rpkr"><span>Probabilidad <b>${Math.round(pr.p * 100)}%</b></span><span>Cuota <b>${pr.cu ? odd(pr.cu) : "—"}</b> ${pr.cr ? "casa" : "justa"}</span><span class="st ${cls}">${lab}</span></div>

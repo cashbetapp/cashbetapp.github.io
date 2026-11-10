@@ -19,10 +19,11 @@ cadena de picks en ese momento. Esta rama nunca se reescribe: su historial de gi
 parte de la prueba. Cada día, `diario/AAAA-MM-DD.txt.ots` ancla la huella en Bitcoin
 con OpenTimestamps (compruébalo arrastrando el .txt y su .ots a https://opentimestamps.org).
 
-## Verificar tú mismo
-1. Descarga el registro: https://cashbetapp.github.io/data/ledger.json
-2. Descarga `sellos.txt`, `registro.py` y `verificar.py` de esta rama.
-3. Ejecuta: `python verificar.py ledger.json sellos.txt`
+## Verificar
+El registro completo (ledger.json) es privado: solo la cuenta administradora lo descarga
+(Historial > Descargar registro). Con ese archivo:
+1. Descarga `sellos.txt`, `registro.py` y `verificar.py` de esta rama.
+2. Ejecuta: `python verificar.py ledger.json sellos.txt`
 
 Si alguien hubiera cambiado o borrado un pick o un resultado, la cadena no coincide con
 los sellos del pasado y el verificador lo dice.

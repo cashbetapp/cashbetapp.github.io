@@ -1,13 +1,27 @@
-// CASHBET · Historial público: registro inalterable de todos los picks (aciertos y fallos)
-let HIST = null, HIST_CARGANDO = false;
+// CASHBET · Historial (solo admin): registro inalterable de todos los picks (aciertos y fallos)
+let HIST = null, HIST_CARGANDO = false, HIST_ERR = null;
 ui.hst = "todos"; ui.hdep = "todos"; ui.hn = 60; ui.hmk = "todos"; ui.hdia = "todos";
 
+// historial completo: PRIVADO en Firebase (privado/historial), solo lo puede leer la cuenta admin.
+// Los demás reciben data/estados.json: el resultado de cada pick (para Seguidos y avisos) y las métricas agregadas.
+async function leerPrivado(n) {
+  await fb();
+  const col = FB.db.collection("privado"), meta = (await col.doc(n).get()).data();
+  if (!meta) throw new Error("vacío");
+  const partes = await Promise.all(Array.from({ length: meta.n }, (_, i) => col.doc(`${n}-${meta.ver}-${i}`).get()));
+  const bin = Uint8Array.from(atob(partes.map((p) => p.data().z).join("")), (c) => c.charCodeAt(0));
+  const txt = await new Response(new Blob([bin]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
+  return { txt, t: meta.t };
+}
 async function cargarHist() {
   if (HIST || HIST_CARGANDO) return;
   HIST_CARGANDO = true;
   try {
-    const r = await fetch("data/historial.json?t=" + Date.now(), { cache: "no-store" });
-    HIST = await r.json();
+    if (typeof esAdmin === "function" && esAdmin()) {
+      try { HIST = JSON.parse((await leerPrivado("historial")).txt); HIST.priv = true; }
+      catch (e) { console.warn("historial privado", e); HIST = null; HIST_ERR = /permission|insufficient/i.test(String(e && (e.code || e.message))) ? "reglas" : "red"; }
+    }
+    if (!HIST) HIST = await (await fetch("data/estados.json?t=" + Date.now(), { cache: "no-store" })).json();
   } catch (e) { HIST = { error: true }; }
   HIST_CARGANDO = false;
   if (/^#(historial|seguidos|notificaciones|errores|inicio)?$|^#(historial|seguidos|notificaciones|errores)/.test(location.hash)) { $("#app").dataset.tab = ""; route(); }
@@ -56,8 +70,10 @@ function filaH(r) {
 }
 
 function historial() {
+  if (HIST && !HIST.priv && !HIST_CARGANDO && !HIST_ERR) HIST = null;   // se cargó el resumen público antes de iniciar sesión
   if (!HIST) { cargarHist(); return header("Historial", "Cargando el registro…") + `<div class="empty">Cargando…</div>`; }
   if (HIST.error) return header("Historial", "") + `<div class="empty">No se pudo cargar el historial. Revisa tu conexión.</div>`;
+  if (!HIST.priv) return header("Historial", "Solo admin") + `<div class="empty">${HIST_ERR === "reglas" ? "Firebase todavía no deja leer el historial privado: falta pegar las reglas nuevas en Firestore (Reglas)." : "No se pudo leer el historial privado. Revisa tu conexión y vuelve a intentar."}</div><button class="bigbtn" data-act="hreint">Reintentar</button>`;
   const H = HIST, s = H.sello;
   let f = H.filas;
   if (ui.hdep !== "todos") f = f.filter((r) => r.d === ui.hdep);
@@ -97,7 +113,7 @@ function historial() {
     <div class="hchips">${chip("hdia", "todos", "Todas las fechas")}${chip("hdia", "hoy", "Hoy")}${chip("hdia", "ayer", "Ayer")}${chip("hdia", "7", "Últimos 7 días")}${chip("hdia", "prox", "Próximos")}</div>
     <div class="hchips">${chip("hdep", "todos", "Todos los deportes")}${chip("hdep", "futbol", "Fútbol")}${chip("hdep", "nba", "NBA")}</div>
     <div class="hchips">${chip("hmk", "todos", "Todos los mercados")}${Object.keys(H.mercado).map((k) => chip("hmk", k, esc(k))).join("")}</div>
-    <div class="small" style="margin:4px 2px 8px">${n0(total)} picks de los últimos 14 días${ui.hst === "todos" ? " (sin retirados)" : ""}. El registro completo está en <a href="data/ledger.json" target="_blank">ledger.json</a>.</div>
+    <div class="small" style="margin:4px 2px 8px">${n0(total)} picks de los últimos 14 días${ui.hst === "todos" ? " (sin retirados)" : ""}. Historial privado: solo lo ve esta cuenta. <button class="hlink" data-act="hledger">Descargar el registro completo (ledger.json)</button></div>
     ${lista || `<div class="empty">No hay picks con este filtro.</div>`}
     ${total > ui.hn ? `<button class="bigbtn" data-act="hmore" style="margin-top:12px">Ver más (${n0(total - ui.hn)})</button>` : ""}`;
 }
@@ -106,5 +122,13 @@ function actHist(a, el) {
   const k = el.dataset.k;
   if (a === "hst" || a === "hdep" || a === "hmk" || a === "hdia") { ui[a] = k; ui.hn = 60; rerender(); return true; }
   if (a === "hmore") { ui.hn += 100; rerender(); return true; }
+  if (a === "hreint") { HIST = null; HIST_ERR = null; rerender(); return true; }
+  if (a === "hledger") {
+    toast("Preparando el registro…");
+    leerPrivado("ledger").then(({ txt }) => { const u = URL.createObjectURL(new Blob([txt], { type: "application/json" })), l = document.createElement("a");
+      l.href = u; l.download = "ledger.json"; document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(u), 5000); })
+      .catch(() => toast("No se pudo descargar el registro"));
+    return true;
+  }
   return false;
 }

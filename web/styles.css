@@ -1573,3 +1573,6 @@ button.ajrow { background: none; color: inherit; font: inherit; border-left: 0; 
 .vvtb { width: 100%; margin: 0; }
 .vvtbl td small.vvout, .vvtbl td small.vvin { font-size: 10.5px; font-weight: 800; margin-left: 5px; } .vvout { color: #ff6b6b; } .vvin { color: var(--p, var(--g)); }
 .vvpl span i.in, .vvpl span i.out { font-size: 11px; }
+
+/* historial privado */
+.hlink { color: var(--p, var(--g)); font-weight: 700; text-decoration: underline; font-size: inherit; }

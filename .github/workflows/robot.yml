@@ -35,6 +35,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - name: Descifrar el historial privado (si falla, el robot se detiene para no empezar un registro nuevo)
+        env:
+          ROBOT_PASS: ${{ secrets.ROBOT_PASS }}
+        run: |
+          pip install -q cryptography
+          python robot/privado.py descifrar data
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
           cache: pip
 
       - run: pip install -r requirements.txt
@@ -93,8 +104,16 @@ jobs:
           git diff --cached --quiet || git commit -q -m "sello $(date -u +%Y-%m-%dT%H:%MZ)"
           git push -q "$URL" sellos
 
-      - name: Guardar los datos (rama datos, sin historial para no crecer)
+      - name: Subir el historial privado a Firebase (solo lo lee la cuenta admin)
+        env:
+          ROBOT_PASS: ${{ secrets.ROBOT_PASS }}
+        run: python robot/privado.py subir || echo "subir el historial privado falló, se sigue"
+
+      - name: Guardar los datos (rama datos, sin historial para no crecer; historial y registro cifrados)
+        env:
+          ROBOT_PASS: ${{ secrets.ROBOT_PASS }}
         run: |
+          python robot/privado.py cifrar data
           cd data
           git init -q -b datos
           git config user.name "robot-cashbet"
@@ -110,7 +129,7 @@ jobs:
           cp -r web/* _site/
           rm -rf _site/data/*
           cp data/picks.json _site/data/
-          cp data/historial.json data/ledger.json data/sello.json data/noticias.json data/resultados.json data/previa.json _site/data/ 2>/dev/null || true
+          cp data/estados.json data/sello.json data/noticias.json data/resultados.json data/previa.json _site/data/ 2>/dev/null || true
           cp -r data/img _site/data/ 2>/dev/null || true
           touch _site/.nojekyll
 

@@ -1,5 +1,5 @@
 // CASHBET · Seguidos (como IABET): solo los picks que TÚ sigues, con rango de fechas y filtros.
-// El resultado de cada uno sale del registro sellado (data/historial.json).
+// El resultado de cada uno sale del registro sellado (data/estados.json, resumen público del historial privado).
 ui.sgR = "7"; ui.sgDep = "todos"; ui.sgEst = "todos";
 I.bookX = '<path d="M6 3h12v18l-6-4-6 4z"/><path d="m10 8 4 4m0-4-4 4"/>';
 I.calR = '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>';

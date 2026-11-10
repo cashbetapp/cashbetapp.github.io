@@ -3,3 +3,4 @@ scipy
 scikit-learn
 pillow
 pywebpush
+cryptography
