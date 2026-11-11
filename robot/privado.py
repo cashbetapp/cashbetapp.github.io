@@ -6,7 +6,7 @@ El repositorio es público, así que el historial (historial.json) y el registro
   python privado.py cifrar  DIR     -> DIR/privado/*.enc (cifrados) + .gitignore que deja fuera los .json
   python privado.py descifrar DIR   -> recupera DIR/historial.json y DIR/ledger.json desde DIR/privado/*.enc
   python privado.py subir           -> los sube comprimidos a Firestore (privado/historial, privado/ledger),
-                                       que según las reglas solo puede leer cashbetsia@gmail.com
+                                       que según las reglas solo puede leer cashbetia@gmail.com
 
 La clave sale del secreto ROBOT_PASS de GitHub Actions. Si falta la clave o algo no cuadra,
 el script falla A PROPÓSITO: es mejor que el robot se detenga a que empiece un registro nuevo

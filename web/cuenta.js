@@ -15,7 +15,7 @@ let FB = null, USER = null, fbCargando = null, AUTH_LISTO = false;
 // la app exige cuenta: hasta saber si hay sesión se muestra "cargando"
 const cuentaActiva = () => !!USER;
 // el Historial solo lo ve la cuenta administradora (pedido del usuario)
-const ADMIN = "cashbetsia@gmail.com";
+const ADMIN = "cashbetia@gmail.com";
 const esAdmin = () => !!(USER && (USER.email || "").toLowerCase() === ADMIN && USER.emailVerified !== false);
 const cuentaPendiente = () => !!(FB && FB.auth.currentUser && !USER);
 I.mail = '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>';
