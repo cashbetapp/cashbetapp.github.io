@@ -19,6 +19,7 @@ DIAS = 8  # cuántos días hacia adelante
 # Liga MX y Liga BetPlay: solo ganador, gana o empata, goles, ambos marcan, córners y tarjetas
 LIGAS_SIN_JUGADORES = {"mex.1", "col.1"}
 LIGAS_SIMPLES = {"mex.1", "col.1"}
+CAL_MIN_N = 40   # casos mínimos (>= 60 %) para confiar en un mercado de Liga MX / BetPlay
 MERCADOS_SIMPLES = {"cor", "tar"}
 
 # ---- la app busca ERRORES DE CUOTA de las casas de apuestas ----
@@ -178,11 +179,18 @@ def soccer(par, report):
             # oportunidad fuerte; si no, el mercado de goles más seguro
             # (siempre con cuota >= 1.30; si el favorito paga menos, se busca
             # el mercado más probable que sí pague eso)
+            cm = (report["futbol"].get("cal_mercado") or {}).get(key)
+            if cm:   # Liga MX / BetPlay: probabilidad corregida con su acierto real (solo se baja, nunca se sube)
+                for s_ in sels:
+                    c = cm.get(s_["m"])
+                    if c and c["n"] >= CAL_MIN_N and c["paso"] < c["dijo"]:
+                        s_["p"] = round(s_["p"] * c["paso"] / c["dijo"], 4); s_["justa"] = round(1 / max(s_["p"], 1e-6), 2); s_["cal"] = 1
             con_casa(sels, PESO["futbol"])
             by = {s["m"]: s for s in sels}
-            if key in LIGAS_SIMPLES:   # solo ganador, gana o empata, goles y ambos marcan
-                cand = [s for s in sels if s["m"] in ("1", "2", "1X", "X2", "btts_si", "btts_no") or s["m"].startswith(("mas_", "menos_"))]
-                pick = elegir(cand, prefer=[by["1"], by["2"]])
+            if key in LIGAS_SIMPLES:   # solo ganador, gana o empata, goles y ambos marcan; y solo mercados con historial suficiente
+                ok = lambda m: not cm or (cm.get(m) or {}).get("n", 0) >= CAL_MIN_N
+                cand = [s for s in sels if (s["m"] in ("1", "2", "1X", "X2", "btts_si", "btts_no") or s["m"].startswith(("mas_", "menos_"))) and ok(s["m"])]
+                pick = elegir(cand or sels, prefer=[by["1"], by["2"]])
             else:
                 pick = elegir(sels, prefer=[by["1"], by["X"], by["2"]])
             # diferencia con la casa: AÚN SIN PROBAR (no hay cuotas históricas)
@@ -688,8 +696,23 @@ def ledger(partidos, props_, extras=None):
         por.setdefault(e["s"] + "_" + ("j" if e["sc"] == "j" else "t" if e["sc"] == "t" else "e"), []).append(e)
     val = [e for e in list(L["partidos"].values()) + list(L["props"].values())
            if (e.get("valor") or -1) >= VALOR_MIN and e.get("cuota")]
+    # desglose de los picks de valor (para revisar dónde fallan): por deporte y mercado,
+    # con la probabilidad del modelo (pm), la mezclada (p), la de la casa sin margen (q) y la cuota
+    vp = {}
+    for e in val:
+        if e.get("ok") is None:
+            continue
+        mk = e.get("m") or e.get("t") or "?"
+        mk = mk.split("_")[0] if mk.startswith(("mas_", "menos_", "hcp_")) else mk
+        k = f"{e.get('dep', 'nba')}|{'prop' if e.get('pl') else 'partido'}|{mk}"
+        x = vp.setdefault(k, {"n": 0, "g": 0, "pm": 0.0, "p": 0.0, "q": 0.0, "cuota": 0.0, "valor": 0.0})
+        x["n"] += 1; x["g"] += bool(e["ok"]); x["pm"] += e.get("pm") or e.get("p") or 0; x["p"] += e.get("p") or 0
+        x["q"] += e.get("q") or e.get("casa") or 0; x["cuota"] += e.get("cuota") or 0; x["valor"] += e.get("valor") or 0
+    for x in vp.values():
+        for kk in ("pm", "p", "q", "cuota", "valor"):
+            x[kk] = round(x[kk] / x["n"], 3)
     return {"partidos": stats(L["partidos"].values()), "props": stats(L["props"].values()), "ultimos": hist,
-            "valor": stats(val), "sello": {"n": n, "h": h, "t": ahora},
+            "valor": stats(val), "valor_por": vp, "sello": {"n": n, "h": h, "t": ahora},
             "extra": stats(L["extra"].values()), "extra_por": {k: stats(v) for k, v in por.items()}, "semana": semana}
 
 

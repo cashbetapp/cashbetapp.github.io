@@ -317,6 +317,31 @@ def tune_soccer():
     return {"xi": xi, "ridge": ridge, "wsot": wsot, "rho": rho, "disp": bd[1]}, walks
 
 
+def cal_mercado(walks, par, ligas, pmin=0.6):
+    out = {}
+    for key in ligas:
+        if key not in walks:
+            continue
+        walk, det = walks[key]
+        st = {}
+        for g, gh, ga, lc in walk:
+            pm = soccer_markets(gh, ga, None, par["rho"], 1)
+            ob = soccer_outcomes(g, det)
+            mk = {"1": (pm["1"], ob["1"]), "2": (pm["2"], ob["2"]), "X": (pm["X"], ob["X"]),
+                  "1X": (pm["1"] + pm["X"], ob["1"] or ob["X"]), "X2": (pm["X"] + pm["2"], ob["X"] or ob["2"]),
+                  "12": (pm["1"] + pm["2"], not ob["X"]),
+                  "btts_si": (pm["btts"], ob["btts"]), "btts_no": (1 - pm["btts"], not ob["btts"])}
+            for ln in (1.5, 2.5, 3.5):
+                mk[f"mas_{ln}"] = (pm[f"o{ln}"], ob[f"o{ln}"])
+                mk[f"menos_{ln}"] = (1 - pm[f"o{ln}"], not ob[f"o{ln}"])
+            for m, (p, y) in mk.items():
+                if p >= pmin:
+                    x = st.setdefault(m, [0, 0.0, 0])
+                    x[0] += 1; x[1] += float(p); x[2] += bool(y)
+        out[key] = {m: {"n": n, "dijo": round(sp / n, 4), "paso": round(sy / n, 4)} for m, (n, sp, sy) in st.items()}
+    return out
+
+
 # ---------------------------------------------------------------- NBA
 def nba_teams(games):
     from collections import Counter
@@ -573,6 +598,9 @@ def main():
             "calibracion": calib([(m, p, y) for m, p, y, _ in rows]),
         },
     }
+    # Liga MX y BetPlay: acierto real de cada mercado cuando el modelo lo daría como pick (>= 60 %),
+    # con TODOS los partidos jugados. predict.py baja la probabilidad de los que acertaron menos de lo que decían.
+    rep["futbol"]["cal_mercado"] = cal_mercado(walks, par, ("col.1", "mex.1"))
     print("NBA: eligiendo ajustes con calibración")
     rep["nba"], nbapar = nba_eval()
     games, det, _ = load("nba")
