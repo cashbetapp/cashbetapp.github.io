@@ -33,6 +33,24 @@ function pReal(p0, grupo) {
   return { p, h: notas.join(" · ") || "Mercado sin historial suficiente todavía" };
 }
 
+// probabilidad de los picks de jugadores NBA corregida con su acierto real (se baja, nunca se sube);
+// se aplica una vez a cada prop cuando ya está el historial (x.p0 guarda la del modelo)
+function corregirProps() {
+  if (!HIST || HIST.error || !HIST.mercado || !D.props) return;
+  for (const x of D.props) {
+    if (x.p0 != null) continue;
+    x.p0 = x.p;
+    const g = "Jugadores NBA · " + x.tipo, m = HIST.mercado[g];
+    // una sola corrección: el acierto real de su mercado frente a lo que decía (prob_media)
+    if (m && m.calificados >= 20 && m.acierto != null && m.prob_media && m.acierto < m.prob_media) {
+      x.p = Math.round(x.p * (m.acierto / m.prob_media) * 1000) / 1000;
+      x.preal = `historial de ${x.tipo.toLowerCase()}: ${Math.round(m.acierto)}% en ${m.calificados} picks`;
+    }
+    if (x.cuota) x.valor = Math.round((x.p * x.cuota - 1) * 1000) / 1000;
+  }
+  // con menos de 50 % real no es pick: fuera de las listas
+  if (D.propsOk) D.propsOk = D.propsOk.filter((x) => x.p >= 0.5);
+}
 function erroresCuota() {
   if (!HIST && typeof cargarHist === "function") cargarHist();
   const out = [], ahora = Date.now(), lim = ahora + 36 * 3600e3;
@@ -45,11 +63,9 @@ function erroresCuota() {
       if (r.p >= ERR_PMIN && err >= ERR_MIN) out.push({ k: "g", g, x, p: r.p, pm: x.p, cuota: x.cuota, err, h: r.h, dep: g.dep });
     }
   }
-  for (const x of D.propsOk || []) {
-    if (!vigente(x.at) || !x.cuota) continue;
-    const r = pReal(x.pm || x.p, "Jugadores NBA · " + x.tipo), err = r.p * x.cuota - 1;
-    if (r.p >= ERR_PMIN && err >= ERR_MIN) out.push({ k: "pr", x, p: r.p, pm: x.pm || x.p, cuota: x.cuota, err, h: r.h, dep: "nba", prueba: true });
-  }
+  // Jugadores NBA: NO entran. En el registro real, 80 de 81 "errores" eran de jugadores y acertaron 37 %:
+  // cuando el modelo de jugadores no está de acuerdo con la casa, la que tiene razón es la casa
+  // (además ESPN no dice si la cuota es de "más" o de "menos").
   // un error por jugador (el más grande) y primero los más probables
   const visto = new Set();
   return out.sort((a, b) => b.err - a.err).filter((e) => { const k = e.k === "pr" ? "j" + e.x.pl : "g" + e.g.id + e.x.m; if (visto.has(k)) return false; visto.add(k); return true; })

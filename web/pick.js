@@ -376,6 +376,8 @@ function mcAnalisis(p, q25, q75, media, ln, up, valor, N) {
 
 // ------------------------------------------------------------ lista de Predicciones
 function pickItems() {
+  if (!HIST && typeof cargarHist === "function") cargarHist();
+  if (typeof corregirProps === "function") corregirProps();   // % real de los jugadores NBA
   const hoy = D.partidos.filter((g) => esHoy(g.at) && new Date(g.at) > Date.now());
   const it = [];
   for (const g of hoy) {

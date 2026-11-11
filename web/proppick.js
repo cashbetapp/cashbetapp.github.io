@@ -9,6 +9,7 @@ const ppHit = (x, v) => (x.lado === "mas" ? v > x.linea : v < x.linea);
 const ppCasa = (x, g) => (g && x.eq ? g.h.ab === x.eq.ab || g.h.n === x.eq.n : null);
 
 function openProp(i, keep) {
+  if (typeof corregirProps === "function") corregirProps();
   const x = D.props[i]; if (!x) return;
   if (!keep || sheetState.pp !== i) sheetState = { pp: i, n: 10, tab: "resumen" };
   const g = D.byId[x.ev], up = x.lado === "mas", tab = sheetState.tab, seg = store.get("seg", {}), sid = ppId(x);
@@ -52,7 +53,7 @@ function ppResumen(x, g) {
       <div class="pkbox dir ${x.lado === "mas" ? "" : "bad"}"><div class="k">Dirección</div><b>${x.lado === "mas" ? "MÁS DE" : "MENOS DE"}</b></div>
       <div class="pkbox"><div class="k">Línea</div><b>${x.linea}</b></div>
       <div class="pkbox"><div class="k">Cuota</div><b>${odd(x.cuota)}</b></div>${x.valor > 0 ? `<div class="pkbox ven"><div class="k">Ventaja ${ic("info")}</div><b>+${((x.valor) * 100).toFixed(1)}%</b></div>` : ""}</div>
-    <div class="pkvale ${x.valor >= (D.valor_min || 0.05) ? "v" : ""}">${ic(x.valor >= (D.valor_min || 0.05) ? "bolt" : "info")}<span>${x.valor >= (D.valor_min || 0.05) ? `<b>Error de la casa:</b> paga ${odd(x.cuota)} y le damos ${pct(x.p)}: valor +${Math.round(x.valor * 100)}%.` : `<b>En prueba:</b> la casa paga ${odd(x.cuota)}; el modelo de jugadores NBA todavía no le gana a la casa en el registro real, por eso su probabilidad se mezcla con la de la casa.`}</span></div>
+    <div class="pkvale ${x.prueba === false && x.valor >= (D.valor_min || 0.05) ? "v" : ""}">${ic(x.prueba === false && x.valor >= (D.valor_min || 0.05) ? "bolt" : "info")}<span>${x.prueba === false && x.valor >= (D.valor_min || 0.05) ? `<b>Error de la casa:</b> paga ${odd(x.cuota)} y le damos ${pct(x.p)}: valor +${Math.round(x.valor * 100)}%.` : `<b>En prueba:</b> la casa paga ${odd(x.cuota)}. El modelo de jugadores NBA todavía no le gana a la casa en el registro real, así que el porcentaje ya está corregido con lo que acertó de verdad${x.preal ? ` (${esc(x.preal)})` : ""}.`}</span></div>
     <hr class="pkhr">
     ${lc.length ? `<div class="pkcard ol"><h4>Lo clave</h4><div class="small">Lo que dicen sus últimos partidos sobre el de hoy</div>${clvList(lc)}</div>` : ""}
     <div class="pkhist" style="margin-top:18px"><h4>Historial de rendimiento</h4><div class="pk5">${[5, 10, 20].map((k) => `<button class="${n === k ? "on" : ""}" data-act="ppn" data-k="${k}">${k}G</button>`).join("")}</div></div>

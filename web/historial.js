@@ -24,7 +24,7 @@ async function cargarHist() {
     if (!HIST) HIST = await (await fetch("data/estados.json?t=" + Date.now(), { cache: "no-store" })).json();
   } catch (e) { HIST = { error: true }; }
   HIST_CARGANDO = false;
-  if (/^#(historial|seguidos|notificaciones|errores|inicio)?$|^#(historial|seguidos|notificaciones|errores)/.test(location.hash)) { $("#app").dataset.tab = ""; route(); }
+  if (/^#(historial|seguidos|notificaciones|errores|inicio|picks)?$|^#(historial|seguidos|notificaciones|errores|picks)/.test(location.hash)) { $("#app").dataset.tab = ""; route(); }
 }
 
 const ESTADO = { acierto: ["Acierto", "ok"], fallo: ["Fallo", "no"], push: ["Push", "nu"], nulo: ["Nulo", "nu"], retirado: ["Retirado", "nu"] };

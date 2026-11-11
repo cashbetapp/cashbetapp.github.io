@@ -99,7 +99,7 @@ def errores(D, H, ahora):
                 if p >= ERR_PMIN and p * x["cuota"] - 1 >= ERR_MIN:
                     out.append({"k": f"{g['id']}|{x['m']}", "n": f"{g['h']['n']} vs {g['a']['n']}", "txt": x["txt"], "p": p, "c": x["cuota"], "e": p * x["cuota"] - 1})
     vmin = D.get("valor_min") or 0.05
-    for x in D.get("props") or []:
+    for x in []:   # jugadores NBA fuera: sus "errores de cuota" acertaron 37 % (la casa tenía razón), igual que en la app
         if not vig(x["at"]) or not x.get("cuota") or not ((x.get("valor") or -1) >= vmin or x.get("p", 0) >= 0.55):
             continue
         p = _p_real(H, x.get("pm") or x["p"], "Jugadores NBA · " + x["tipo"])
