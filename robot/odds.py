@@ -1,0 +1,437 @@
+"""CASHBET ODDS INTELLIGENCE - motor de comparación de cuotas.
+
+Fuente: The Odds API (plan gratis, clave en el secreto ODDS_API_KEY; nunca se imprime).
+Casas de la región "eu" (incluye Pinnacle, la referencia de precio justo).
+
+Qué hace en cada corrida:
+  1. Mira (gratis) qué ligas tienen partidos en las próximas horas.
+  2. Pide cuotas solo de esas ligas y solo si el presupuesto de créditos del mes lo permite.
+  3. Quita el margen de cada casa y calcula la probabilidad "del mercado"
+     (Pinnacle sin margen; si no está, la mediana de al menos 4 casas).
+  4. Compara cada cuota con esa probabilidad (EV = prob × cuota - 1) y con la del modelo de CASHBET.
+  5. Clasifica: normal / desajustada / valor / arbitraje / descartada.
+  6. Guarda los movimientos de la probabilidad y registra cuándo aparece y desaparece
+     cada oportunidad, con la cuota de cierre (CLV) para probar con el tiempo si el valor es real.
+
+Regla: "valor" solo se publica cuando el propio registro del motor demuestra CLV positivo
+con suficientes casos (VALOR_MIN_N). Mientras no, lo máximo es "desajustada (en observación)".
+Nunca se afirma que una casa tiene un error confirmado.
+
+Salidas: data/odds.json (para la app) y data/odds/{uso,hist,registro}.json (memoria del motor).
+Uso:  python odds.py
+"""
+import json, os, sys, time, gzip, unicodedata, statistics, datetime as dt, urllib.request, urllib.error
+from difflib import SequenceMatcher
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA = os.path.join(ROOT, "data")
+DIR = os.path.join(DATA, "odds")
+OUT = os.path.join(DATA, "odds.json")
+BASE = "https://api.the-odds-api.com/v4"
+KEY = os.environ.get("ODDS_API_KEY", "").strip()
+
+REGION = "eu"
+MARKETS = "h2h,totals"           # coste por consulta = 2 créditos (mercados × regiones)
+COSTE = 2
+CREDITOS_MES = 500
+RESERVA = 20                      # nunca bajar de aquí
+VENTANA_H = 30                    # solo ligas con partidos en las próximas 30 h
+CADA_H = 6                        # una liga no se vuelve a pedir antes de 6 h...
+PREVIA_MIN = (30, 150)            # ...salvo para la foto de cierre (30-150 min antes del partido)
+
+MIN_CASAS = 4                     # menos casas = datos insuficientes
+UMBRAL_EV = 0.02                  # +2 % sobre el precio justo para considerarla desajustada
+UMBRAL_MOV = 0.05                 # 5 puntos de probabilidad = movimiento fuerte
+VIEJA_MIN = 45                    # cuota con más de 45 min de atraso frente a la referencia
+VALOR_MIN_N = 100                 # oportunidades cerradas necesarias para hablar de "valor"
+REF = "pinnacle"
+
+LIGAS = {  # clave The Odds API -> (clave ESPN usada en CASHBET, nombre)
+    "soccer_epl": ("eng.1", "Premier League"),
+    "soccer_spain_la_liga": ("esp.1", "LaLiga"),
+    "soccer_italy_serie_a": ("ita.1", "Serie A"),
+    "soccer_germany_bundesliga": ("ger.1", "Bundesliga"),
+    "soccer_france_ligue_one": ("fra.1", "Ligue 1"),
+    "soccer_uefa_champs_league": ("uefa.champions", "Champions League"),
+    "soccer_mexico_ligamx": ("mex.1", "Liga MX"),
+    "basketball_nba": ("nba", "NBA"),
+}
+
+
+# ---------------------------------------------------------------- utilidades
+def ahora():
+    return dt.datetime.now(dt.timezone.utc)
+
+
+def iso(t):
+    return t.strftime("%Y-%m-%dT%H:%MZ")
+
+
+def fecha(s):
+    if not s:
+        return None
+    s = s.replace("Z", "+00:00")
+    if len(s) == 22 and s[16] == "+":  # 2026-11-09T00:00+00:00
+        s = s[:16] + ":00" + s[16:]
+    return dt.datetime.fromisoformat(s)
+
+
+def leer(path, defecto):
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return defecto
+
+
+def guardar(path, obj):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(obj, f, ensure_ascii=False, separators=(",", ":"))
+    os.replace(tmp, path)
+
+
+def limpio(msg):
+    """Nunca dejar la clave en un mensaje."""
+    return str(msg).replace(KEY, "***") if KEY else str(msg)
+
+
+def pedir(ruta, **params):
+    """GET a The Odds API. Devuelve (json, cabeceras) o (None, error)."""
+    params["apiKey"] = KEY
+    q = "&".join(f"{k}={v}" for k, v in params.items())
+    req = urllib.request.Request(f"{BASE}{ruta}?{q}", headers={"Accept-Encoding": "gzip", "User-Agent": "cashbet-robot"})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            raw = r.read()
+            if r.headers.get("Content-Encoding") == "gzip" or raw[:2] == b"\x1f\x8b":
+                raw = gzip.decompress(raw)
+            return json.loads(raw.decode("utf-8")), dict(r.headers)
+    except urllib.error.HTTPError as e:
+        cuerpo = ""
+        try:
+            cuerpo = e.read().decode("utf-8", "ignore")[:200]
+        except Exception:
+            pass
+        return None, limpio(f"HTTP {e.code} {cuerpo}")
+    except Exception as e:  # noqa
+        return None, limpio(e)
+
+
+def norm(s):
+    s = unicodedata.normalize("NFKD", s or "").encode("ascii", "ignore").decode().lower()
+    for ch in ".-'&/()":
+        s = s.replace(ch, " ")
+    fuera = {"fc", "cf", "club", "de", "the", "ac", "sc", "cd", "ud", "afc", "ssc", "as", "rc", "sv", "vfb", "vfl", "tsg", "1", "fsv", "sk"}
+    return " ".join(w for w in s.split() if w not in fuera)
+
+
+def parecido(a, b):
+    a, b = norm(a), norm(b)
+    if not a or not b:
+        return 0.0
+    if a in b or b in a:
+        return 1.0
+    ta, tb = set(a.split()), set(b.split())
+    if ta & tb:
+        return max(0.85, SequenceMatcher(None, a, b).ratio())
+    return SequenceMatcher(None, a, b).ratio()
+
+
+def sin_margen(precios):
+    """Cuotas decimales -> probabilidades sin el margen de la casa (método proporcional)."""
+    imp = [1 / c for c in precios]
+    s = sum(imp)
+    return [x / s for x in imp], s - 1
+
+
+def pt(x):
+    return ("%g" % float(x))
+
+
+# ---------------------------------------------------------------- presupuesto
+def presupuesto(uso, t):
+    """Créditos que se pueden gastar hoy sin quedarse sin nada antes de fin de mes."""
+    mes = t.strftime("%Y-%m")
+    if uso.get("mes") != mes:
+        uso.update({"mes": mes, "restantes": CREDITOS_MES, "dias": {}})
+    sig = (t.replace(day=28) + dt.timedelta(days=4)).replace(day=1)
+    dias_quedan = (sig.date() - t.date()).days  # incluye hoy
+    hoy = t.strftime("%Y-%m-%d")
+    gastado_hoy = uso["dias"].get(hoy, 0)
+    disponible = max(0, uso.get("restantes", CREDITOS_MES) - RESERVA)
+    cupo_hoy = (disponible + gastado_hoy) / max(1, dias_quedan)
+    return max(0, int(cupo_hoy - gastado_hoy)), hoy
+
+
+# ---------------------------------------------------------------- partidos de CASHBET
+def partidos_cashbet():
+    d = leer(os.path.join(DATA, "picks.json"), {})
+    return d.get("partidos", [])
+
+
+def emparejar(ev, lg, partidos):
+    t = fecha(ev["commence_time"])
+    mejor, score = None, 0
+    for g in partidos:
+        if g.get("lg") != lg or not g.get("at"):
+            continue
+        if abs((fecha(g["at"]) - t).total_seconds()) > 3 * 3600:
+            continue
+        s = parecido(ev["home_team"], g["h"]["n"]) + parecido(ev["away_team"], g["a"]["n"])
+        if s > score:
+            mejor, score = g, s
+    return mejor if score >= 1.5 else None
+
+
+# ---------------------------------------------------------------- análisis de un evento
+def analizar(ev, lg, liga, g, hist, t):
+    casas = ev.get("bookmakers") or []
+    modelo = {m["m"]: m["p"] for m in (g or {}).get("mercados", []) if m.get("p") is not None}
+    nombres = {ev["home_team"]: "1", ev["away_team"]: "2", "Draw": "X"}
+    txt_l = (g or {}).get("h", {}).get("n") or ev["home_team"]
+    txt_v = (g or {}).get("a", {}).get("n") or ev["away_team"]
+
+    # agrupar: (mercado, línea) -> casa -> {resultado: (cuota, hora)}
+    grupos = {}
+    for b in casas:
+        for mk in b.get("markets", []):
+            hora = mk.get("last_update") or b.get("last_update")
+            for o in mk.get("outcomes", []):
+                if mk["key"] == "h2h":
+                    clave, res = ("h2h", None), nombres.get(o["name"])
+                elif mk["key"] == "totals" and o.get("point") is not None:
+                    clave, res = ("totals", pt(o["point"])), ("mas" if o["name"] == "Over" else "menos")
+                else:
+                    continue
+                if res and o.get("price") and o["price"] > 1:
+                    grupos.setdefault(clave, {}).setdefault(b["key"], {"titulo": b.get("title", b["key"]), "r": {}})["r"][res] = (float(o["price"]), hora)
+
+    salida = []
+    for (mk, linea), por_casa in grupos.items():
+        resultados = ["1", "X", "2"] if mk == "h2h" and lg != "nba" else ["1", "2"] if mk == "h2h" else ["mas", "menos"]
+        completas = {k: v for k, v in por_casa.items() if all(r in v["r"] for r in resultados)}
+        n = len(completas)
+        # probabilidad justa por casa
+        justas = {}
+        for k, v in completas.items():
+            probs, margen = sin_margen([v["r"][r][0] for r in resultados])
+            justas[k] = dict(zip(resultados, probs))
+            v["margen"] = margen
+        if REF in justas:
+            ref, ref_nom, ref_hora = justas[REF], "Pinnacle sin margen", fecha(completas[REF]["r"][resultados[0]][1])
+        elif n >= MIN_CASAS:
+            ref = {r: statistics.median(j[r] for j in justas.values()) for r in resultados}
+            s = sum(ref.values())
+            ref = {r: p / s for r, p in ref.items()}
+            ref_nom, ref_hora = f"mediana de {n} casas sin margen", None
+        else:
+            ref, ref_nom, ref_hora = None, None, None
+
+        # arbitraje: la mejor cuota de cada resultado, de casas distintas o no
+        mejores = {}
+        for r in resultados:
+            ofertas = [(v["r"][r][0], k, v["titulo"], v["r"][r][1]) for k, v in por_casa.items() if r in v["r"]]
+            if ofertas:
+                mejores[r] = max(ofertas)
+        arb = None
+        if len(mejores) == len(resultados):
+            suma = sum(1 / mejores[r][0] for r in resultados)
+            if suma < 1:
+                arb = round(1 / suma - 1, 4)
+
+        for r in resultados:
+            if r not in mejores:
+                continue
+            cuota, ck, ctit, chora = mejores[r]
+            m_key = r if mk == "h2h" else f"{r}_{linea}"
+            if mk == "h2h":
+                txt = "Empate" if r == "X" else f"Gana {txt_l if r == '1' else txt_v}"
+            else:
+                txt = f"{'Más' if r == 'mas' else 'Menos'} de {linea} {'puntos' if lg == 'nba' else 'goles'}"
+            item = {
+                "mercado": m_key, "txt": txt, "casas": n,
+                "mejor": {"casa": ctit, "cuota": cuota, "hora": chora},
+                "cuotas": sorted(([v["titulo"], v["r"][r][0]] for v in por_casa.values() if r in v["r"]), key=lambda x: -x[1]),
+                "p_mercado": None, "ref": ref_nom, "ev": None,
+                "p_modelo": modelo.get(m_key), "ev_modelo": None,
+                "arbitraje": arb, "mov": None, "vieja": False,
+            }
+            if item["p_modelo"] is not None:
+                item["ev_modelo"] = round(item["p_modelo"] * cuota - 1, 4)
+            # estado
+            if ref is None:
+                item["estado"], item["motivo"] = "descartada", f"datos insuficientes: {n} casas con el mercado completo y sin Pinnacle"
+            else:
+                p = ref[r]
+                item["p_mercado"] = round(p, 4)
+                item["justa"] = round(1 / p, 2)
+                item["ev"] = round(p * cuota - 1, 4)
+                # movimiento de la probabilidad del mercado
+                hk = f"{ev['id']}|{m_key}"
+                serie = hist.setdefault(hk, [])
+                if not serie or serie[-1][1] != round(p, 4):
+                    serie.append([iso(t), round(p, 4)])
+                del serie[:-24]
+                if len(serie) >= 2:
+                    item["mov"] = round(serie[-1][1] - serie[0][1], 4)
+                # cuota posiblemente desactualizada (la casa no se movió cuando la referencia sí)
+                if ref_hora and chora and ck != REF:
+                    atraso = (ref_hora - fecha(chora)).total_seconds() / 60
+                    item["vieja"] = atraso > VIEJA_MIN
+                if arb:
+                    item["estado"], item["motivo"] = "arbitraje", f"cubriendo todos los resultados con las mejores cuotas queda +{arb:.1%}; puede ser una cuota vieja: verificar en la casa"
+                    if item["vieja"]:
+                        item["motivo"] += f" ({ctit} no actualiza esta cuota hace rato)"
+                elif item["ev"] >= UMBRAL_EV and ck != REF:
+                    item["estado"] = "desajustada"
+                    item["motivo"] = f"{ctit} paga {cuota} y el precio justo es {item['justa']} (EV {item['ev']:+.1%})"
+                    if item["vieja"]:
+                        item["motivo"] += "; su cuota no se actualizó cuando el mercado se movió"
+                else:
+                    item["estado"], item["motivo"] = "normal", "en línea con el mercado"
+            salida.append(item)
+    return salida
+
+
+# ---------------------------------------------------------------- registro de oportunidades
+def registrar(reg, eventos, t):
+    """Abre/actualiza/cierra oportunidades. La foto de cierre (CLV) es la última antes del partido."""
+    vistos = set()
+    for e in eventos:
+        empieza = fecha(e["at"])
+        fresco = e.get("actualizado") == iso(t)
+        for m in e["mercados"]:
+            k = f"{e['oid']}|{m['mercado']}"
+            if not fresco:  # datos de una consulta anterior: no se toca nada, solo no se da por desaparecida
+                if k in reg:
+                    vistos.add(k)
+                continue
+            if m["p_mercado"] is not None and k in reg and empieza > t:
+                r = reg[k]
+                r["p_cierre"], r["hora_cierre"] = m["p_mercado"], iso(t)
+                r["clv"] = round(r["cuota"] * m["p_mercado"] - 1, 4)
+            if m["estado"] not in ("desajustada", "arbitraje", "valor") or empieza <= t:
+                continue
+            vistos.add(k)
+            r = reg.get(k)
+            if not r:
+                reg[k] = r = {"evento": e["oid"], "espn": e.get("id"), "lg": e["lg"], "at": e["at"],
+                              "partido": f"{e['local']} vs {e['visita']}", "mercado": m["mercado"], "txt": m["txt"],
+                              "casa": m["mejor"]["casa"], "cuota": m["mejor"]["cuota"], "p_mercado": m["p_mercado"],
+                              "p_modelo": m["p_modelo"], "ev": m["ev"], "estado": m["estado"],
+                              "aparece": iso(t), "fuente": "The Odds API / " + REGION}
+            r["ultima"] = iso(t)
+            r.pop("desaparece", None)
+    for k, r in reg.items():
+        if k not in vistos and "desaparece" not in r and fecha(r["ultima"]) < t:
+            r["desaparece"] = iso(t)
+
+
+def valor_probado(reg):
+    cerradas = [r["clv"] for r in reg.values() if r.get("clv") is not None and fecha(r["at"]) <= ahora()]
+    n = len(cerradas)
+    media = round(sum(cerradas) / n, 4) if n else None
+    return (n >= VALOR_MIN_N and media is not None and media > 0), n, media
+
+
+# ---------------------------------------------------------------- principal
+def main():
+    t = ahora()
+    previo = leer(OUT, {})
+    uso = leer(os.path.join(DIR, "uso.json"), {})
+    hist = leer(os.path.join(DIR, "hist.json"), {})
+    reg = leer(os.path.join(DIR, "registro.json"), {})
+    base = {"generado": iso(t), "fuente": "The Odds API (región eu)", "referencia": "Pinnacle sin margen; si falta, mediana de 4+ casas"}
+
+    if not KEY:
+        print("odds: falta el secreto ODDS_API_KEY; no se consulta nada")
+        guardar(OUT, {**previo, **base, "estado": "sin clave", "eventos": previo.get("eventos", [])})
+        return
+
+    cupo, hoy = presupuesto(uso, t)
+    ultimos = uso.setdefault("ligas", {})
+    eventos, errores, pedidas = [], [], []
+    partidos = partidos_cashbet()
+    viejos = {e["oid"]: e for e in previo.get("eventos", [])}
+
+    for sk, (lg, liga) in LIGAS.items():
+        # 1) gratis: ¿hay partidos pronto?
+        lista, info = pedir(f"/sports/{sk}/events", dateFormat="iso")
+        if lista is None:
+            errores.append(f"{liga}: {info}")
+            continue
+        pronto = [e for e in lista if t < fecha(e["commence_time"]) <= t + dt.timedelta(hours=VENTANA_H)]
+        if not pronto:
+            continue
+        ult = fecha(ultimos.get(sk)) if ultimos.get(sk) else None
+        cierre = any(PREVIA_MIN[0] <= (fecha(e["commence_time"]) - t).total_seconds() / 60 <= PREVIA_MIN[1] for e in pronto)
+        toca = ult is None or (t - ult) >= dt.timedelta(hours=CADA_H) or (cierre and (t - ult) >= dt.timedelta(hours=2))
+        if not toca or cupo < COSTE:
+            # se conservan los datos anteriores de esta liga, marcados con su hora real
+            for e in viejos.values():
+                if e["lg"] == lg and fecha(e["at"]) > t:
+                    eventos.append(e)
+            continue
+        # 2) con coste: cuotas de las casas
+        datos, info = pedir(f"/sports/{sk}/odds", regions=REGION, markets=MARKETS, oddsFormat="decimal", dateFormat="iso")
+        if datos is None:
+            errores.append(f"{liga}: {info}")
+            continue
+        try:
+            uso["restantes"] = int(float(info.get("x-requests-remaining", info.get("X-Requests-Remaining"))))
+        except Exception:
+            pass
+        gasto = COSTE
+        try:
+            gasto = int(float(info.get("x-requests-last", info.get("X-Requests-Last"))))
+        except Exception:
+            pass
+        uso["dias"][hoy] = uso["dias"].get(hoy, 0) + gasto
+        cupo -= gasto
+        ultimos[sk] = iso(t)
+        pedidas.append(liga)
+        for ev in datos:
+            if not (t < fecha(ev["commence_time"]) <= t + dt.timedelta(hours=VENTANA_H)):
+                continue
+            g = emparejar(ev, lg, partidos)
+            eventos.append({
+                "oid": ev["id"], "id": g["id"] if g else None, "lg": lg, "liga": liga, "at": iso(fecha(ev["commence_time"])),
+                "local": g["h"]["n"] if g else ev["home_team"], "visita": g["a"]["n"] if g else ev["away_team"],
+                "actualizado": iso(t), "mercados": analizar(ev, lg, liga, g, hist, t),
+            })
+
+    ok, n_cerradas, clv_medio = valor_probado(reg)
+    if ok:  # solo con CLV positivo demostrado una desajustada que el modelo respalda pasa a "valor"
+        for e in eventos:
+            for m in e["mercados"]:
+                if m["estado"] == "desajustada" and (m["ev_modelo"] or -1) >= UMBRAL_EV:
+                    m["estado"] = "valor"
+    registrar(reg, eventos, t)
+
+    # limpiar memoria vieja (más de 10 días)
+    corte = t - dt.timedelta(days=10)
+    reg = {k: r for k, r in reg.items() if fecha(r["at"]) > corte}
+    vivos = {e["oid"] for e in eventos}
+    hist = {k: v for k, v in hist.items() if k.split("|")[0] in vivos or fecha(v[-1][0]) > corte}
+
+    cuenta = {}
+    for e in eventos:
+        for m in e["mercados"]:
+            cuenta[m["estado"]] = cuenta.get(m["estado"], 0) + 1
+    salida = {**base, "estado": "con errores" if errores else "ok", "errores": errores,
+              "consultadas": pedidas, "creditos_restantes": uso.get("restantes"),
+              "valor": {"probado": ok, "n": n_cerradas, "clv_medio": clv_medio, "minimo": VALOR_MIN_N},
+              "resumen": cuenta, "eventos": sorted(eventos, key=lambda e: e["at"])}
+    guardar(OUT, salida)
+    guardar(os.path.join(DIR, "uso.json"), uso)
+    guardar(os.path.join(DIR, "hist.json"), hist)
+    guardar(os.path.join(DIR, "registro.json"), reg)
+    print(f"odds: {len(eventos)} partidos, consultadas {pedidas or 'ninguna'}, créditos restantes {uso.get('restantes')}, {cuenta}")
+    for e in errores:
+        print("  error", e)
+
+
+if __name__ == "__main__":
+    main()

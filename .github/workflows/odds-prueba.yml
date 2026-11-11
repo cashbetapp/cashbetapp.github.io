@@ -1,0 +1,53 @@
+name: Prueba Odds Intelligence (no publica la app)
+
+# Solo corre al subir a la rama de prueba. No toca main, ni la app, ni la rama datos:
+# deja el resultado en la rama odds-prueba para revisarlo.
+on:
+  push:
+    branches: [odds-intel]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: odds-prueba
+  cancel-in-progress: false
+
+jobs:
+  prueba:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Traer los partidos actuales (solo lectura de la rama datos) y la memoria de la prueba anterior
+        run: |
+          URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          mkdir -p data
+          git clone -q --depth 1 --branch datos "$URL" datos_tmp && cp datos_tmp/picks.json data/ && rm -rf datos_tmp
+          if git ls-remote --exit-code --heads origin odds-prueba >/dev/null; then
+            git clone -q --depth 1 --branch odds-prueba "$URL" prev && cp -r prev/odds prev/odds.json data/ 2>/dev/null || true
+            rm -rf prev
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Motor de cuotas
+        working-directory: robot
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+        run: python odds.py
+
+      - name: Guardar el resultado en la rama odds-prueba
+        run: |
+          mkdir out && cp -r data/odds data/odds.json out/
+          cd out
+          git init -q -b odds-prueba
+          git config user.name "robot-cashbet"
+          git config user.email "robot-cashbet@users.noreply.github.com"
+          git add -A
+          git commit -q -m "prueba odds $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" odds-prueba
