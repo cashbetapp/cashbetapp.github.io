@@ -78,6 +78,10 @@ jobs:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python odds.py || echo "odds falló, se sigue"
 
+      - name: Validación del objetivo 70 % (solo lee el registro; no cambia nada)
+        working-directory: robot
+        run: python evaluar.py || echo "evaluar falló, se sigue"
+
       - name: Noticias (ESPN en español)
         working-directory: robot
         run: python noticias.py || echo "noticias falló, se sigue"

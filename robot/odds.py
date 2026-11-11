@@ -356,6 +356,7 @@ def main():
     uso = leer(os.path.join(DIR, "uso.json"), {})
     hist = leer(os.path.join(DIR, "hist.json"), {})
     reg = leer(os.path.join(DIR, "registro.json"), {})
+    cierre = leer(os.path.join(DIR, "cierre.json"), {})
     base = {"generado": iso(t), "fuente": "The Odds API (región eu)", "referencia": "Pinnacle sin margen; si falta, mediana de 4+ casas"}
 
     if not KEY:
@@ -379,8 +380,8 @@ def main():
         if not pronto:
             continue
         ult = fecha(ultimos.get(sk)) if ultimos.get(sk) else None
-        cierre = any(PREVIA_MIN[0] <= (fecha(e["commence_time"]) - t).total_seconds() / 60 <= PREVIA_MIN[1] for e in pronto)
-        toca = os.environ.get("ODDS_FORZAR") == "1" or ult is None or (t - ult) >= dt.timedelta(hours=CADA_H) or (cierre and (t - ult) >= dt.timedelta(hours=2))
+        hay_cierre = any(PREVIA_MIN[0] <= (fecha(e["commence_time"]) - t).total_seconds() / 60 <= PREVIA_MIN[1] for e in pronto)
+        toca = os.environ.get("ODDS_FORZAR") == "1" or ult is None or (t - ult) >= dt.timedelta(hours=CADA_H) or (hay_cierre and (t - ult) >= dt.timedelta(hours=2))
         if not toca or cupo < COSTE:
             # se conservan los datos anteriores de esta liga, marcados con su hora real
             for e in viejos.values():
@@ -422,10 +423,18 @@ def main():
                 if m["estado"] == "desajustada" and (m["ev_modelo"] or -1) >= UMBRAL_EV:
                     m["estado"] = "valor"
     registrar(reg, eventos, t)
+    # cierre del mercado por partido de CASHBET (para medir el CLV de los picks en evaluar.py):
+    # se pisa en cada consulta hecha antes del partido, así queda la última antes de empezar
+    for e in eventos:
+        if e.get("id") and e.get("actualizado") == iso(t) and fecha(e["at"]) > t:
+            for m in e["mercados"]:
+                if m["p_mercado"] is not None:
+                    cierre[f"{e['id']}|{m['mercado']}"] = {"p": m["p_mercado"], "t": iso(t), "at": e["at"]}
 
     # limpiar memoria vieja (más de 10 días)
     corte = t - dt.timedelta(days=10)
     reg = {k: r for k, r in reg.items() if fecha(r["at"]) > corte}
+    cierre = {k: c for k, c in cierre.items() if fecha(c["at"]) > t - dt.timedelta(days=60)}
     vivos = {e["oid"] for e in eventos}
     hist = {k: v for k, v in hist.items() if k.split("|")[0] in vivos or fecha(v[-1][0]) > corte}
 
@@ -441,6 +450,7 @@ def main():
     guardar(os.path.join(DIR, "uso.json"), uso)
     guardar(os.path.join(DIR, "hist.json"), hist)
     guardar(os.path.join(DIR, "registro.json"), reg)
+    guardar(os.path.join(DIR, "cierre.json"), cierre)
     print(f"odds: {len(eventos)} partidos, consultadas {pedidas or 'ninguna'}, créditos restantes {uso.get('restantes')}, {cuenta}")
     for e in errores:
         print("  error", e)
