@@ -39,6 +39,7 @@ jobs:
         working-directory: robot
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+          ODDS_FORZAR: "1"   # solo en la prueba: ignora el intervalo de 6 h (el presupuesto de créditos se respeta igual)
         run: python odds.py
 
       - name: Guardar el resultado en la rama odds-prueba

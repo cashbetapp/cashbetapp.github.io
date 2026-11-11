@@ -45,6 +45,10 @@ UMBRAL_MOV = 0.05                 # 5 puntos de probabilidad = movimiento fuerte
 VIEJA_MIN = 45                    # cuota con más de 45 min de atraso frente a la referencia
 VALOR_MIN_N = 100                 # oportunidades cerradas necesarias para hablar de "valor"
 REF = "pinnacle"
+ARB_MIN = 0.005                   # arbitraje de menos de 0.5 % no se cuenta
+# bolsas de apuestas: su cuota se paga con comisión sobre la ganancia, así que no se comparan
+# como "mejor cuota" ni para arbitraje (sí cuentan para el consenso de precio justo)
+BOLSAS = {"betfair_ex_eu", "betfair_ex_uk", "betfair_ex_au", "matchbook", "smarkets"}
 
 LIGAS = {  # clave The Odds API -> (clave ESPN usada en CASHBET, nombre)
     "soccer_epl": ("eng.1", "Premier League"),
@@ -208,6 +212,14 @@ def analizar(ev, lg, liga, g, hist, t):
                 if res and o.get("price") and o["price"] > 1:
                     grupos.setdefault(clave, {}).setdefault(b["key"], {"titulo": b.get("title", b["key"]), "r": {}})["r"][res] = (float(o["price"]), hora)
 
+    # totales: cada casa ofrece líneas distintas; solo se analizan las que tienen Pinnacle o 4+ casas.
+    # Si ninguna llega, se deja la más ofrecida (saldrá como descartada por datos insuficientes).
+    tot = {c: v for c, v in grupos.items() if c[0] == "totals"}
+    if tot:
+        buenas = [c for c, v in tot.items() if REF in v or len(v) >= MIN_CASAS]
+        dejar = set(buenas) or {max(tot, key=lambda c: len(tot[c]))}
+        grupos = {c: v for c, v in grupos.items() if c[0] != "totals" or c in dejar}
+
     salida = []
     for (mk, linea), por_casa in grupos.items():
         resultados = ["1", "X", "2"] if mk == "h2h" and lg != "nba" else ["1", "2"] if mk == "h2h" else ["mas", "menos"]
@@ -232,13 +244,13 @@ def analizar(ev, lg, liga, g, hist, t):
         # arbitraje: la mejor cuota de cada resultado, de casas distintas o no
         mejores = {}
         for r in resultados:
-            ofertas = [(v["r"][r][0], k, v["titulo"], v["r"][r][1]) for k, v in por_casa.items() if r in v["r"]]
+            ofertas = [(v["r"][r][0], k, v["titulo"], v["r"][r][1]) for k, v in por_casa.items() if r in v["r"] and k not in BOLSAS]
             if ofertas:
                 mejores[r] = max(ofertas)
         arb = None
         if len(mejores) == len(resultados):
             suma = sum(1 / mejores[r][0] for r in resultados)
-            if suma < 1:
+            if 1 / suma - 1 >= ARB_MIN:
                 arb = round(1 / suma - 1, 4)
 
         for r in resultados:
@@ -253,7 +265,7 @@ def analizar(ev, lg, liga, g, hist, t):
             item = {
                 "mercado": m_key, "txt": txt, "casas": n,
                 "mejor": {"casa": ctit, "cuota": cuota, "hora": chora},
-                "cuotas": sorted(([v["titulo"], v["r"][r][0]] for v in por_casa.values() if r in v["r"]), key=lambda x: -x[1]),
+                "cuotas": sorted(([v["titulo"] + (" (bolsa)" if k in BOLSAS else ""), v["r"][r][0]] for k, v in por_casa.items() if r in v["r"]), key=lambda x: -x[1]),
                 "p_mercado": None, "ref": ref_nom, "ev": None,
                 "p_modelo": modelo.get(m_key), "ev_modelo": None,
                 "arbitraje": arb, "mov": None, "vieja": False,
@@ -367,7 +379,7 @@ def main():
             continue
         ult = fecha(ultimos.get(sk)) if ultimos.get(sk) else None
         cierre = any(PREVIA_MIN[0] <= (fecha(e["commence_time"]) - t).total_seconds() / 60 <= PREVIA_MIN[1] for e in pronto)
-        toca = ult is None or (t - ult) >= dt.timedelta(hours=CADA_H) or (cierre and (t - ult) >= dt.timedelta(hours=2))
+        toca = os.environ.get("ODDS_FORZAR") == "1" or ult is None or (t - ult) >= dt.timedelta(hours=CADA_H) or (cierre and (t - ult) >= dt.timedelta(hours=2))
         if not toca or cupo < COSTE:
             # se conservan los datos anteriores de esta liga, marcados con su hora real
             for e in viejos.values():
