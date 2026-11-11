@@ -72,6 +72,10 @@ jobs:
         working-directory: robot
         run: python evaluar.py || echo "evaluar falló; sin validación no se muestra ningún pick"
 
+      - name: Informe de rentabilidad (solo lee el registro; ROI por deporte, mercado, cuota, probabilidad y fecha)
+        working-directory: robot
+        run: python rentabilidad.py || echo "rentabilidad falló, se sigue"
+
       - name: Pronósticos
         working-directory: robot
         run: python predict.py
