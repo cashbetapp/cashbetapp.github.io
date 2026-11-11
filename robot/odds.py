@@ -9,7 +9,8 @@ Qué hace en cada corrida:
   3. Quita el margen de cada casa y calcula la probabilidad "del mercado"
      (Pinnacle sin margen; si no está, la mediana de al menos 4 casas).
   4. Compara cada cuota con esa probabilidad (EV = prob × cuota - 1) y con la del modelo de CASHBET.
-  5. Clasifica: normal / desajustada / valor / arbitraje / descartada.
+  5. Clasifica: normal / desajustada (cuota desajustada) / posible_valor (mercado + modelo validado) /
+     valor (demostrado con CLV) / arbitraje (posible) / arbitraje_confirmado / descartada.
   6. Guarda los movimientos de la probabilidad y registra cuándo aparece y desaparece
      cada oportunidad, con la cuota de cierre (CLV) para probar con el tiempo si el valor es real.
 
@@ -47,6 +48,8 @@ VALOR_MIN_N = 100                 # oportunidades cerradas necesarias para habla
 ANTIGUO_H = 6                     # datos de más de 6 h: se marcan como antiguos (nunca se presentan como actuales)
 REF = "pinnacle"
 ARB_MIN = 0.005                   # arbitraje de menos de 0.5 % no se cuenta
+ARB_FRESCA_MIN = 30               # arbitraje "confirmado": todas las patas actualizadas hace <= 30 min...
+                                  # ...y el mismo arbitraje visto también en la consulta anterior
 # bolsas de apuestas: su cuota se paga con comisión sobre la ganancia, así que no se comparan
 # como "mejor cuota" ni para arbitraje (sí cuentan para el consenso de precio justo)
 BOLSAS = {"betfair_ex_eu", "betfair_ex_uk", "betfair_ex_au", "matchbook", "smarkets"}
@@ -194,6 +197,8 @@ def emparejar(ev, lg, partidos):
 def analizar(ev, lg, liga, g, hist, t):
     casas = ev.get("bookmakers") or []
     modelo = {m["m"]: m["p"] for m in (g or {}).get("mercados", []) if m.get("p") is not None}
+    # tipo de pick del modelo validado o en prueba (predict.py marca "oculto" los que no demuestran 70 %)
+    modelo_ok = {m["m"]: not m.get("oculto") for m in (g or {}).get("mercados", []) if m.get("p") is not None}
     nombres = {ev["home_team"]: "1", ev["away_team"]: "2", "Draw": "X"}
     txt_l = (g or {}).get("h", {}).get("n") or ev["home_team"]
     txt_v = (g or {}).get("a", {}).get("n") or ev["away_team"]
@@ -248,11 +253,20 @@ def analizar(ev, lg, liga, g, hist, t):
             ofertas = [(v["r"][r][0], k, v["titulo"], v["r"][r][1]) for k, v in por_casa.items() if r in v["r"] and k not in BOLSAS]
             if ofertas:
                 mejores[r] = max(ofertas)
-        arb = None
+        arb, arb_conf = None, False
+        hk_arb = f"{ev['id']}|arb|{mk}|{linea}"
         if len(mejores) == len(resultados):
             suma = sum(1 / mejores[r][0] for r in resultados)
             if 1 / suma - 1 >= ARB_MIN:
                 arb = round(1 / suma - 1, 4)
+        if arb:
+            frescas = all(mejores[r][3] and (t - fecha(mejores[r][3])).total_seconds() <= ARB_FRESCA_MIN * 60 for r in resultados)
+            antes = hist.get(hk_arb)
+            arb_conf = frescas and bool(antes) and antes[-1][0] != iso(t)
+            if not antes or antes[-1][0] != iso(t):
+                hist[hk_arb] = (antes or [])[-1:] + [[iso(t), arb]]
+        else:
+            hist.pop(hk_arb, None)          # tiene que repetirse en consultas SEGUIDAS
 
         for r in resultados:
             if r not in mejores:
@@ -268,7 +282,7 @@ def analizar(ev, lg, liga, g, hist, t):
                 "mejor": {"casa": ctit, "cuota": cuota, "hora": chora},
                 "cuotas": sorted(([v["titulo"] + (" (bolsa)" if k in BOLSAS else ""), v["r"][r][0]] for k, v in por_casa.items() if r in v["r"]), key=lambda x: -x[1]),
                 "p_mercado": None, "ref": ref_nom, "ev": None,
-                "p_modelo": modelo.get(m_key), "ev_modelo": None,
+                "p_modelo": modelo.get(m_key), "ev_modelo": None, "modelo_validado": modelo_ok.get(m_key, False),
                 "arbitraje": arb, "mov": None, "vieja": False,
             }
             if item["p_modelo"] is not None:
@@ -299,13 +313,22 @@ def analizar(ev, lg, liga, g, hist, t):
                 if ref_hora and chora and ck != REF:
                     atraso = (ref_hora - fecha(chora)).total_seconds() / 60
                     item["vieja"] = atraso > VIEJA_MIN
-                if arb:
-                    item["estado"], item["motivo"] = "arbitraje", f"cubriendo todos los resultados con las mejores cuotas queda +{arb:.1%}; puede ser una cuota vieja: verificar en la casa"
+                if arb and arb_conf:
+                    item["estado"], item["motivo"] = "arbitraje_confirmado", f"cubriendo todos los resultados queda +{arb:.1%}; todas las cuotas actualizadas hace menos de {ARB_FRESCA_MIN} min y el arbitraje se repitió en dos consultas seguidas. Aun así la casa puede cambiar o limitar la apuesta: verificar antes"
+                elif arb:
+                    item["estado"], item["motivo"] = "arbitraje", f"posible arbitraje: cubriendo todos los resultados con las mejores cuotas queda +{arb:.1%}; sin confirmar (cuota posiblemente vieja o vista una sola vez): verificar en la casa"
                     if item["vieja"]:
                         item["motivo"] += f" ({ctit} no actualiza esta cuota hace rato)"
                 elif item["ev"] >= UMBRAL_EV and ck != REF:
                     item["estado"] = "desajustada"
-                    item["motivo"] = f"{ctit} paga {cuota} y el precio justo es {item['justa']} (EV {item['ev']:+.1%})"
+                    item["motivo"] = f"cuota desajustada: {ctit} paga {cuota} y el precio justo del mercado es {item['justa']} (EV {item['ev']:+.1%})"
+                    if (item["ev_modelo"] or -1) >= UMBRAL_EV:
+                        if item["modelo_validado"]:
+                            # el mercado Y el modelo (tipo de pick validado o en prueba) dicen que paga de más
+                            item["estado"] = "posible_valor"
+                            item["motivo"] += f"; el modelo CASHBET también la ve por encima ({item['p_modelo']:.0%}, EV {item['ev_modelo']:+.1%}). Posible valor: NO demostrado (falta CLV positivo en {VALOR_MIN_N}+ casos)"
+                        else:
+                            item["motivo"] += "; el modelo también la ve por encima, pero ese tipo de pick no demuestra 70 %: no cuenta como posible valor"
                     if item["vieja"]:
                         item["motivo"] += "; su cuota no se actualizó cuando el mercado se movió"
                 else:
@@ -410,7 +433,7 @@ def registrar(reg, eventos, t):
                     if r["evento"] == e["oid"] and r["mercado"] == m["mercado"]:
                         r["p_cierre"], r["hora_cierre"] = m["p_mercado"], iso(t)
                         r["clv"] = round(r["cuota"] * m["p_mercado"] - 1, 4)
-            if m["estado"] not in ("desajustada", "arbitraje", "valor") or empieza <= t:
+            if m["estado"] not in ("desajustada", "posible_valor", "arbitraje", "arbitraje_confirmado", "valor") or empieza <= t:
                 continue
             vistos.add(k)
             r = reg.get(k)
@@ -567,10 +590,10 @@ def main():
             })
 
     ok, n_cerradas, clv_medio = valor_probado(reg)
-    if ok:  # solo con CLV positivo demostrado una desajustada que el modelo respalda pasa a "valor"
+    if ok:  # solo con CLV positivo demostrado un posible valor (mercado + modelo validado) pasa a "valor"
         for e in eventos:
             for m in e["mercados"]:
-                if m["estado"] == "desajustada" and (m["ev_modelo"] or -1) >= UMBRAL_EV:
+                if m["estado"] == "posible_valor":
                     m["estado"] = "valor"
     registrar(reg, eventos, t)
     vigilar(eventos, viejos, t)

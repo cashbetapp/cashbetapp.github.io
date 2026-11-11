@@ -32,9 +32,11 @@ const pctP = (x) => (x == null ? "—" : `${(x * 100).toFixed(1)}%`);
 function etiqueta(m, e) {
   if (m.estado === "suspendido") return ["susp", "Mercado suspendido"];
   if (e && e.antiguo && m.estado !== "normal") return ["desc", "Descartada · datos antiguos"];
-  if (m.estado === "valor") return ["ok", "Oportunidad detectada"];
-  if (m.estado === "arbitraje") return ["obs", "En observación · arbitraje"];
-  if (m.estado === "desajustada") return ["obs", "En observación"];
+  if (m.estado === "valor") return ["ok", "Valor demostrado"];
+  if (m.estado === "arbitraje_confirmado") return ["ok", "Arbitraje confirmado"];
+  if (m.estado === "arbitraje") return ["obs", "Posible arbitraje"];
+  if (m.estado === "posible_valor") return ["obs", "Posible valor"];
+  if (m.estado === "desajustada") return ["obs", "Cuota desajustada"];
   if (m.estado === "descartada") return ["desc", "Datos insuficientes"];
   return ["norm", "Cuota normal"];
 }
@@ -72,7 +74,7 @@ function oiOportunidades(O) {
   }
   items.sort((a, b) => (b.m.ev || -9) - (a.m.ev || -9));
   const V = O.valor || {};
-  const regla = `<div class="small oiregla">Regla de CASHBET: solo se marca <b>Oportunidad detectada</b> cuando el registro demuestra que estas cuotas le ganan al cierre del mercado (CLV positivo en ${V.minimo || 100}+ casos). Hoy: ${V.n || 0} casos${V.clv_medio != null ? `, CLV medio ${V.clv_medio > 0 ? "+" : ""}${(V.clv_medio * 100).toFixed(2)}%` : ""}. ${V.probado ? "Demostrado." : "Todavía no demostrado: todo queda <b>En observación</b>."} Una cuota distinta no es un error confirmado de la casa.</div>`;
+  const regla = `<div class="small oiregla">Regla de CASHBET: solo se marca <b>Valor demostrado</b> cuando el registro demuestra que estas cuotas le ganan al cierre del mercado (CLV positivo en ${V.minimo || 100}+ casos). Hoy: ${V.n || 0} casos${V.clv_medio != null ? `, CLV medio ${V.clv_medio > 0 ? "+" : ""}${(V.clv_medio * 100).toFixed(2)}%` : ""}. ${V.probado ? "Demostrado." : "Todavía no demostrado: lo demás queda como <b>Cuota desajustada</b> (el mercado la ve alta) o <b>Posible valor</b> (también el modelo validado)."} Una cuota distinta no es un error confirmado de la casa.</div>`;
   const cerr = (O.cerrados || []).length ? `<div class="sec"><h2>Partidos ya empezados</h2></div>${O.cerrados.map(oiCerrado).join("")}` : "";
   return `<div class="tiles">
       <div class="tile"><div class="k">Para revisar</div><div class="v">${items.length}</div></div>
@@ -163,7 +165,17 @@ function oiRendimiento(O) {
       <div class="tile"><div class="k">CLV medio</div><div class="v">${R.clv && R.clv.medio != null ? (R.clv.medio > 0 ? "+" : "") + R.clv.medio + "%" : "—"}</div><div class="n">${R.clv ? R.clv.n : 0} con cierre</div></div>
       <div class="tile"><div class="k">Pendientes</div><div class="v">${R.pendientes}</div></div></div>
     ${graf ? `<div class="oicard">${graf}</div>` : ""}
+    ${oiPorEstado(R.por_estado || {})}
     <div class="small" style="margin:12px 2px">Yield = ganancia ÷ lo apostado, con 1 unidad por oportunidad a la cuota detectada. CLV = cuánto mejor era la cuota que el cierre del mercado; es la mejor señal de valor real a largo plazo. Resultados pasados no garantizan los futuros.</div>`;
+}
+
+// el rendimiento separado por tipo: cuota desajustada, posible valor, valor demostrado, arbitraje
+function oiPorEstado(P) {
+  const filas = Object.entries(P);
+  if (!filas.length) return "";
+  return `<div class="oicard"><table class="oitab"><thead><tr><th>Tipo</th><th>N</th><th>Acierto</th><th>Unidades</th></tr></thead><tbody>
+    ${filas.map(([k, q]) => `<tr><td>${esc(etiqueta({ estado: k })[1])}</td><td>${q.n}</td><td>${q.n ? Math.round((100 * q.ganadas) / q.n) + "%" : "—"}</td><td class="${q.unidades > 0 ? "best" : ""}">${q.unidades > 0 ? "+" : ""}${q.unidades}</td></tr>`).join("")}
+    </tbody></table></div>`;
 }
 
 function actOdds(a, el) {
