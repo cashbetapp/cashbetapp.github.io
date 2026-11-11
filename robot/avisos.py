@@ -94,7 +94,7 @@ def errores(D, H, ahora):
         if not vig(g["at"]):
             continue
         for x in g.get("mercados") or []:
-            if x.get("cuota") and x.get("p"):
+            if x.get("cuota") and x.get("p") and not x.get("oculto"):   # solo tipos validados o en prueba
                 p = _p_real(H, x["p"], _mk_grupo(g, x["m"]))
                 if p >= ERR_PMIN and p * x["cuota"] - 1 >= ERR_MIN:
                     out.append({"k": f"{g['id']}|{x['m']}", "n": f"{g['h']['n']} vs {g['a']['n']}", "txt": x["txt"], "p": p, "c": x["cuota"], "e": p * x["cuota"] - 1})
@@ -134,7 +134,7 @@ def mensajes(u, D, H, errs, enviados, ahora):
     hoy, out = loc.strftime("%Y-%m-%d"), []
     despierto = 7 <= loc.hour <= 23
     if pref.get("dia", True) and despierto and f"dia|{hoy}" not in enviados:
-        juegos = [g for g in D.get("partidos") or [] if not (g.get("pick") or {}).get("bajo") and (g.get("pick") or {}).get("txt")
+        juegos = [g for g in D.get("partidos") or [] if not (g.get("pick") or {}).get("bajo") and not (g.get("pick") or {}).get("oculto") and (g.get("pick") or {}).get("txt")
                   and dt.datetime.fromisoformat(g["at"].replace("Z", "+00:00")).astimezone(COL).strftime("%Y-%m-%d") == hoy
                   and dt.datetime.fromisoformat(g["at"].replace("Z", "+00:00")) > ahora]
         if juegos:
@@ -152,7 +152,7 @@ def mensajes(u, D, H, errs, enviados, ahora):
     if pref.get("alta", True) and despierto:
         # picks de alta confianza (>= 70 %) de hoy que aún no se avisaron (como "Picks de Alta Confianza" de IABET)
         pp = lambda g: g["pick"].get("pv") if g["pick"].get("tipo") == "valor" else g["pick"].get("p", 0)
-        altos = [g for g in D.get("partidos") or [] if (g.get("pick") or {}).get("txt") and not g["pick"].get("bajo") and pp(g) >= 0.70
+        altos = [g for g in D.get("partidos") or [] if (g.get("pick") or {}).get("txt") and not g["pick"].get("bajo") and not g["pick"].get("oculto") and pp(g) >= 0.70
                  and dt.datetime.fromisoformat(g["at"].replace("Z", "+00:00")).astimezone(COL).strftime("%Y-%m-%d") == hoy
                  and dt.datetime.fromisoformat(g["at"].replace("Z", "+00:00")) > ahora and f"alta|{g['id']}" not in enviados]
         if altos:

@@ -1070,6 +1070,11 @@ def main():
             v = nivel_validacion(V, mercado("partidos", {"m": pk["m"], "dep": g["dep"]}))
             pk.update({"val": v} if v else {"oculto": True})
             ocultos += not v
+        # cada mercado del partido también (de aquí salen los "errores de cuota" de la app y de los avisos)
+        for x in g.get("mercados") or []:
+            if x.get("m"):
+                v = nivel_validacion(V, mercado("partidos", {"m": x["m"], "dep": g["dep"]}))
+                x.update({"val": v} if v else {"oculto": True})
         x = g.get("extra")
         if x:
             for q in x.get("picks", []) + x.get("jug", []):

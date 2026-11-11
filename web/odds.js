@@ -47,10 +47,12 @@ function oddsVista() {
   const O = ODDS, s = O.salud || {};
   const tabs = [["op", "Oportunidades"], ["cmp", "Comparador"], ["his", "Historial"], ["ren", "Rendimiento"]];
   const cuerpo = { op: oiOportunidades, cmp: oiComparador, his: oiHistorial, ren: oiRendimiento }[ui.oiTab] || oiOportunidades;
-  return header("Odds Intelligence", `Actualizado ${hace(O.generado)} · ${esc(O.fuente || "")}`) + `
+  const cq = s.cuotas_hasta || O.generado;   // hora real de las cuotas, no la hora de la revisión
+  return header("Odds Intelligence", `Cuotas de ${hace(cq)} · ${esc(O.fuente || "")}`) + `
     <div class="oisalud ${s.api === "ok" ? "" : "mal"}">
       <span><i></i>${s.api === "ok" ? "Fuente de cuotas funcionando" : "La fuente de cuotas falla"}</span>
-      <span>Última consulta buena: ${hace(s.ultima_consulta_ok)}</span>
+      <span>Fuente revisada: ${hace(s.ultima_consulta_ok)}</span>
+      ${s.cuotas_de && s.cuotas_de !== s.cuotas_hasta ? `<span>Cuotas más viejas: ${hace(s.cuotas_de)}</span>` : ""}
       ${O.creditos_restantes != null ? `<span>Consultas del mes: ${O.creditos_restantes}</span>` : ""}
     </div>
     ${(O.errores || []).length ? `<div class="oiaviso">${ic("warn")}<span>${esc(O.errores.slice(0, 3).join(" · "))}</span></div>` : ""}
@@ -135,7 +137,7 @@ function oiHistorial(O) {
   return H.map((r) => {
     const [cl, lab] = R[r.res] || ["norm", "Pendiente"];
     return `<div class="oihis"><div><b>${esc(r.partido)}</b><span>${esc(r.txt)} · ${esc(r.casa)} ${odd(r.cuota)} · EV ${pctS(r.ev)}</span>
-      <span>Apareció ${fmtD.format(new Date(r.aparece))} ${hora(r.aparece)}${r.desaparece ? ` · desapareció ${hora(r.desaparece)}` : ""}${r.clv != null ? ` · CLV ${pctS(r.clv)}` : ""}${r.marcador ? ` · ${esc(r.marcador)}` : ""}</span></div>
+      <span>Apareció ${fmtD.format(new Date(r.aparece))} ${hora(r.aparece)}${r.desaparece ? ` · desapareció ${hora(r.desaparece)}` : ""}${r.clv != null ? ` · CLV ${pctS(r.clv)}` : ""}${r.marcador ? ` · ${esc(r.marcador)}` : ""}${r.repetida ? " · misma selección en otra casa: no se cuenta dos veces" : ""}</span></div>
       <span class="oiest ${cl}">${lab}</span></div>`;
   }).join("");
 }

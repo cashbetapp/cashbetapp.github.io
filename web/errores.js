@@ -59,7 +59,7 @@ function erroresCuota() {
   for (const g of D.partidos || []) {
     if (!vigente(g.at) || (g.dep === "nba" && D.nba_ok === false)) continue;
     for (const x of g.mercados || []) {
-      if (!x.cuota || !x.p) continue;
+      if (!x.cuota || !x.p || x.oculto) continue;   // tipo de pick sin 70 % demostrado: no se muestra
       const r = pReal(x.p, mkGrupo(g, x.m)), err = r.p * x.cuota - 1;
       if (r.p >= ERR_PMIN && err >= ERR_MIN) out.push({ k: "g", g, x, p: r.p, pm: x.p, cuota: x.cuota, err, h: r.h, dep: g.dep });
     }
@@ -95,10 +95,10 @@ function errores() {
   if (!HIST && typeof cargarHist === "function") cargarHist().then(() => { if (location.hash.startsWith("#errores")) { $("#app").dataset.tab = ""; route(); } });
   const todos = erroresCuota(), xs = todos.filter((e) => ui.errDep === "todos" || e.dep === ui.errDep);
   const n = (d) => todos.filter((e) => d === "todos" || e.dep === d).length;
-  return header("Errores de cuota", "La casa paga más de lo que debería") + `
-    <div class="pkvale v">${ic("bolt")}<span><b>¿Qué es un error de cuota?</b> Cuando un pick pasa ${Math.round(ERR_PMIN * 100)}% o más de las veces y la casa paga más que la cuota justa. Ejemplo: 70% de probabilidad debería pagar 1.43; si la casa paga 1.60, es un error de +12% a tu favor.</span></div>
+  return header("Errores de cuota", "La casa paga más que la cuota justa del modelo") + `
+    <div class="pkvale v">${ic("bolt")}<span><b>¿Qué es un error de cuota?</b> Cuando un pick pasa ${Math.round(ERR_PMIN * 100)}% o más de las veces y la casa paga más que la cuota justa. Ejemplo: 70% de probabilidad debería pagar 1.43; si la casa paga 1.60, hay +12% de ventaja <b>si el modelo tiene razón</b>. Es una posible ventaja, no un error confirmado de la casa ni una ganancia segura.</span></div>
     <div class="pk5 wide" style="margin-top:12px">${[["todos", "Todos"], ["futbol", "Fútbol"], ["nba", "NBA"]].map(([k, l]) => `<button class="${ui.errDep === k ? "on" : ""}" data-act="errdep" data-k="${k}">${l} (${n(k)})</button>`).join("")}</div>
-    ${xs.length ? xs.map(errFila).join("") : `<div class="sgvac"><span>${ic("bolt")}</span><b>Sin errores de cuota ahora</b><p>Las casas están pagando lo justo en los partidos de las próximas 36 horas. El robot revisa cada hora.</p></div>`}
+    ${xs.length ? xs.map(errFila).join("") : `<div class="sgvac"><span>${ic("bolt")}</span><b>Sin errores de cuota ahora</b><p>Ninguna cuota supera la cuota justa del modelo en los partidos de las próximas 36 horas. El robot revisa cada hora.</p></div>`}
     <div class="small" style="margin:14px 2px">La probabilidad ya viene corregida con lo que el modelo acertó de verdad en ese mercado (Historial). Si antes se equivocó más de lo que decía, aquí se baja. Los de jugadores NBA siguen <b>en prueba</b>: su historial todavía es corto. Las cuotas cambian: confirma en tu casa antes de apostar. Ningún pick es seguro.</div>`;
 }
 function actErr(a, el) {

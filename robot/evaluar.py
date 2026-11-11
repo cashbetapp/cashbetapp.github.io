@@ -125,7 +125,7 @@ def main():
                 "cuota": cuota, "real": bool(e.get("cuota_casa") or coll == "props"),
                 "clv": round(cuota * c["p"] - 1, 4) if c and cuota and e.get("cuota_casa") else None,
                 "bt": f"{e['s']}_{e['sc']}" if coll == "extra" else None, "dep": "nba" if coll == "props" or e.get("dep") == "nba" else "futbol",
-                "at": e["at"],
+                "at": e["at"], "pub": bool(pub),
             })
 
     def bloque(xs):
@@ -162,6 +162,9 @@ def main():
         "excluidos": {"anotados_con_el_partido_empezado": despues},
         "sin_hora_de_publicacion": sin_hora,
         "global": bloque(filas),
+        # solo los picks con hora de publicación guardada ANTES del partido (los de antes del sello no la tienen):
+        # es la muestra que se puede demostrar que se predijo antes del resultado
+        "verificable": bloque([x for x in filas if x["pub"]]),
         "deporte": {d: bloque([x for x in filas if x["dep"] == d]) for d in ("futbol", "nba")},
         "mercados": mercados,
         "calibracion": calib,
@@ -173,6 +176,8 @@ def main():
 
     g = out["global"]
     print(f"evaluar: {g['todos']['n']} picks calificados ({sin_hora} sin hora de publicación, {despues} excluidos)")
+    v = out["verificable"]["p70"]
+    print(f"evaluar: con hora probada, picks de 70 %+: {v.get('n', 0)}, acierto {v.get('acierto')}, IC95 {v.get('ic95')}")
     print(f"  {'mercado':<34}{'n':>5}{'acierto':>9}{'n70+':>6}{'ac70+':>7}{'IC95 70+':>14}  estado")
     for mk, b in mercados.items():
         t, m = b["todos"], b["p70"]

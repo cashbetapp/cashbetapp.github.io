@@ -420,6 +420,11 @@ def registrar(reg, eventos, t):
                               "casa": m["mejor"]["casa"], "cuota": m["mejor"]["cuota"], "p_mercado": m["p_mercado"],
                               "p_modelo": m["p_modelo"], "ev": m["ev"], "estado": m["estado"],
                               "aparece": iso(t), "fuente": "The Odds API / " + REGION}
+                # la misma selección ya registrada con otra casa: se guarda (historial), pero no cuenta dos veces
+                primera = next((kk for kk, rr in reg.items() if kk != k and rr["evento"] == e["oid"] and rr["mercado"] == m["mercado"]
+                                and not rr.get("repetida")), None)
+                if primera:
+                    r["repetida"] = primera
             r["ultima"] = iso(t)
             r.pop("desaparece", None)
     for k, r in reg.items():
@@ -456,8 +461,9 @@ def calificar(reg, t):
 def rendimiento(reg):
     """Indicadores del panel, calculados aquí (nunca en la app): acierto, unidades, yield, CLV y la
     curva de unidades acumuladas (1 unidad por oportunidad, a la cuota detectada)."""
-    xs = sorted((r for r in reg.values() if r.get("res") in ("ganada", "perdida")), key=lambda r: r["at"])
-    out = {"n": len(xs), "pendientes": sum(1 for r in reg.values() if not r.get("res"))}
+    unicas = [r for r in reg.values() if not r.get("repetida")]   # cada selección cuenta una sola vez (la primera casa detectada)
+    xs = sorted((r for r in unicas if r.get("res") in ("ganada", "perdida")), key=lambda r: r["at"])
+    out = {"n": len(xs), "pendientes": sum(1 for r in unicas if not r.get("res"))}
     if xs:
         u, serie = 0.0, []
         for r in xs:
@@ -480,7 +486,7 @@ def rendimiento(reg):
 
 
 def valor_probado(reg):
-    cerradas = [r["clv"] for r in reg.values() if r.get("clv") is not None and fecha(r["at"]) <= ahora()]
+    cerradas = [r["clv"] for r in reg.values() if r.get("clv") is not None and not r.get("repetida") and fecha(r["at"]) <= ahora()]
     n = len(cerradas)
     media = round(sum(cerradas) / n, 4) if n else None
     return (n >= VALOR_MIN_N and media is not None and media > 0), n, media
@@ -590,6 +596,9 @@ def main():
             cuenta[m["estado"]] = cuenta.get(m["estado"], 0) + 1
     salud = {"api": "ok" if uso.get("ultima_ok") == iso(t) else "falla",
              "ultima_consulta_ok": uso.get("ultima_ok"), "sin_creditos_hoy": sin_cupo,
+             # hora real de las cuotas mostradas (la revisión gratis de partidos no trae cuotas)
+             "cuotas_de": min((e["actualizado"] for e in eventos if e.get("actualizado")), default=None),
+             "cuotas_hasta": max((e["actualizado"] for e in eventos if e.get("actualizado")), default=None),
              "frecuencia": f"cada {CADA_H} h por liga (y una más 30-150 min antes de cada partido), según los créditos del plan gratis",
              "en_vivo": False}
     salida = {**base, "estado": "con errores" if errores else "ok", "errores": errores, "salud": salud,
