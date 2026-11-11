@@ -128,11 +128,23 @@ def main():
                 "at": e["at"], "pub": bool(pub),
             })
 
-    def bloque(xs):
+    def bloque(xs, estricto=True):
         todos = metricas(xs)
         m70 = metricas([x for x in xs if x["p"] >= OBJ])
         m74 = metricas([x for x in xs if x["p"] >= 0.74])
-        return {"todos": todos, "p70": m70, "p74": m74, "estado": estado(m70)}
+        b = {"todos": todos, "p70": m70, "p74": m74, "estado": estado(m70)}
+        if estricto:
+            # VALIDACIÓN ESTRICTA: "validado" solo con picks de hora de publicación verificable (nueva muestra).
+            # Los antiguos sin hora no se mezclan: sirven de referencia ("en camino"), nunca para validar.
+            xv = [x for x in xs if x["pub"]]
+            v70 = [x for x in xv if x["p"] >= OBJ]
+            b["verificable"] = {"todos": metricas(xv), "p70": metricas(v70), "estado": estado(metricas(v70)),
+                                "progreso": f"{len(v70)}/{N_MIN} picks de 70 %+ con hora verificable"}
+            if b["estado"] == "validado" and b["verificable"]["estado"] != "validado":
+                b["estado"] = "en camino (validación pendiente: faltan picks con hora verificable)"
+            elif b["verificable"]["estado"] == "validado":
+                b["estado"] = "validado"
+        return b
 
     por_mk = {}
     for x in filas:
@@ -164,11 +176,12 @@ def main():
         "global": bloque(filas),
         # solo los picks con hora de publicación guardada ANTES del partido (los de antes del sello no la tienen):
         # es la muestra que se puede demostrar que se predijo antes del resultado
-        "verificable": bloque([x for x in filas if x["pub"]]),
+        "verificable": bloque([x for x in filas if x["pub"]], estricto=False),
         "deporte": {d: bloque([x for x in filas if x["dep"] == d]) for d in ("futbol", "nba")},
         "mercados": mercados,
         "calibracion": calib,
-        "validados": [mk for mk, b in mercados.items() if b["estado"] == "validado"],
+        "validados": [mk for mk, b in mercados.items() if b["estado"] == "validado"],   # solo con muestra verificable
+        "regla": "validado = 100+ picks de 70 %+ CON hora de publicación verificable y límite inferior del IC95 >= 70 %",
     }
     os.makedirs(os.path.join(DATA, "model"), exist_ok=True)
     with open(os.path.join(DATA, "model", "validacion.json"), "w", encoding="utf-8") as f:
@@ -183,7 +196,8 @@ def main():
         t, m = b["todos"], b["p70"]
         ic = f"{m['ic95'][0]}-{m['ic95'][1]}" if m.get("ic95") else "-"
         print(f"  {mk[:33]:<34}{t['n']:>5}{t.get('acierto', '-'):>9}{m['n']:>6}{m.get('acierto', '-'):>7}{ic:>14}  {b['estado']}"
-              + ("  [SOBREAJUSTE: prueba " + str(b['prueba_historica']) + "]" if b.get("sobreajuste") else ""))
+              + ("  [SOBREAJUSTE: prueba " + str(b['prueba_historica']) + "]" if b.get("sobreajuste") else "")
+              + f"  | verificable: {b['verificable']['progreso']}")
     print("  validados:", out["validados"] or "ninguno todavía")
 
 
