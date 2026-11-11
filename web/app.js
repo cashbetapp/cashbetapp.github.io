@@ -71,7 +71,7 @@ function crest(team, size = 40) {
   const nbaAb = team && /\/teamlogos\/nba\/500(?:-dark)?\/(?:scoreboard\/)?([a-z]+)\.png/i.exec(team.logo || "");
   if (nbaAb && NBA_LOGOS.has(nbaAb[1].toLowerCase())) team = Object.assign({}, team, { logo: `img/nba/${nbaAb[1].toLowerCase()}.svg`, ld: null });
   const src = team && (team.ld && !document.documentElement.classList.contains("light") ? team.ld : team.logo);
-  if (src) return `<img class="crest nb" src="${esc(src)}"${team.ld ? ` data-ll="${esc(team.logo)}" data-ld="${esc(team.ld)}"` : ""} alt="" width="${size}" height="${size}" loading="lazy" data-fb="${esc(f)}">`;
+  if (src) return `<img class="crest nb${nbaAb ? " nba" : ""}" src="${esc(src)}"${team.ld ? ` data-ll="${esc(team.logo)}" data-ld="${esc(team.ld)}"` : ""} alt="" width="${size}" height="${size}" loading="lazy" data-fb="${esc(f)}">`;
   return f;
 }
 // si una imagen no carga, se reemplaza por la sigla (escudos) o se oculta (fotos)

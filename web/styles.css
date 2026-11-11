@@ -1613,3 +1613,5 @@ button.ajrow { background: none; color: inherit; font: inherit; border-left: 0; 
 .cref summary::-webkit-details-marker { display: none; }
 .cref summary svg { width: 14px; height: 14px; transition: transform .2s; }
 .cref[open] summary svg { transform: rotate(180deg); }
+/* NBA: escudos oficiales sin recorte circular (algunos son cuadrados o con texto) */
+img.crest.nba { border-radius: 0 !important; background: transparent !important; }
