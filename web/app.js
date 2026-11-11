@@ -60,12 +60,16 @@ function toast(t) {
   clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove("on"), 1800);
 }
 const sigla = (t) => ((t && (t.ab || t.n)) || "?").replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ0-9 ]/g, "").split(" ").filter(Boolean).map((w, i, a) => a.length > 1 ? w[0] : w.slice(0, 3)).join("").slice(0, 3).toUpperCase();
+const NBA_LOGOS = new Set("atl bos bkn cha chi cle dal den det gs hou ind lac lal mem mia mil min no ny okc orl phi phx por sac sa tor utah wsh".split(" "));
 function crest(team, size = 40) {
   const f = `<span class="crest-f" style="width:${size}px;height:${size}px;font-size:${Math.max(9, size / 3.6)}px">${esc(sigla(team))}</span>`;
   // fútbol: si el robot tiene el escudo real de FotMob para ese equipo de ESPN, se usa ese
   const fmId = team && /\/soccer\/500(?:-dark)?\/(?:scoreboard\/)?(\d+)\.png/.exec(team.logo || "");
   const fmLogo = fmId && typeof D !== "undefined" && D && D.escudos && D.escudos[fmId[1]];
   if (fmLogo) team = Object.assign({}, team, { logo: fmLogo, ld: null });
+  // NBA: escudo oficial principal de la liga (vectorial, guardado en img/nba) en vez del de ESPN
+  const nbaAb = team && /\/teamlogos\/nba\/500(?:-dark)?\/(?:scoreboard\/)?([a-z]+)\.png/i.exec(team.logo || "");
+  if (nbaAb && NBA_LOGOS.has(nbaAb[1].toLowerCase())) team = Object.assign({}, team, { logo: `img/nba/${nbaAb[1].toLowerCase()}.svg`, ld: null });
   const src = team && (team.ld && !document.documentElement.classList.contains("light") ? team.ld : team.logo);
   if (src) return `<img class="crest nb" src="${esc(src)}"${team.ld ? ` data-ll="${esc(team.logo)}" data-ld="${esc(team.ld)}"` : ""} alt="" width="${size}" height="${size}" loading="lazy" data-fb="${esc(f)}">`;
   return f;

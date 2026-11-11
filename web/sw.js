@@ -1,6 +1,6 @@
 // CASHBET: guarda la app para abrir rápido; los pronósticos siempre se piden nuevos.
-const V = "cashbet-v72";
-const SHELL = ["./", "index.html", "styles.css?v=72", "app.js?v=72", "pick.js?v=72", "nba.js?v=72", "vistas.js?v=72", "historial.js?v=72", "privacidad.js?v=72", "cuenta.js?v=72", "seguidos.js?v=72", "matchpick.js?v=72", "inicio2.js?v=72", "resultados.js?v=72", "envivo.js?v=72", "futvivo.js?v=72", "bankroll.js?v=72", "previa.js?v=72", "proppick.js?v=72", "errores.js?v=72", "push.js?v=72", "manifest.webmanifest", "icon-192.png"];
+const V = "cashbet-v73";
+const SHELL = ["./", "index.html", "styles.css?v=73", "app.js?v=73", "pick.js?v=73", "nba.js?v=73", "vistas.js?v=73", "historial.js?v=73", "privacidad.js?v=73", "cuenta.js?v=73", "seguidos.js?v=73", "matchpick.js?v=73", "inicio2.js?v=73", "resultados.js?v=73", "envivo.js?v=73", "futvivo.js?v=73", "bankroll.js?v=73", "previa.js?v=73", "proppick.js?v=73", "errores.js?v=73", "push.js?v=73", "manifest.webmanifest", "icon-192.png"];
 self.addEventListener("install", (e) => { e.waitUntil(caches.open(V).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", (e) => {
   e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== V).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
