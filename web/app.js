@@ -114,6 +114,13 @@ async function load() {
   D.propsOk = (D.props || []).filter((x) => new Date(x.at).getTime() > Date.now() && (x.valor >= (D.valor_min || 0.05) || x.p >= 0.55))
     .sort((a, b) => b.valor - a.valor || b.p - a.p);
   D.propsOk.forEach((x) => (x.prueba = !(x.valor >= (D.valor_min || 0.05))));
+  // regla del usuario (opción 2): solo tipos de pick validados o "en prueba" (70 %+ real); los demás
+  // el robot los marca "oculto" (se registran para ganarse la validación, pero no se muestran)
+  D.partidos.forEach((g) => {
+    if (g.pick && g.pick.oculto) g.pick.bajo = true;
+    if (g.extra) { g.extra.picks = g.extra.picks.filter((x) => !x.oculto); g.extra.jug = g.extra.jug.filter((x) => !x.oculto); }
+  });
+  D.propsOk = D.propsOk.filter((x) => !x.oculto);
   route();
   if (typeof avisoPriv === "function") setTimeout(avisoPriv, 600);
 }

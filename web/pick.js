@@ -395,7 +395,7 @@ function pickItems() {
     vistoJ.add(x.pl); porEv[x.ev] = (porEv[x.ev] || 0) + 1;
     it.push({ k: "pr", x, p: x.p, mk: "nbaj", dep: "nba", eq: 0, val: x.prueba ? null : x.valor, casa: x.cuota, prueba: x.prueba });
   });
-  it.forEach((e) => { e.gid = e.g ? e.g.id : e.x.ev; e.pr = pruebaDe(e); });
+  it.forEach((e) => { e.gid = e.g ? e.g.id : e.x.ev; e.pr = pruebaDe(e); e.vl = e.k === "g" ? e.g.pick.val : e.x.val; });
   return it;
 }
 // acierto en la prueba del tipo de pick (para desempatar picks con el mismo %)
@@ -509,7 +509,7 @@ function pcCard(e) {
     pill = `${up ? "Más" : "Menos"} de ${x.linea} ${x.tipo.toLowerCase()}`; attr = `data-pr="${D.props.indexOf(x)}"`; cuota = x.cuota; liga = "NBA";
   }
   return `<button class="pcard ${jug || pan ? "jg" : ""}" ${attr}>${img}<div class="pcm"><div class="pcl">${jug ? lab : esc(lab)}</div><div class="pct">${esc(tit)}</div><div class="pcs">${esc(sub)}</div>
-    <span class="pcpill ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(pill)}</span></span></div>
+    <span class="pcpill ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(pill)}</span></span>${e.vl ? `<div class="pcv ${e.vl.e}">${e.vl.e === "validado" ? "Validado" : "En prueba"} · ${String(e.vl.ac).replace(".", ",")} % en ${e.vl.n} picks</div>` : ""}</div>
     <div class="pcr"><span class="pcp"><i></i>${pct(e.p)}</span></div>
     <div class="pcb">${e.val != null ? `<span class="pcval">+${Math.round(e.val * 100)}%</span><span class="pcc">${odd(e.casa)}</span>` : e.prueba ? `<span class="pcc" title="Cuota de la casa (en prueba)">${odd(e.casa)}</span>` : `<span class="pcc" title="Vale la pena desde esta cuota">${odd(e.min || cuota)}</span>`}</div></button>`;
 }

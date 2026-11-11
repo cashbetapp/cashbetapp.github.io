@@ -12,6 +12,7 @@ from scipy.stats import norm
 from sklearn.linear_model import LogisticRegression
 from fetch import get, LEAGUES
 from extra import predict as extra_predict, outcome as extra_outcome
+from evaluar import mercado
 from model import (DATA, SOCCER, Poi, load, soccer_markets, nba_teams, is_preseason,
                    nba_walk, STATS, stat_val)
 
@@ -1001,6 +1002,28 @@ def liga_logos():
     return out
 
 
+def validacion():
+    """data/model/validacion.json (evaluar.py). Sin ese archivo no se puede demostrar nada: None."""
+    try:
+        return json.load(open(os.path.join(DATA, "model", "validacion.json"), encoding="utf-8"))["mercados"]
+    except Exception as e:
+        print("validación: no disponible, no se muestra ningún pick:", e)
+        return None
+
+
+def nivel_validacion(V, nombre):
+    """{"e": "validado"|"prueba", "ac": acierto real 70 %+, "n": picks} o None (no se muestra)."""
+    b = (V or {}).get(nombre)
+    if not b:
+        return None
+    m = b["p70"]
+    if b["estado"] == "validado":
+        return {"e": "validado", "ac": m["acierto"], "n": m["n"]}
+    if b["estado"].startswith("en camino"):
+        return {"e": "prueba", "ac": m["acierto"], "n": m["n"]}
+    return None
+
+
 def main():
     pesos()
     r = rep()
@@ -1021,6 +1044,7 @@ def main():
     nb, injured = nba(par["nba"])
     pr = props(injured)
     nba_ok = nba_probada()
+    V = validacion()
     # solo picks de 70 %+ (y la NBA solo si ya lo demostró); lo demás no entra a listas ni al registro
     pr = [x for x in pr if nba_ok and PMIN <= x["p"]]
     try:
@@ -1036,6 +1060,27 @@ def main():
             g["pick"]["bajo"] = True
             if g.get("extra"):
                 g["extra"]["picks"] = []
+    # regla del usuario (2026-11-11, opción 2): solo se MUESTRAN los tipos de pick validados o "en prueba"
+    # (70 %+ real sin prueba completa). Los demás se marcan "oculto": se siguen anotando en el registro
+    # sellado para que puedan ganarse la validación, pero la app no los muestra.
+    ocultos = 0
+    for g in f + nb:
+        pk = g["pick"]
+        if not pk.get("bajo"):
+            v = nivel_validacion(V, mercado("partidos", {"m": pk["m"], "dep": g["dep"]}))
+            pk.update({"val": v} if v else {"oculto": True})
+            ocultos += not v
+        x = g.get("extra")
+        if x:
+            for q in x.get("picks", []) + x.get("jug", []):
+                v = nivel_validacion(V, mercado("extra", q))
+                q.update({"val": v} if v else {"oculto": True})
+                ocultos += not v
+    for q in pr:
+        v = nivel_validacion(V, mercado("props", q))
+        q.update({"val": v} if v else {"oculto": True})
+        ocultos += not v
+    print(f"validación: {ocultos} picks ocultos (se registran, no se muestran)")
     for g in f + nb:
         if g["pick"].get("p", 0) >= TOP and not g["pick"].get("bajo"):
             g["pick"]["top"] = True
