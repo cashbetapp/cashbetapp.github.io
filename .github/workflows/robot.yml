@@ -70,7 +70,7 @@ jobs:
 
       - name: Validación del objetivo 70 % (solo lee el registro; decide qué tipos de pick se muestran)
         working-directory: robot
-        run: python evaluar.py || echo "evaluar falló: sin validación no se muestra ningún pick"
+        run: python evaluar.py || echo "evaluar falló; sin validación no se muestra ningún pick"
 
       - name: Pronósticos
         working-directory: robot
