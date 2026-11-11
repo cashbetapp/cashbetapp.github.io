@@ -1617,3 +1617,51 @@ button.ajrow { background: none; color: inherit; font: inherit; border-left: 0; 
 img.crest.nba { border-radius: 0 !important; background: transparent !important; }
 .pcv { font-size: 11px; font-weight: 700; color: var(--tx2); margin-top: 6px; letter-spacing: .2px; }
 .pcv.validado { color: var(--g); }
+
+/* ---- Odds Intelligence (panel de cuotas) ---- */
+.oiban { display: flex; align-items: center; gap: 12px; width: 100%; margin-top: 10px; padding: 11px 12px 11px 14px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); text-align: left; color: var(--tx); }
+.oiban > svg:first-child { width: 20px; height: 20px; color: var(--g); background: var(--gsoft); padding: 7px; border-radius: 10px; box-sizing: content-box; flex: none; }
+.oiban > svg:last-child { width: 16px; height: 16px; color: var(--tx3); flex: none; }
+.oiban div { flex: 1; min-width: 0; } .oiban b { display: block; font-size: 14px; } .oiban span { font-size: 12.5px; color: var(--tx2); }
+.oisalud { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px; font-size: 12.5px; color: var(--tx2); }
+.oisalud span:first-child { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: var(--tx); }
+.oisalud i { width: 8px; height: 8px; border-radius: 50%; background: var(--g); display: inline-block; }
+.oisalud.mal i { background: var(--bad); }
+.oiaviso { display: flex; gap: 8px; align-items: flex-start; margin-top: 10px; padding: 9px 11px; border-radius: 12px; background: var(--badsoft); color: var(--tx); font-size: 12.5px; }
+.oiaviso svg { width: 15px; height: 15px; flex: none; color: var(--bad); margin-top: 1px; }
+.oiaviso.chico { margin-top: 8px; padding: 7px 9px; }
+.oinota { margin-top: 8px; font-size: 12px; color: var(--tx3); }
+.oitabs { display: grid; grid-template-columns: repeat(4, auto); margin-top: 14px; max-width: 100%; }
+.oitabs button { white-space: nowrap; padding: 6px 8px; font-size: 12.5px; }
+.oiregla { margin: 4px 2px 12px; }
+.oicard { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 13px 14px; margin-top: 10px; box-shadow: var(--shadow); min-width: 0; }
+.oicard.gris { opacity: .8; }
+.oitop { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; color: var(--tx2); }
+.oiest { font-size: 11px; font-weight: 800; padding: 4px 9px; border-radius: 99px; white-space: nowrap; background: var(--chip); color: var(--tx2); }
+.oiest.ok { background: var(--gsoft); color: var(--gtx); }
+.oiest.obs { background: rgba(240,138,28,.14); color: #f08a1c; }
+.oiest.mal, .oiest.susp { background: var(--badsoft); color: var(--bad); }
+.oipt { font-weight: 800; font-size: 15px; margin-top: 6px; }
+.oimk { font-size: 13.5px; color: var(--tx2); margin-top: 2px; }
+.oinum { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 11px; }
+.oinum span { min-width: 0; } .oinum small { display: block; font-size: 10.5px; color: var(--tx3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.oinum b { font-size: 16px; font-weight: 800; } .oinum b.g { color: var(--gtx); } .oinum em { display: block; font-style: normal; font-size: 10.5px; color: var(--tx3); }
+.oimeta { font-size: 12px; color: var(--tx2); margin-top: 9px; }
+.oimot { font-size: 12.5px; color: var(--tx2); margin: 6px 0 0; }
+.oitab { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+.oitab th { text-align: right; font-size: 11px; color: var(--tx3); font-weight: 700; padding: 4px 4px; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.oitab th:first-child, .oitab td:first-child { text-align: left; }
+.oitab td { text-align: right; padding: 6px 4px; border-top: 1px solid var(--line); }
+.oitab td:first-child { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.oitab tr.justa td { color: var(--tx2); font-weight: 700; }
+.oitab td.best { color: var(--gtx); font-weight: 800; }
+.oimas { margin: 10px 0 6px; }
+.oihis { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 2px; border-bottom: 1px solid var(--line); }
+.oihis div { min-width: 0; } .oihis b { display: block; font-size: 14px; } .oihis span { display: block; font-size: 12px; color: var(--tx2); }
+.oihis > .oiest { flex: none; }
+.oigraf { width: 100%; height: 130px; display: block; }
+.oigraf polyline { fill: none; stroke-width: 2.2; vector-effect: non-scaling-stroke; }
+.oigraf polyline.pos { stroke: var(--g); } .oigraf polyline.neg { stroke: var(--bad); }
+.oigraf .cero { stroke: var(--line); stroke-dasharray: 4 4; vector-effect: non-scaling-stroke; }
+.oieje { display: flex; justify-content: space-between; gap: 8px; margin-top: 4px; white-space: nowrap; }
+@media (max-width: 440px) { .oinum { grid-template-columns: repeat(2, 1fr); row-gap: 10px; } }

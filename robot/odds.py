@@ -427,6 +427,58 @@ def registrar(reg, eventos, t):
             r["desaparece"] = iso(t)
 
 
+def calificar(reg, t):
+    """Resultado de cada oportunidad con el marcador final de ESPN (resultados.json). Una sola vez."""
+    res = leer(os.path.join(DATA, "resultados.json"), {})
+    for r in reg.values():
+        if r.get("res") or fecha(r["at"]) > t:
+            continue
+        x = res.get(r.get("espn") or "")
+        if not x or x.get("st") != "post":
+            continue
+        try:
+            hs, as_ = int(x["h"]["s"]), int(x["a"]["s"])
+        except Exception:
+            continue
+        m = r["mercado"]
+        if m in ("1", "X", "2"):
+            gana = {"1": hs > as_, "X": hs == as_, "2": hs < as_}[m]
+        else:
+            lado, linea = m.split("_")
+            tot = hs + as_
+            if tot == float(linea):
+                r["res"], r["marcador"] = "nula", f"{hs}-{as_}"
+                continue
+            gana = (tot > float(linea)) == (lado == "mas")
+        r["res"], r["marcador"] = ("ganada" if gana else "perdida"), f"{hs}-{as_}"
+
+
+def rendimiento(reg):
+    """Indicadores del panel, calculados aquí (nunca en la app): acierto, unidades, yield, CLV y la
+    curva de unidades acumuladas (1 unidad por oportunidad, a la cuota detectada)."""
+    xs = sorted((r for r in reg.values() if r.get("res") in ("ganada", "perdida")), key=lambda r: r["at"])
+    out = {"n": len(xs), "pendientes": sum(1 for r in reg.values() if not r.get("res"))}
+    if xs:
+        u, serie = 0.0, []
+        for r in xs:
+            u += (r["cuota"] - 1) if r["res"] == "ganada" else -1
+            serie.append([r["at"][:10], round(u, 2)])
+        g = sum(1 for r in xs if r["res"] == "ganada")
+        out.update({"ganadas": g, "perdidas": len(xs) - g, "acierto": round(100 * g / len(xs), 1),
+                    "unidades": round(u, 2), "yield": round(100 * u / len(xs), 1),
+                    "prob_media_mercado": round(100 * sum(r["p_mercado"] for r in xs) / len(xs), 1),
+                    "serie": serie[-200:]})
+    clv = [r["clv"] for r in xs if r.get("clv") is not None]
+    out["clv"] = {"n": len(clv), "medio": round(100 * sum(clv) / len(clv), 2) if clv else None}
+    por = {}
+    for r in xs:
+        q = por.setdefault(r["estado"], {"n": 0, "ganadas": 0, "unidades": 0.0})
+        q["n"] += 1; q["ganadas"] += r["res"] == "ganada"
+        q["unidades"] = round(q["unidades"] + ((r["cuota"] - 1) if r["res"] == "ganada" else -1), 2)
+    out["por_estado"] = por
+    return out
+
+
 def valor_probado(reg):
     cerradas = [r["clv"] for r in reg.values() if r.get("clv") is not None and fecha(r["at"]) <= ahora()]
     n = len(cerradas)
@@ -446,7 +498,8 @@ def main():
 
     if not KEY:
         print("odds: falta el secreto ODDS_API_KEY; no se consulta nada")
-        guardar(OUT, {**previo, **base, "estado": "sin clave", "eventos": previo.get("eventos", [])})
+        guardar(OUT, {**previo, **base, "estado": "sin clave", "errores": ["falta la clave de The Odds API"],
+                      "salud": {"api": "falla", "en_vivo": False}, "eventos": []})
         return
 
     cupo, hoy = presupuesto(uso, t)
@@ -515,6 +568,7 @@ def main():
                     m["estado"] = "valor"
     registrar(reg, eventos, t)
     vigilar(eventos, viejos, t)
+    calificar(reg, t)
     # cierre del mercado por partido de CASHBET (para medir el CLV de los picks en evaluar.py):
     # se pisa en cada consulta hecha antes del partido, así queda la última antes de empezar
     for e in eventos:
@@ -523,9 +577,9 @@ def main():
                 if m["p_mercado"] is not None:
                     cierre[f"{e['id']}|{m['mercado']}"] = {"p": m["p_mercado"], "t": iso(t), "at": e["at"]}
 
-    # limpiar memoria vieja (más de 10 días)
+    # limpiar memoria vieja: series de 10 días; el registro de oportunidades se guarda 180 días (historial)
     corte = t - dt.timedelta(days=10)
-    reg = {k: r for k, r in reg.items() if fecha(r["at"]) > corte}
+    reg = {k: r for k, r in reg.items() if fecha(r["at"]) > t - dt.timedelta(days=180)}
     cierre = {k: c for k, c in cierre.items() if fecha(c["at"]) > t - dt.timedelta(days=60)}
     vivos = {e["oid"] for e in eventos}
     hist = {k: v for k, v in hist.items() if k.split("|")[0] in vivos or fecha(v[-1][0]) > corte}
@@ -541,7 +595,10 @@ def main():
     salida = {**base, "estado": "con errores" if errores else "ok", "errores": errores, "salud": salud,
               "consultadas": pedidas, "creditos_restantes": uso.get("restantes"), "cerrados": cerrados(viejos, t),
               "valor": {"probado": ok, "n": n_cerradas, "clv_medio": clv_medio, "minimo": VALOR_MIN_N},
-              "resumen": cuenta, "eventos": sorted(eventos, key=lambda e: e["at"])}
+              "resumen": cuenta, "eventos": sorted(eventos, key=lambda e: e["at"]),
+              "rendimiento": rendimiento(reg),
+              # historial completo (ganadas, perdidas, nulas y pendientes), lo más reciente primero
+              "historial": sorted(reg.values(), key=lambda r: (r["at"], r["aparece"]), reverse=True)[:300]}
     guardar(OUT, salida)
     guardar(os.path.join(DIR, "uso.json"), uso)
     guardar(os.path.join(DIR, "hist.json"), hist)

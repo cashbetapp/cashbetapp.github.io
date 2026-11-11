@@ -144,7 +144,7 @@ jobs:
           cp -r web/* _site/
           rm -rf _site/data/*
           cp data/picks.json _site/data/
-          cp data/estados.json data/sello.json data/noticias.json data/resultados.json data/previa.json _site/data/ 2>/dev/null || true
+          cp data/estados.json data/sello.json data/noticias.json data/resultados.json data/previa.json data/odds.json _site/data/ 2>/dev/null || true
           cp -r data/img _site/data/ 2>/dev/null || true
           touch _site/.nojekyll
 
