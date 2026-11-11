@@ -1,0 +1,52 @@
+name: Reloj del robot
+
+# GitHub casi no respeta el horario "cron" en este repositorio (el 11-nov solo lo lanzó 2 veces en el día).
+# Este reloj espera hasta el minuto 17 de la siguiente hora, lanza el robot y se vuelve a lanzar a sí mismo.
+# Solo puede haber un reloj esperando (grupo "reloj"); el cron de abajo lo revive si alguna vez se cae.
+# Para apagarlo: Actions > Reloj del robot > "..." > Disable workflow.
+
+on:
+  workflow_dispatch:
+  push:                        # al publicar este archivo, el reloj arranca solo
+    branches: [main]
+    paths: [".github/workflows/reloj.yml"]
+  schedule:
+    - cron: "47 */3 * * *"   # respaldo: revive el reloj si se detuvo
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: reloj
+  cancel-in-progress: false
+
+jobs:
+  reloj:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - name: Esperar hasta el minuto 17 de la siguiente hora
+        run: |
+          ahora=$(date -u +%s)
+          prox=$(( (ahora / 3600) * 3600 + 17 * 60 ))
+          [ "$prox" -le $(( ahora + 60 )) ] && prox=$(( prox + 3600 ))
+          echo "Esperando $(( (prox - ahora) / 60 )) minutos"
+          sleep $(( prox - ahora ))
+
+      - name: Lanzar el robot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          curl -fsS -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/robot.yml/dispatches" \
+            -d '{"ref":"main"}' && echo "robot lanzado"
+
+      - name: Volver a programar el reloj
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          curl -fsS -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/reloj.yml/dispatches" \
+            -d '{"ref":"main"}' && echo "reloj reprogramado"
