@@ -76,12 +76,6 @@ jobs:
         working-directory: robot
         run: python predict.py
 
-      - name: Odds Intelligence (comparar casas con The Odds API; respeta el límite de créditos del mes)
-        working-directory: robot
-        env:
-          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
-        run: python odds.py || echo "odds falló, se sigue"
-
       - name: Noticias (ESPN en español)
         working-directory: robot
         run: python noticias.py || echo "noticias falló, se sigue"
@@ -93,6 +87,12 @@ jobs:
       - name: Previa (récords, estadísticas, líderes, rotación)
         working-directory: robot
         run: python previa.py || echo "previa falló, se sigue"
+
+      - name: Odds Intelligence (comparar casas con The Odds API; respeta el límite de créditos del mes; lee bajas y resultados)
+        working-directory: robot
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+        run: python odds.py || echo "odds falló, se sigue"
 
       - name: Notificaciones push (picks del día, errores de cuota, resultados de seguidos)
         working-directory: robot

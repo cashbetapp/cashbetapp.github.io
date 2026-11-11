@@ -44,6 +44,7 @@ UMBRAL_EV = 0.02                  # +2 % sobre el precio justo para considerarla
 UMBRAL_MOV = 0.05                 # 5 puntos de probabilidad = movimiento fuerte
 VIEJA_MIN = 45                    # cuota con más de 45 min de atraso frente a la referencia
 VALOR_MIN_N = 100                 # oportunidades cerradas necesarias para hablar de "valor"
+ANTIGUO_H = 6                     # datos de más de 6 h: se marcan como antiguos (nunca se presentan como actuales)
 REF = "pinnacle"
 ARB_MIN = 0.005                   # arbitraje de menos de 0.5 % no se cuenta
 # bolsas de apuestas: su cuota se paga con comisión sobre la ganancia, así que no se comparan
@@ -275,6 +276,7 @@ def analizar(ev, lg, liga, g, hist, t):
             # estado
             if ref is None:
                 item["estado"], item["motivo"] = "descartada", f"datos insuficientes: {n} casas con el mercado completo y sin Pinnacle"
+                item["confianza"] = "baja"
             else:
                 p = ref[r]
                 item["p_mercado"] = round(p, 4)
@@ -288,6 +290,11 @@ def analizar(ev, lg, liga, g, hist, t):
                 del serie[:-24]
                 if len(serie) >= 2:
                     item["mov"] = round(serie[-1][1] - serie[0][1], 4)
+                    salto = serie[-1][1] - serie[-2][1]
+                    if abs(salto) >= UMBRAL_MOV:   # cambio brusco entre dos consultas seguidas
+                        item["brusco"] = {"puntos": round(100 * salto, 1), "desde": serie[-2][0]}
+                # confianza: referencia Pinnacle con muchas casas = alta; mediana o pocas casas = media
+                item["confianza"] = "alta" if ref_nom.startswith("Pinnacle") and n >= 10 else "media"
                 # cuota posiblemente desactualizada (la casa no se movió cuando la referencia sí)
                 if ref_hora and chora and ck != REF:
                     atraso = (ref_hora - fecha(chora)).total_seconds() / 60
@@ -303,8 +310,86 @@ def analizar(ev, lg, liga, g, hist, t):
                         item["motivo"] += "; su cuota no se actualizó cuando el mercado se movió"
                 else:
                     item["estado"], item["motivo"] = "normal", "en línea con el mercado"
+                if item.get("brusco"):
+                    item["motivo"] += f"; cambio brusco de {item['brusco']['puntos']:+} puntos de probabilidad desde la consulta anterior"
             salida.append(item)
     return salida
+
+
+# ---------------------------------------------------------------- vigilancia (suspensiones, noticias, partidos empezados)
+BAJA = ("out", "doubtful", "fuera", "duda", "injured", "lesionado", "suspended", "suspendido", "day-to-day")
+
+
+def bajas_de(previa, gid):
+    """Jugadores con estado de lesión/suspensión según ESPN (previa.json; solo la NBA trae rotación)."""
+    out = {}
+    for lado, pos in ((previa.get(gid) or {}).get("rot") or {}).items():
+        vistos = {}
+        for p in pos:
+            for j in p.get("js", []):
+                if j.get("st") and any(b in j["st"].lower() for b in BAJA):
+                    vistos[j["n"]] = j["st"]
+        if vistos:
+            out[lado] = [[n, st] for n, st in vistos.items()]
+    return out
+
+
+def vigilar(eventos, viejos, t):
+    """Compara con la consulta anterior: mercados que desaparecen, casas que retiran la cuota,
+    nuevas bajas posteriores a la cuota y edad de los datos."""
+    previa = leer(os.path.join(DATA, "previa.json"), {})
+    for e in eventos:
+        fresco = e.get("actualizado") == iso(t)
+        v = viejos.get(e["oid"])
+        e["edad_min"] = int((t - fecha(e["actualizado"])).total_seconds() // 60)
+        e["antiguo"] = e["edad_min"] >= ANTIGUO_H * 60
+        avisos = []
+        if fresco and v and v.get("actualizado") != e["actualizado"]:
+            nuevos = {m["mercado"]: m for m in e["mercados"]}
+            for m in v.get("mercados", []):
+                # solo ganador (las líneas de totales cambian de número y eso no es una suspensión)
+                if m["mercado"] not in ("1", "X", "2") or m.get("estado") == "suspendido":
+                    continue
+                if m["mercado"] not in nuevos:
+                    e["mercados"].append(dict(m, estado="suspendido", motivo="ninguna casa ofrece ya este mercado (suspendido o retirado)",
+                                              cuotas=[], arbitraje=None, brusco=None, confianza="baja"))
+                    avisos.append(f"Mercado suspendido: {m['txt']}")
+                else:
+                    antes = {c[0] for c in m.get("cuotas", [])}
+                    ahora_ = {c[0] for c in nuevos[m["mercado"]]["cuotas"]}
+                    fuera = sorted(antes - ahora_)
+                    if fuera:
+                        nuevos[m["mercado"]]["retiradas"] = fuera
+        if e.get("id"):
+            b = bajas_de(previa, e["id"])
+            if b:
+                e["bajas"] = b
+                antes = {n for lado in (v or {}).get("bajas", {}).values() for n, _ in lado}
+                for lado in b.values():
+                    for n, st in lado:
+                        if v and n not in antes:
+                            avisos.append(f"Nueva baja: {n} ({st}). " + ("Las cuotas son de esta consulta." if fresco
+                                          else f"Las cuotas guardadas son de hace {e['edad_min'] // 60} h y quizá no la reflejan."))
+        if e["antiguo"]:
+            avisos.append(f"Datos de hace {e['edad_min'] // 60} h: no son cuotas actuales.")
+        e["avisos"] = avisos
+
+
+def cerrados(viejos, t):
+    """Partidos que ya empezaron: sus cuotas pre-partido dejan de valer. No se siguen cuotas en vivo
+    (el plan gratis no alcanza); se informa lo que pasó en el partido según ESPN."""
+    res = leer(os.path.join(DATA, "resultados.json"), {})
+    out = []
+    for e in viejos.values():
+        empieza = fecha(e["at"])
+        if not (t - dt.timedelta(hours=4) < empieza <= t):
+            continue
+        r = res.get(e.get("id") or "", {})
+        ev = [{"t": x["t"], "min": x.get("min"), "s": x.get("s"), "j": x.get("j")} for x in r.get("ev", []) if x.get("t") in ("gol", "autogol", "penal", "roja")]
+        out.append({"oid": e["oid"], "id": e.get("id"), "liga": e["liga"], "at": e["at"], "local": e["local"], "visita": e["visita"],
+                    "estado_partido": r.get("st"), "marcador": [r.get("h", {}).get("s"), r.get("a", {}).get("s")] if r else None,
+                    "eventos": ev, "motivo": "empezó el partido: las cuotas pre-partido ya no valen; no se siguen cuotas en vivo"})
+    return out
 
 
 # ---------------------------------------------------------------- registro de oportunidades
@@ -366,7 +451,7 @@ def main():
 
     cupo, hoy = presupuesto(uso, t)
     ultimos = uso.setdefault("ligas", {})
-    eventos, errores, pedidas = [], [], []
+    eventos, errores, pedidas, sin_cupo = [], [], [], []
     partidos = partidos_cashbet()
     viejos = {e["oid"]: e for e in previo.get("eventos", [])}
 
@@ -375,13 +460,19 @@ def main():
         lista, info = pedir(f"/sports/{sk}/events", dateFormat="iso")
         if lista is None:
             errores.append(f"{liga}: {info}")
+            for e in viejos.values():   # se conserva lo anterior, marcado con su hora real
+                if e["lg"] == lg and fecha(e["at"]) > t:
+                    eventos.append(e)
             continue
+        uso["ultima_ok"] = iso(t)
         pronto = [e for e in lista if t < fecha(e["commence_time"]) <= t + dt.timedelta(hours=VENTANA_H)]
         if not pronto:
             continue
         ult = fecha(ultimos.get(sk)) if ultimos.get(sk) else None
         hay_cierre = any(PREVIA_MIN[0] <= (fecha(e["commence_time"]) - t).total_seconds() / 60 <= PREVIA_MIN[1] for e in pronto)
         toca = os.environ.get("ODDS_FORZAR") == "1" or ult is None or (t - ult) >= dt.timedelta(hours=CADA_H) or (hay_cierre and (t - ult) >= dt.timedelta(hours=2))
+        if toca and cupo < COSTE:
+            sin_cupo.append(liga)
         if not toca or cupo < COSTE:
             # se conservan los datos anteriores de esta liga, marcados con su hora real
             for e in viejos.values():
@@ -423,6 +514,7 @@ def main():
                 if m["estado"] == "desajustada" and (m["ev_modelo"] or -1) >= UMBRAL_EV:
                     m["estado"] = "valor"
     registrar(reg, eventos, t)
+    vigilar(eventos, viejos, t)
     # cierre del mercado por partido de CASHBET (para medir el CLV de los picks en evaluar.py):
     # se pisa en cada consulta hecha antes del partido, así queda la última antes de empezar
     for e in eventos:
@@ -442,8 +534,12 @@ def main():
     for e in eventos:
         for m in e["mercados"]:
             cuenta[m["estado"]] = cuenta.get(m["estado"], 0) + 1
-    salida = {**base, "estado": "con errores" if errores else "ok", "errores": errores,
-              "consultadas": pedidas, "creditos_restantes": uso.get("restantes"),
+    salud = {"api": "ok" if uso.get("ultima_ok") == iso(t) else "falla",
+             "ultima_consulta_ok": uso.get("ultima_ok"), "sin_creditos_hoy": sin_cupo,
+             "frecuencia": f"cada {CADA_H} h por liga (y una más 30-150 min antes de cada partido), según los créditos del plan gratis",
+             "en_vivo": False}
+    salida = {**base, "estado": "con errores" if errores else "ok", "errores": errores, "salud": salud,
+              "consultadas": pedidas, "creditos_restantes": uso.get("restantes"), "cerrados": cerrados(viejos, t),
               "valor": {"probado": ok, "n": n_cerradas, "clv_medio": clv_medio, "minimo": VALOR_MIN_N},
               "resumen": cuenta, "eventos": sorted(eventos, key=lambda e: e["at"])}
     guardar(OUT, salida)
