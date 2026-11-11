@@ -408,7 +408,8 @@ function pruebaDe(e) {
   return b ? b.paso : 0;
 }
 // primero los ERRORES DE CUOTA (más valor primero); después los de mayor probabilidad
-const ordenar = (xs) => xs.sort((a, b) => (b.val != null) - (a.val != null) || (b.val || 0) - (a.val || 0) || b.p - a.p || b.pr - a.pr);
+// pedido del usuario 2026-11-11: los de 74 %+ (máxima confianza) van primero
+const ordenar = (xs) => xs.sort((a, b) => (b.p >= 0.74) - (a.p >= 0.74) || (b.val != null) - (a.val != null) || (b.val || 0) - (a.val || 0) || b.p - a.p || b.pr - a.pr);
 // cuota mínima para que valga la pena cuando no tenemos la cuota de la casa
 const vale = (justa) => Math.round(justa * (D.margen || 1.05) * 100) / 100;
 const valorCasa = (e) => e.val || 0;

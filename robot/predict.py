@@ -26,7 +26,11 @@ MERCADOS_SIMPLES = {"cor", "tar"}
 # valor = probabilidad x cuota de la casa - 1   (ej. 70 % x 1.60 - 1 = +12 %)
 VALOR_MIN = 0.05            # solo se marca "error de la casa" con +5 % o más
 MARGEN = 1.05               # sin cuota de la casa: vale la pena si paga 5 % más que la justa
-PMIN, PMAX = 0.55, 0.75     # picks por probabilidad (sin cuota de casa): ni dudosos ni regalados
+# pedido del usuario 2026-11-11 ("solo picks muy probables"): medido en 1.671 picks jugados,
+# 55-65 % acertaba 53-63 % y 70 %+ acertaba 75 % (fútbol). Solo se publica desde 70 %.
+PMIN, PMAX = 0.70, 0.85     # picks por probabilidad (sin cuota de casa)
+TOP = 0.74                  # 74 %+ = "máxima confianza": van primero en las listas
+NBA_MIN_N, NBA_MIN_AC = 30, 0.70   # la NBA vuelve a las listas cuando sus picks de 70 %+ acierten 70 %+ en 30 o más
 CUOTA_MIN = round(1 / PMAX, 2)
 # peso del modelo frente a la casa (se ajusta solo con los resultados reales, ver pesos())
 PESO = {"futbol": 0.5, "nba": 0.5, "props": 0.3}
@@ -60,7 +64,7 @@ def elegir(sels, prefer=None):
        que sí tenemos paga menos de lo que vale -> no se recomienda); se muestra la
        cuota mínima para que valga la pena en la casa de cada persona."""
     val = [s for s in sels if s.get("valor") is not None and s["valor"] >= VALOR_MIN
-           and s["pv"] >= 0.40 and 1.40 <= s["cuota"] <= 4.0]
+           and s["pv"] >= PMIN and 1.40 <= s["cuota"] <= 4.0]
     if val:
         return dict(max(val, key=lambda s: s["valor"]), tipo="valor")
     apt = [s for s in sels if PMIN <= s["p"] <= PMAX and not s.get("cuota")]
@@ -75,6 +79,22 @@ def elegir(sels, prefer=None):
     # nada sirve (favorito regalado, partido muy parejo o la casa ya paga lo justo):
     # se muestra el más probable marcado "bajo"; no entra a las listas ni a la libreta
     return dict(max(sels, key=lambda s: s["p"]), bajo=True)
+
+
+def nba_probada():
+    """La NBA solo entra a las listas si sus picks de 70 %+ ya calificados acertaron 70 %+
+    (al menos NBA_MIN_N). Hasta el 8-nov iban 54 % en total y 61,5 % con 70 %+."""
+    p = os.path.join(DATA, "ledger.json")
+    if not os.path.exists(p):
+        return False
+    L = json.load(open(p, encoding="utf-8"))
+    xs = [e for c in ("partidos", "props", "extra") for e in L.get(c, {}).values()
+          if e.get("ok") is not None and (e.get("p") or 0) >= PMIN
+          and (c == "props" or e.get("dep") == "nba" or e.get("s") == "pts")]
+    ac = sum(1 for e in xs if e["ok"]) / len(xs) if xs else 0
+    ok = len(xs) >= NBA_MIN_N and ac >= NBA_MIN_AC
+    print(f"NBA 70 %+: {len(xs)} calificados, acierto {100 * ac:.1f} % ->", "en listas" if ok else "fuera de listas")
+    return ok
 
 
 def pesos():
@@ -1000,6 +1020,9 @@ def main():
             g["extra"] = x
     nb, injured = nba(par["nba"])
     pr = props(injured)
+    nba_ok = nba_probada()
+    # solo picks de 70 %+ (y la NBA solo si ya lo demostró); lo demás no entra a listas ni al registro
+    pr = [x for x in pr if nba_ok and PMIN <= x["p"]]
     try:
         import nbaextra
         nbaextra.completar(nb, globals().get("NBA_ROWS") or [])       # puntos de equipo, defensa del rival, líderes, bajas
@@ -1008,7 +1031,19 @@ def main():
     import lineas
     lineas.movimiento(f + nb)        # primera y última cuota vista de cada partido
     tab = form_table()
+    for g in nb:
+        if not nba_ok:
+            g["pick"]["bajo"] = True
+            if g.get("extra"):
+                g["extra"]["picks"] = []
     for g in f + nb:
+        if g["pick"].get("p", 0) >= TOP and not g["pick"].get("bajo"):
+            g["pick"]["top"] = True
+        x = g.get("extra")
+        if x:
+            for q in x.get("picks", []) + x.get("jug", []):
+                if q.get("p", 0) >= TOP:
+                    q["top"] = True
         g["pick"]["txt"] = pick_name(g["pick"]["m"], g)
         for s in g["mercados"]:
             s["txt"] = pick_name(s["m"], g)
@@ -1038,7 +1073,7 @@ def main():
             "extra": {k: {"titulo": v["titulo"], "picks": v["picks"], "acierto": v["acierto_picks"],
                           "dijo": v["dijo_picks"], "publicar": v["publicar"]} for k, v in xrep["mercados"].items()},
         },
-        "cuota_min": CUOTA_MIN, "valor_min": VALOR_MIN, "margen": MARGEN, "peso": PESO,
+        "cuota_min": CUOTA_MIN, "valor_min": VALOR_MIN, "pmin": PMIN, "top": TOP, "nba_ok": nba_ok, "margen": MARGEN, "peso": PESO,
         "registro": rec,
         "ligas": liga_logos(),
         "partidos": sorted(f + nb, key=lambda x: x["at"]),

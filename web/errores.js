@@ -2,7 +2,8 @@
 // Ejemplo: el modelo dice 70 % (cuota justa 1.43) y la casa paga 1.60 -> error de +12 %.
 // Para no engañarnos, la probabilidad se corrige con lo que el modelo ACERTÓ de verdad en ese mercado
 // (registro sellado). Si en el historial acertó menos de lo que decía, se baja; nunca se sube.
-const ERR_PMIN = 0.6, ERR_MIN = 0.05;
+const ERR_PMIN = 0.70,   // pedido del usuario 2026-11-11: solo picks de 70 %+
+      ERR_MIN = 0.05;
 ui.errDep = "todos";
 
 const mkGrupo = (g, m) => g.dep === "nba"
@@ -56,7 +57,7 @@ function erroresCuota() {
   const out = [], ahora = Date.now(), lim = ahora + 36 * 3600e3;
   const vigente = (at) => { const t = new Date(at).getTime(); return t > ahora && t < lim; };
   for (const g of D.partidos || []) {
-    if (!vigente(g.at)) continue;
+    if (!vigente(g.at) || (g.dep === "nba" && D.nba_ok === false)) continue;
     for (const x of g.mercados || []) {
       if (!x.cuota || !x.p) continue;
       const r = pReal(x.p, mkGrupo(g, x.m)), err = r.p * x.cuota - 1;

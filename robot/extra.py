@@ -26,8 +26,8 @@ LE = {"cor": [2.5, 3.5, 4.5, 5.5, 6.5], "sot": [1.5, 2.5, 3.5, 4.5, 5.5], "tir":
 # jugadores: estadística -> (campo en el box score, líneas)
 PJ = {"sot": ("shotsOnTarget", [0.5, 1.5]), "tir": ("totalShots", [0.5, 1.5, 2.5]),
       "fal": ("foulsCommitted", [0.5, 1.5]), "tar": ("yellowCards", [0.5])}
-MAXP = 0.75                 # pick por probabilidad entre 55 % y 75 % (sin cuota de casa:
-PMIN = 0.55                 # la app muestra "vale la pena si tu casa paga más de X")
+MAXP = 0.85                 # pick por probabilidad entre 70 % y 85 % (sin cuota de casa:
+PMIN = 0.70                 # la app muestra "vale la pena si tu casa paga más de X")
 CUOTA_MIN = round(1 / MAXP, 2)
 
 
