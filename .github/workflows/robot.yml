@@ -11,13 +11,37 @@ permissions:
   contents: write
   pages: write
   id-token: write
+  actions: write      # para revivir el reloj si se detuvo
 
 concurrency:
   group: robot
   cancel-in-progress: false
 
 jobs:
+  # El reloj (reloj.yml) lanza el robot al minuto 17 de cada hora. Si el cron de GitHub también dispara
+  # (pasa pocas veces), esta guarda evita una segunda corrida seguida: se salta si el robot ya corrió
+  # hace menos de 40 minutos. Las corridas por push o a mano nunca se saltan.
+  guarda:
+    runs-on: ubuntu-latest
+    outputs:
+      correr: ${{ steps.g.outputs.correr }}
+    steps:
+      - id: g
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          correr=1
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            ult=$(curl -fsS --retry 3 -H "Authorization: Bearer $GH_TOKEN"               "https://api.github.com/repos/${{ github.repository }}/actions/workflows/robot.yml/runs?status=success&per_page=1"               | python3 -c "import json,sys;r=json.load(sys.stdin)['workflow_runs'];print(r[0]['run_started_at'] if r else '')" || echo "")
+            if [ -n "$ult" ] && [ $(( $(date -u +%s) - $(date -u -d "$ult" +%s) )) -lt 2400 ]; then
+              correr=0; echo "El robot corrió a las $ult (hace menos de 40 min): se salta esta corrida del cron."
+            fi
+          fi
+          echo "correr=$correr" >> "$GITHUB_OUTPUT"
+
   robot:
+    needs: guarda
+    if: needs.guarda.outputs.correr == '1'
     runs-on: ubuntu-latest
     timeout-minutes: 50
     steps:
@@ -151,6 +175,23 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
+
+      - name: Revivir el reloj si no hay ninguno esperando
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          api="https://api.github.com/repos/${{ github.repository }}/actions/workflows/reloj.yml"
+          vivos=0
+          for st in in_progress queued pending waiting; do
+            n=$(curl -fsS --retry 3 -H "Authorization: Bearer $GH_TOKEN" "$api/runs?status=$st&per_page=1"                 | python3 -c "import json,sys;print(json.load(sys.stdin)['total_count'])" || echo 1)
+            vivos=$(( vivos + n ))
+          done
+          if [ "$vivos" -eq 0 ]; then
+            curl -fsS --retry 5 --retry-all-errors -X POST -H "Authorization: Bearer $GH_TOKEN"               -H "Accept: application/vnd.github+json" "$api/dispatches" -d '{"ref":"main"}' && echo "reloj revivido"
+          else
+            echo "reloj activo ($vivos)"
+          fi
 
   publicar:
     needs: robot
