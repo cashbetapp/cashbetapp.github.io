@@ -1,6 +1,6 @@
 // CASHBET · Notificaciones push reales (llegan con la app cerrada).
 // El celular se suscribe con la llave pública VAPID; la suscripción se guarda en tu cuenta (usuarios/{uid}.push)
-// y el robot (cada 2 h) envía: resumen de picks del día, errores de cuota nuevos y resultados de tus seguidos.
+// y el robot (cada hora) envía: resumen de picks del día, errores de cuota nuevos y resultados de tus seguidos.
 const VAPID_PUB = "BKrTLfpmyS-tz7TVP1JhQwDOAVE07qSGOrHDZQn08ynpOO68zz-o_jg2J0gxN22eXeoUaf-MwV-oCMK8j5EzCkk";
 const PUSH_PREF = [["dia", "Picks del día", "Un resumen por la mañana con los picks de hoy"], ["alta", "Picks de alta confianza", "Solo picks con 70 % o más de probabilidad"],
   ["err", "Errores de cuota", "Cuando el robot encuentra una casa pagando de más"], ["res", "Resultados de tus picks", "Cuando un pick que sigues gana o pierde"],
@@ -45,7 +45,7 @@ function notifAjustes() {
     <div class="ajlist"><button class="ajrow" data-act="pushtog"><div><b>Notificaciones en este celular</b><small>${on ? "Activadas" : "Desactivadas"}</small></div><span class="tog ${on ? "on" : ""}"></span></button></div>
     <div class="ajsec">QUÉ QUIERES RECIBIR</div>
     <div class="ajlist">${PUSH_PREF.map(([k, t, s]) => `<button class="ajrow ${on ? "" : "dis"}" data-act="pushpref" data-k="${k}"><div><b>${t}</b><small>${s}</small></div><span class="tog ${pf[k] ? "on" : ""}"></span></button>`).join("")}</div>
-    <div class="ajnote">El robot revisa cada 2 horas, así que un aviso puede llegar hasta 2 horas después. Puedes desactivarlas cuando quieras.</div>`;
+    <div class="ajnote">El robot revisa cada hora, así que un aviso puede llegar hasta una hora después. Puedes desactivarlas cuando quieras.</div>`;
 }
 function actPush(a, el) {
   if (a === "pushtog") { (pushOn() ? pushDesactivar() : pushActivar()).catch((e) => { toast(/permission|denied/i.test(e.message || "") ? "El navegador no dio permiso. Revisa que las notificaciones de CASHBET estén permitidas" : /cuenta/.test(e.message || "") ? "Inicia sesión para activar las notificaciones" : "No se pudo activar. Intenta de nuevo"); }); return true; }

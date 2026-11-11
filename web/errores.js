@@ -97,7 +97,7 @@ function errores() {
   return header("Errores de cuota", "La casa paga más de lo que debería") + `
     <div class="pkvale v">${ic("bolt")}<span><b>¿Qué es un error de cuota?</b> Cuando un pick pasa ${Math.round(ERR_PMIN * 100)}% o más de las veces y la casa paga más que la cuota justa. Ejemplo: 70% de probabilidad debería pagar 1.43; si la casa paga 1.60, es un error de +12% a tu favor.</span></div>
     <div class="pk5 wide" style="margin-top:12px">${[["todos", "Todos"], ["futbol", "Fútbol"], ["nba", "NBA"]].map(([k, l]) => `<button class="${ui.errDep === k ? "on" : ""}" data-act="errdep" data-k="${k}">${l} (${n(k)})</button>`).join("")}</div>
-    ${xs.length ? xs.map(errFila).join("") : `<div class="sgvac"><span>${ic("bolt")}</span><b>Sin errores de cuota ahora</b><p>Las casas están pagando lo justo en los partidos de las próximas 36 horas. El robot revisa cada 2 horas.</p></div>`}
+    ${xs.length ? xs.map(errFila).join("") : `<div class="sgvac"><span>${ic("bolt")}</span><b>Sin errores de cuota ahora</b><p>Las casas están pagando lo justo en los partidos de las próximas 36 horas. El robot revisa cada hora.</p></div>`}
     <div class="small" style="margin:14px 2px">La probabilidad ya viene corregida con lo que el modelo acertó de verdad en ese mercado (Historial). Si antes se equivocó más de lo que decía, aquí se baja. Los de jugadores NBA siguen <b>en prueba</b>: su historial todavía es corto. Las cuotas cambian: confirma en tu casa antes de apostar. Ningún pick es seguro.</div>`;
 }
 function actErr(a, el) {

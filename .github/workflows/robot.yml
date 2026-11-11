@@ -2,7 +2,7 @@ name: Robot CASHBET
 
 on:
   schedule:
-    - cron: "17 */2 * * *"   # cada 2 horas (solo corre desde la rama por defecto: main)
+    - cron: "17 * * * *"   # cada hora (GitHub a veces se salta turnos; solo corre desde la rama por defecto: main)
   workflow_dispatch:          # botón "Run workflow"
   push:
     branches: [main]
@@ -60,8 +60,13 @@ jobs:
       - name: Prueba de acierto (una vez al día o si falta)
         working-directory: robot
         run: |
-          if [ ! -f ../data/model/report.json ] || [ "$(date -u +%H)" = "08" ]; then python model.py > /dev/null; fi
-          if [ ! -f ../data/model/extra.json ] || [ "$(date -u +%H)" = "08" ] || ! python -c "import json,sys,extra; sys.exit(0 if json.load(open('../data/model/extra.json')).get('cuota_min') == extra.CUOTA_MIN else 1)"; then python -W ignore extra.py; fi
+          # una vez al día: la primera corrida desde las 08 UTC (3 a. m. Colombia) que aún no lo hizo hoy
+          # (antes solo si arrancaba justo a las 08: si GitHub se saltaba ese turno, no se hacía ese día)
+          HOY=$(date -u +%F); NUEVO=0
+          if [ ! -f ../data/model/report.json ]; then NUEVO=1
+          elif [ "$(date -u +%H)" -ge 8 ] && [ "$(python -c "import json; print(json.load(open('../data/model/report.json'))['fecha'])")" != "$HOY" ]; then NUEVO=1; fi
+          if [ "$NUEVO" = 1 ]; then python model.py > /dev/null; fi
+          if [ "$NUEVO" = 1 ] || [ ! -f ../data/model/extra.json ] || ! python -c "import json,sys,extra; sys.exit(0 if json.load(open('../data/model/extra.json')).get('cuota_min') == extra.CUOTA_MIN else 1)"; then python -W ignore extra.py; fi
 
       - name: Pronósticos
         working-directory: robot
