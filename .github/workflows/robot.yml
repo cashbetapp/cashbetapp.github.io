@@ -2,7 +2,7 @@ name: Robot CASHBET
 
 on:
   schedule:
-    - cron: "17 */2 * * *"   # cada 2 horas
+    - cron: "17 */2 * * *"   # cada 2 horas (solo corre desde la rama por defecto: main)
   workflow_dispatch:          # botón "Run workflow"
   push:
     branches: [main]
