@@ -212,11 +212,11 @@ def analizar(ev, lg, liga, g, hist, t):
                 if res and o.get("price") and o["price"] > 1:
                     grupos.setdefault(clave, {}).setdefault(b["key"], {"titulo": b.get("title", b["key"]), "r": {}})["r"][res] = (float(o["price"]), hora)
 
-    # totales: cada casa ofrece líneas distintas; solo se analizan las que tienen Pinnacle o 4+ casas.
+    # totales: cada casa ofrece líneas distintas; solo se analizan las que ofrecen 4+ casas.
     # Si ninguna llega, se deja la más ofrecida (saldrá como descartada por datos insuficientes).
     tot = {c: v for c, v in grupos.items() if c[0] == "totals"}
     if tot:
-        buenas = [c for c, v in tot.items() if REF in v or len(v) >= MIN_CASAS]
+        buenas = [c for c, v in tot.items() if len(v) >= MIN_CASAS]
         dejar = set(buenas) or {max(tot, key=lambda c: len(tot[c]))}
         grupos = {c: v for c, v in grupos.items() if c[0] != "totals" or c in dejar}
 
@@ -231,9 +231,9 @@ def analizar(ev, lg, liga, g, hist, t):
             probs, margen = sin_margen([v["r"][r][0] for r in resultados])
             justas[k] = dict(zip(resultados, probs))
             v["margen"] = margen
-        if REF in justas:
+        if REF in justas and n >= 2:  # Pinnacle sola no deja nada que comparar
             ref, ref_nom, ref_hora = justas[REF], "Pinnacle sin margen", fecha(completas[REF]["r"][resultados[0]][1])
-        elif n >= MIN_CASAS:
+        elif n >= MIN_CASAS:  # sin Pinnacle: mediana
             ref = {r: statistics.median(j[r] for j in justas.values()) for r in resultados}
             s = sum(ref.values())
             ref = {r: p / s for r, p in ref.items()}
@@ -315,15 +315,16 @@ def registrar(reg, eventos, t):
         empieza = fecha(e["at"])
         fresco = e.get("actualizado") == iso(t)
         for m in e["mercados"]:
-            k = f"{e['oid']}|{m['mercado']}"
+            k = f"{e['oid']}|{m['mercado']}|{m['mejor']['casa']}"
             if not fresco:  # datos de una consulta anterior: no se toca nada, solo no se da por desaparecida
                 if k in reg:
                     vistos.add(k)
                 continue
-            if m["p_mercado"] is not None and k in reg and empieza > t:
-                r = reg[k]
-                r["p_cierre"], r["hora_cierre"] = m["p_mercado"], iso(t)
-                r["clv"] = round(r["cuota"] * m["p_mercado"] - 1, 4)
+            if m["p_mercado"] is not None and empieza > t:  # foto de cierre para todas las abiertas de este mercado
+                for r in reg.values():
+                    if r["evento"] == e["oid"] and r["mercado"] == m["mercado"]:
+                        r["p_cierre"], r["hora_cierre"] = m["p_mercado"], iso(t)
+                        r["clv"] = round(r["cuota"] * m["p_mercado"] - 1, 4)
             if m["estado"] not in ("desajustada", "arbitraje", "valor") or empieza <= t:
                 continue
             vistos.add(k)
