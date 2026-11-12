@@ -501,6 +501,68 @@ def prop_prob(prev, keys, line, fac=1.0):
     return mu, 1 - p_under
 
 
+# Picks NBA de jugadores con la LÍNEA REAL de la casa ("X+ puntos", "X+ rebotes"...), pedido del usuario 2026-11-12.
+# Prueba hacia adelante con cuotas reales del 8 al 12-nov: cuota >= 1.60 y modelo >= 80 % -> 11 de 11;
+# cuota >= 1.50, modelo >= 80 % y H2H no en contra -> 24 picks, 79 %. Muestra corta: se mide en el registro sellado.
+# Se descarta al jugador con bajón de minutos (últimos 3 < 80 % de lo que usa el modelo) o el H2H en contra.
+NBA_MIL = {"Points Milestones": "Total Points", "Rebounds Milestones": "Total Rebounds", "Assists Milestones": "Total Assists",
+           "3-Point Field Goals Milestones": "Total 3-Point Field Goals", "Points + Rebounds Milestones": "Total Points and Rebounds",
+           "Points + Assists Milestones": "Total Points and Assists", "Rebounds + Assists Milestones": "Total Assists and Rebounds",
+           "Points + Assists + Rebounds Milestones": "Total Points, Rebounds, and Assists"}
+NBA_MIL_PISO, NBA_MIL_PMIN, NBA_MIL_POR_PARTIDO = 1.60, 0.80, 2
+
+
+def _min_bajon(prev):
+    last = prev[-15:]; w = np.array([0.88 ** (len(last) - 1 - i) for i in range(len(last))])
+    mod = float(np.sum(w * np.array([x["MIN"] for x in last])) / w.sum())
+    return float(np.mean([x["MIN"] for x in prev[-3:]])) / max(mod, 1)
+
+
+def props_mil(ev, e, seq, names, ab_de, injured):
+    """Líneas X+ de la casa que pasan la regla (máx. NBA_MIL_POR_PARTIDO por partido, 1 por jugador)."""
+    esc = {}
+    for p in ev["props"]:
+        if p["t"] in NBA_MIL and p["pl"] and p["ln"] is not None:
+            esc.setdefault((p["pl"], p["t"]), []).append(p)
+    cand = []
+    for (pid, tm), ps in esc.items():
+        prev = seq.get(pid, [])
+        if len(prev) < 5 or pid in injured or _min_bajon(prev) < 0.8:
+            continue
+        ps = sorted(ps, key=lambda p: p["ln"]); os_ = [float(p["o"]) for p in ps]
+        if any(b <= a for a, b in zip(os_, os_[1:])):      # escalera incoherente (línea mal etiquetada): fuera
+            continue
+        t = NBA_MIL[tm]; ks = PROP_TYPES[t]
+        mio = ab_de.get(str(names[pid][1])); eq = [x.strip() for x in ev["name"].split("@")]
+        riv = next((x for x in eq if x != mio), None)
+        for p in ps:
+            o = float(p["o"]); X = float(p["ln"])
+            if not (NBA_MIL_PISO <= o <= 2.6):
+                continue
+            mu, pm = prop_prob(prev, ks, X - 0.5)
+            if pm < NBA_MIL_PMIN:
+                continue
+            h2h = [sum(z[k] for k in ks) >= X for z in prev if z.get("_vs") == riv][-6:]
+            if len(h2h) >= 2 and sum(h2h) < 0.5 * len(h2h):
+                continue
+            q = 1 / o / 1.045
+            pv = round(0.5 * pm + 0.5 * q, 4)               # lo que se muestra: modelo y casa a medias (el modelo solo exagera)
+            cand.append({"ev": e, "at": ev["at"], "partido": ev["name"], "pl": pid, "jugador": names[pid][0], "equipo": names[pid][1],
+                         "tipo": NOMBRE[t], "t": t, "linea": X - 0.5, "lado": "mas", "esperado": round(mu, 1), "aus": 0,
+                         "p": pv, "pm": round(pm, 4), "cuota": o, "casa": round(1 / o, 4), "valor": round(pv * o - 1, 3), "mil": True, "prueba": True,
+                         "h2h": [sum(h2h), len(h2h)],
+                         "ult": [sum(x[k] for k in ks) for x in prev[-10:]],
+                         "hist": [[sum(x[k] for k in ks), x.get("_vs"), 1 if x.get("_l") else 0, x.get("_at"), round(x["MIN"])] for x in prev[-40:]][::-1],
+                         "prom": round(float(np.mean([sum(x[k] for k in ks) for x in prev[-10:]])), 1)})
+    cand.sort(key=lambda x: -(x["pm"] * x["cuota"]))
+    out, vistos = [], set()
+    for x in cand:
+        if x["pl"] in vistos: continue
+        vistos.add(x["pl"]); out.append(x)
+        if len(out) >= NBA_MIL_POR_PARTIDO: break
+    return out
+
+
 def props(injured, days=None):
     games, det, _ = load("nba")
     out = []
@@ -510,9 +572,13 @@ def props(injured, days=None):
     for fn in files:
         db = json.load(open(os.path.join(pdir, fn), encoding="utf-8"))
         seq, names, team = player_models(games, det, fn[:10])
+        ab_de = {}
+        for g_ in games:
+            for s_ in ("h", "a"): ab_de[str(g_[s_]["id"])] = g_[s_].get("ab")
         for e, ev in db.items():
             if not days and ev["at"] <= now().strftime("%Y-%m-%dT%H:%MZ"):
                 continue
+            out += props_mil(ev, e, seq, names, ab_de, injured)
             pairs = {}
             for p in ev["props"]:
                 if p["t"] in PROP_TYPES and p["pl"] and p["ln"] is not None:
@@ -1100,7 +1166,7 @@ def main():
     except Exception as e:
         print("candidatos_fuente:", e)
     # solo picks de 70 %+ (y la NBA solo si ya lo demostró); lo demás no entra a listas ni al registro
-    pr = [x for x in pr if nba_ok and PMIN <= x["p"] and (x.get("cuota") or x.get("justa") or 1 / x["p"]) >= CUOTA_PISO]
+    pr = [x for x in pr if (x.get("mil") or (nba_ok and PMIN <= x["p"])) and (x.get("cuota") or x.get("justa") or 1 / x["p"]) >= CUOTA_PISO]
     try:
         import nbaextra
         nbaextra.completar(nb, globals().get("NBA_ROWS") or [])       # puntos de equipo, defensa del rival, líderes, bajas
@@ -1150,6 +1216,8 @@ def main():
                 ocultos += not v
     for q in pr:
         v = nivel_validacion(V, mercado("props", q))
+        if not v and q.get("mil"):
+            v = {"e": "historial"}; con_resp += 1          # regla de líneas reales de la casa (se mide en el registro)
         q.update({"val": v} if v else {"oculto": True})
         ocultos += not v
     print(f"validación: {ocultos} picks ocultos (se registran, no se muestran); {con_resp} experimentales con respaldo del historial")
