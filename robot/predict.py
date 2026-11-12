@@ -32,7 +32,10 @@ MARGEN = 1.05               # sin cuota de la casa: vale la pena si paga 5 % má
 PMIN, PMAX = 0.70, 0.85     # picks por probabilidad (sin cuota de casa)
 TOP = 0.74                  # 74 %+ = "máxima confianza": van primero en las listas
 NBA_MIN_N, NBA_MIN_AC = 30, 0.70   # la NBA vuelve a las listas cuando sus picks de 70 %+ acierten 70 %+ en 30 o más
-CUOTA_MIN = round(1 / PMAX, 2)
+# pedido del usuario 2026-11-12: "cuotas 1.20 no gracias, mejor no salga nada" -> ningún pick se
+# publica con cuota menor a 1.40 (si no hay ninguno que cumpla, no sale nada)
+CUOTA_PISO = 1.40
+CUOTA_MIN = CUOTA_PISO
 # peso del modelo frente a la casa (se ajusta solo con los resultados reales, ver pesos())
 PESO = {"futbol": 0.5, "nba": 0.5, "props": 0.3}
 
@@ -68,7 +71,7 @@ def elegir(sels, prefer=None):
            and s["pv"] >= PMIN and 1.40 <= s["cuota"] <= 4.0]
     if val:
         return dict(max(val, key=lambda s: s["valor"]), tipo="valor")
-    apt = [s for s in sels if PMIN <= s["p"] <= PMAX and not s.get("cuota")]
+    apt = [s for s in sels if PMIN <= s["p"] <= PMAX and not s.get("cuota") and s["justa"] >= CUOTA_PISO]
     if prefer:
         pa = [s for s in prefer if s in apt]
         if pa:
@@ -1046,7 +1049,7 @@ def main():
     nba_ok = nba_probada()
     V = validacion()
     # solo picks de 70 %+ (y la NBA solo si ya lo demostró); lo demás no entra a listas ni al registro
-    pr = [x for x in pr if nba_ok and PMIN <= x["p"]]
+    pr = [x for x in pr if nba_ok and PMIN <= x["p"] and (x.get("cuota") or x.get("justa") or 1 / x["p"]) >= CUOTA_PISO]
     try:
         import nbaextra
         nbaextra.completar(nb, globals().get("NBA_ROWS") or [])       # puntos de equipo, defensa del rival, líderes, bajas

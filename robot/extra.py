@@ -29,6 +29,8 @@ PJ = {"sot": ("shotsOnTarget", [0.5, 1.5]), "tir": ("totalShots", [0.5, 1.5, 2.5
 MAXP = 0.85                 # pick por probabilidad entre 70 % y 85 % (sin cuota de casa:
 PMIN = 0.70                 # la app muestra "vale la pena si tu casa paga más de X")
 CUOTA_MIN = round(1 / MAXP, 2)
+CUOTA_PISO = 1.40            # pedido del usuario 2026-11-12: no se publica ningún pick con cuota < 1.40
+MAXP_PUB = 1 / CUOTA_PISO    # (solo para elegir picks; las métricas históricas no cambian)
 
 
 def tval(t, s):
@@ -334,7 +336,7 @@ def _txt(s, sc, lado, ln, quien=""):
 def _best(pov, lines):
     """Pick de un mercado: el lado/línea más probable con cuota justa >= CUOTA_MIN."""
     c = [(p, "mas", ln) for p, ln in zip(pov, lines)] + [(1 - p, "menos", ln) for p, ln in zip(pov, lines)]
-    c = [x for x in c if PMIN <= x[0] <= MAXP]
+    c = [x for x in c if PMIN <= x[0] <= min(MAXP, MAXP_PUB)]
     return max(c, key=lambda x: x[0]) if c else None
 
 

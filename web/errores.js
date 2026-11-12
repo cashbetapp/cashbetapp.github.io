@@ -59,7 +59,8 @@ function erroresCuota() {
   for (const g of D.partidos || []) {
     if (!vigente(g.at) || (g.dep === "nba" && D.nba_ok === false)) continue;
     for (const x of g.mercados || []) {
-      if (!x.cuota || !x.p || x.oculto) continue;   // tipo de pick sin 70 % demostrado: no se muestra
+      if (!x.cuota || !x.p || x.oculto) continue;
+      if (x.cuota < (D.cuota_min || 1.40)) continue;   // pedido del usuario: nada con cuota menor a 1.40   // tipo de pick sin 70 % demostrado: no se muestra
       const r = pReal(x.p, mkGrupo(g, x.m)), err = r.p * x.cuota - 1;
       if (r.p >= ERR_PMIN && err >= ERR_MIN) out.push({ k: "g", g, x, p: r.p, pm: x.p, cuota: x.cuota, err, h: r.h, dep: g.dep });
     }
