@@ -378,7 +378,7 @@ function mcAnalisis(p, q25, q75, media, ln, up, valor, N) {
 function pickItems() {
   if (!HIST && typeof cargarHist === "function") cargarHist();
   if (typeof corregirProps === "function") corregirProps();   // % real de los jugadores NBA
-  const hoy = D.partidos.filter((g) => esHoy(g.at) && new Date(g.at) > Date.now());
+  const hoy = D.partidos.filter((g) => hoyManana(g.at) && new Date(g.at) > Date.now());   // como iABET: hoy y mañana
   const it = [];
   for (const g of hoy) {
     if (!g.pick.bajo) it.push({ k: "g", g, p: g.pick.tipo === "valor" ? g.pick.pv : g.pick.p, mk: "res", dep: g.dep, eq: 1,
@@ -390,7 +390,7 @@ function pickItems() {
   }
   // jugadores NBA: solo con valor real contra la casa; 1 por jugador y 3 por partido
   const vistoJ = new Set(), porEv = {};
-  D.propsOk.filter((x) => esHoy(x.at) && new Date(x.at) > Date.now() && x.cuota >= 1.4).forEach((x) => {
+  D.propsOk.filter((x) => hoyManana(x.at) && new Date(x.at) > Date.now() && x.cuota >= 1.4).forEach((x) => {
     if (vistoJ.has(x.pl) || (porEv[x.ev] || 0) >= 3) return;
     vistoJ.add(x.pl); porEv[x.ev] = (porEv[x.ev] || 0) + 1;
     it.push({ k: "pr", x, p: x.p, mk: "nbaj", dep: "nba", eq: 0, val: x.prueba ? null : x.valor, casa: x.cuota, prueba: x.prueba });
@@ -398,6 +398,9 @@ function pickItems() {
   it.forEach((e) => { e.gid = e.g ? e.g.id : e.x.ev; e.pr = pruebaDe(e); e.vl = e.k === "g" ? e.g.pick.val : e.x.val; });
   return it;
 }
+// hoy y mañana (hora del teléfono); en la tarjeta, los de mañana dicen "Mañana"
+function hoyManana(at) { const m = new Date(); m.setDate(m.getDate() + 1); const k = dkey(new Date(at)); return k === dkey(new Date()) || k === dkey(m); }
+const cuando = (at) => (esHoy(at) ? "" : "Mañana ") + hora(at);
 // acierto en la prueba del tipo de pick (para desempatar picks con el mismo %)
 function pruebaDe(e) {
   if (e.k === "x") return e.x.prueba || 0;
@@ -473,11 +476,11 @@ function picks() {
   const total = it.length;
   it = it.slice(0, 80);
   const fil = ui.pdep !== "todos" || ui.pmk !== "todos" || (ui.pgame && ui.pgame !== "todos") || (ui.pord && ui.pord !== "conf");
-  return header("Predicciones", `${total} picks · ${fmtD.format(new Date())}`) + `
+  return header("Predicciones", `${total} picks · hoy y mañana`) + `
     <div class="pkbar"><div class="pktabs dark">${[["todos", "Todos"], ["jugadores", "Jugadores"], ["equipos", "Equipos"]].map(([k, l]) => `<button class="${ui.pseg === k ? "on" : ""}" data-act="pseg" data-k="${k}">${l}</button>`).join("")}</div>
       <button class="pkfil ${fil ? "on" : ""}" data-act="pfil" aria-label="Filtros">${ic(fil ? "filtro" : "ball")}</button></div>
     ${fil ? `<div class="small" style="margin:-2px 2px 10px">Filtro: ${ui.pdep === "todos" ? "todos los deportes" : ui.pdep === "nba" ? "NBA" : "Fútbol"} · ${esc(MK.find(([k]) => k === ui.pmk)?.[1] || "")}${ui.pgame && ui.pgame !== "todos" && D.byId[ui.pgame] ? ` · ${esc(abT(D.byId[ui.pgame].h))} vs ${esc(abT(D.byId[ui.pgame].a))}` : ""} · orden: ${esc((ORDS.find(([k]) => k === (ui.pord || "conf")) || [])[1] || "")}</div>` : ""}
-    <div class="pclist">${it.map(pcCard).join("") || `<div class="empty">Hoy ya no quedan picks con este filtro. Los de mañana aparecen aquí desde mañana; puedes verlos antes en el Calendario.</div>`}</div>`;
+    <div class="pclist">${it.map(pcCard).join("") || `<div class="empty">No hay picks para hoy ni mañana con este filtro: solo salen los que pasan las reglas (cuota 1.40 o más). Mira el Calendario para los próximos días.</div>`}</div>`;
 }
 // foto del jugador recortada, pegada al borde izquierdo de la ficha, con el logo de la liga
 function fotoJug(foto, nombre, tm, liga) {
@@ -493,7 +496,7 @@ function pcCard(e) {
   if (e.k === "g") {
     const g = e.g; up = isUp(g.pick.m);
     img = escPanel([g.h, g.a], lgLogo(g.lg, 22)); pan = true;
-    lab = g.dep === "nba" ? "PARTIDO · NBA" : "PARTIDO"; tit = `${g.h.n} vs ${g.a.n}`; sub = `${abT(g.h)} vs ${abT(g.a)} · ${hora(g.at)}`;
+    lab = g.dep === "nba" ? "PARTIDO · NBA" : "PARTIDO"; tit = `${g.h.n} vs ${g.a.n}`; sub = `${abT(g.h)} vs ${abT(g.a)} · ${cuando(g.at)}`;
     pill = g.pick.txt; attr = `data-mp="${g.id}"`; cuota = g.pick.cuota || g.pick.justa; liga = g.liga;
   } else if (e.k === "x") {
     const g = e.g, x = e.x, P = pkFind(g.id, x.m); up = P.lado === "mas" || pkPill(P) === "Recibe tarjeta";
@@ -502,12 +505,12 @@ function pcCard(e) {
     else { img = escPanel(P.sc === "t" ? [g.h, g.a] : [tm], lgLogo(g.lg, 22)); pan = true; }
     lab = P.sc === "j" ? `${crest(tm, 16)}${esc(abT(tm))}` : P.sc === "t" ? "TOTAL DEL PARTIDO" : "TOTAL EQUIPO";
     tit = P.sc === "j" ? x.jugador : P.sc === "t" ? `Total de ${UN[P.s]}` : tm.n;
-    sub = `${abT(g.h)} vs ${abT(g.a)} · ${hora(g.at)}`; pill = pkPill(P); attr = `data-pk="${g.id}" data-m="${esc(x.m)}"`; cuota = x.justa; liga = g.liga;
+    sub = `${abT(g.h)} vs ${abT(g.a)} · ${cuando(g.at)}`; pill = pkPill(P); attr = `data-pk="${g.id}" data-m="${esc(x.m)}"`; cuota = x.justa; liga = g.liga;
   } else {
     const x = e.x; up = x.lado === "mas";
     const eq = x.eq || { n: x.equipo };
     jug = true; img = fotoJug(x.foto, x.jugador, eq, lgLogo("nba", 22));
-    lab = `${crest(eq, 16)}${esc(abT(eq))}`; tit = x.jugador; sub = `${esc(x.partido || "")} · ${hora(x.at)}`;
+    lab = `${crest(eq, 16)}${esc(abT(eq))}`; tit = x.jugador; sub = `${esc(x.partido || "")} · ${cuando(x.at)}`;
     pill = `${up ? "Más" : "Menos"} de ${x.linea} ${x.tipo.toLowerCase()}`; attr = `data-pr="${D.props.indexOf(x)}"`; cuota = x.cuota; liga = "NBA";
   }
   return `<button class="pcard ${jug || pan ? "jg" : ""}" ${attr}>${img}<div class="pcm"><div class="pcl">${jug ? lab : esc(lab)}</div><div class="pct">${esc(tit)}</div><div class="pcs">${esc(sub)}</div>
