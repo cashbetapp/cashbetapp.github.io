@@ -67,7 +67,7 @@ function openPick(gid, m, keep) {
   const html = `<div class="pkh">
       <div class="pkl">
         <div class="pkt">${mini}<h3>${esc(titulo)}</h3></div>
-        <div class="pkm">${esc(abT(g.h))} vs ${esc(abT(g.a))} · ${cuando(g.at)}${g.ven ? `<br>${ic("pin")}${esc(g.ven)}${g.city ? `, ${esc(g.city)}` : ""}` : ""}</div>
+        <div class="pkm">${esc(abT(g.h))} vs ${esc(abT(g.a))} · ${cuandoPk(g.at)}${g.ven ? `<br>${ic("pin")}${esc(g.ven)}${g.city ? `, ${esc(g.city)}` : ""}` : ""}</div>
         <span class="pkpill ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(pkPill(P))}</span></span>
         <div class="pkprog ${x.p >= 0.7 ? "hi" : ""}"><span><i style="width:${x.p * 100}%"></i></span><b>${pct(x.p)}</b></div>
       </div>${bigImg(P)}</div>
@@ -400,7 +400,7 @@ function pickItems() {
 }
 // hoy y mañana (hora del teléfono); en la tarjeta, los de mañana dicen "Mañana"
 function hoyManana(at) { const m = new Date(); m.setDate(m.getDate() + 1); const k = dkey(new Date(at)); return k === dkey(new Date()) || k === dkey(m); }
-const cuando = (at) => (esHoy(at) ? "" : "Mañana ") + hora(at);
+const cuandoPk = (at) => (esHoy(at) ? "" : "Mañana ") + hora(at);
 // acierto en la prueba del tipo de pick (para desempatar picks con el mismo %)
 function pruebaDe(e) {
   if (e.k === "x") return e.x.prueba || 0;
@@ -496,7 +496,7 @@ function pcCard(e) {
   if (e.k === "g") {
     const g = e.g; up = isUp(g.pick.m);
     img = escPanel([g.h, g.a], lgLogo(g.lg, 22)); pan = true;
-    lab = g.dep === "nba" ? "PARTIDO · NBA" : "PARTIDO"; tit = `${g.h.n} vs ${g.a.n}`; sub = `${abT(g.h)} vs ${abT(g.a)} · ${cuando(g.at)}`;
+    lab = g.dep === "nba" ? "PARTIDO · NBA" : "PARTIDO"; tit = `${g.h.n} vs ${g.a.n}`; sub = `${abT(g.h)} vs ${abT(g.a)} · ${cuandoPk(g.at)}`;
     pill = g.pick.txt; attr = `data-mp="${g.id}"`; cuota = g.pick.cuota || g.pick.justa; liga = g.liga;
   } else if (e.k === "x") {
     const g = e.g, x = e.x, P = pkFind(g.id, x.m); up = P.lado === "mas" || pkPill(P) === "Recibe tarjeta";
@@ -505,12 +505,12 @@ function pcCard(e) {
     else { img = escPanel(P.sc === "t" ? [g.h, g.a] : [tm], lgLogo(g.lg, 22)); pan = true; }
     lab = P.sc === "j" ? `${crest(tm, 16)}${esc(abT(tm))}` : P.sc === "t" ? "TOTAL DEL PARTIDO" : "TOTAL EQUIPO";
     tit = P.sc === "j" ? x.jugador : P.sc === "t" ? `Total de ${UN[P.s]}` : tm.n;
-    sub = `${abT(g.h)} vs ${abT(g.a)} · ${cuando(g.at)}`; pill = pkPill(P); attr = `data-pk="${g.id}" data-m="${esc(x.m)}"`; cuota = x.justa; liga = g.liga;
+    sub = `${abT(g.h)} vs ${abT(g.a)} · ${cuandoPk(g.at)}`; pill = pkPill(P); attr = `data-pk="${g.id}" data-m="${esc(x.m)}"`; cuota = x.justa; liga = g.liga;
   } else {
     const x = e.x; up = x.lado === "mas";
     const eq = x.eq || { n: x.equipo };
     jug = true; img = fotoJug(x.foto, x.jugador, eq, lgLogo("nba", 22));
-    lab = `${crest(eq, 16)}${esc(abT(eq))}`; tit = x.jugador; sub = `${esc(x.partido || "")} · ${cuando(x.at)}`;
+    lab = `${crest(eq, 16)}${esc(abT(eq))}`; tit = x.jugador; sub = `${esc(x.partido || "")} · ${cuandoPk(x.at)}`;
     pill = `${up ? "Más" : "Menos"} de ${x.linea} ${x.tipo.toLowerCase()}`; attr = `data-pr="${D.props.indexOf(x)}"`; cuota = x.cuota; liga = "NBA";
   }
   return `<button class="pcard ${jug || pan ? "jg" : ""}" ${attr}>${img}<div class="pcm"><div class="pcl">${jug ? lab : esc(lab)}</div><div class="pct">${esc(tit)}</div><div class="pcs">${esc(sub)}</div>
