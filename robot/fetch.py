@@ -26,8 +26,21 @@ LEAGUES = {
     "mex.1": ("soccer", "mex.1", "Liga MX"),
 }
 # ligas nuevas (experimentales, ver ligas.py)
-from ligas import NUEVAS, DESDE, NUEVAS_POR_CORRIDA
-LEAGUES.update({k: ("soccer", k, v) for k, v in NUEVAS.items()})
+from ligas import NUEVAS, DESDE, NUEVAS_POR_CORRIDA, INTL, DESDE_INTL
+LEAGUES.update({k: ("soccer", "fifa.friendly" if k == "intl" else k, v) for k, v in NUEVAS.items()})
+
+
+def dia_intl(x):
+    """Selecciones: junta los partidos de todas sus competencias de ese día (sin repetir)."""
+    evs, ok = {}, False
+    for code in INTL:
+        d = get(API.format(sp="soccer", lg=code, d=x))
+        if d is None:
+            continue
+        ok = True
+        for ev in d.get("events", []):
+            evs[ev["id"]] = ev
+    return {"events": list(evs.values())} if ok else None
 
 
 def get(url, tries=4):
@@ -125,17 +138,17 @@ def run(d0, d1, workers=4):
             if nuevas >= NUEVAS_POR_CORRIDA:
                 continue
             nuevas += 1
-            d, dias = dt.date.fromisoformat(DESDE), []
+            d, dias = dt.date.fromisoformat(DESDE_INTL if key == "intl" else DESDE), []
             while d <= d1:
                 dias.append(d.strftime("%Y%m%d")); d += dt.timedelta(days=1)
-            print(f"{name}: liga nueva, bajando historial desde {DESDE} ({len(dias)} días)", flush=True)
+            print(f"{name}: liga nueva, bajando historial desde {dias[0]} ({len(dias)} días)", flush=True)
         # pedir: días nunca pedidos, o con partidos sin terminar, o de hoy/futuros
         todo = [x for x in dias if x not in db["days"] or db["days"][x] == "open" or x >= today]
         if not todo:
             continue
         t0 = time.time()
         with ThreadPoolExecutor(workers) as ex:
-            res = list(ex.map(lambda x: (x, get(API.format(sp=sp, lg=lg, d=x))), todo))
+            res = list(ex.map(lambda x: (x, dia_intl(x) if key == "intl" else get(API.format(sp=sp, lg=lg, d=x))), todo))
         n = 0
         for day, data in res:
             if data is None:

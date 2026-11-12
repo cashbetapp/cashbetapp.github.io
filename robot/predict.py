@@ -62,6 +62,37 @@ def con_casa(sels, peso):
     return sels
 
 
+# Respaldo del historial para EQUIPO y PARTIDO (prueba del 2026-11-12, 1.395 picks de la franja 1.40, solo con
+# partidos anteriores): resultado 73,8 % -> 77,0 % (304 picks) y goles 67,5 % -> 73,0 % (178 picks) cuando la
+# condición se cumplió en 75 %+ de los últimos 10 de cada equipo y el H2H no está en contra. No cambia probabilidades.
+RESP_EQ = 0.75
+
+
+def cumple(m, gf, gc, local):
+    """¿El mercado m se habría cumplido en un partido con ese marcador, visto desde un equipo (local=True: el de casa hoy)?"""
+    if m in ("1", "2", "1X", "X2"):
+        mio = (m in ("1", "1X")) == local
+        if m in ("1", "2"): return gf > gc if mio else gf < gc
+        return gf >= gc if mio else gf <= gc
+    if m == "X": return gf == gc
+    if m == "12": return gf != gc
+    if m == "btts_si": return gf > 0 and gc > 0
+    if m == "btts_no": return not (gf > 0 and gc > 0)
+    if m.startswith("mas_"): return gf + gc > float(m[4:])
+    if m.startswith("menos_"): return gf + gc < float(m[6:])
+    return None
+
+
+def respaldo_eq(m, hh, ha, hid, aid):
+    """hh / ha: [(goles a favor, en contra, rival)] de cada equipo, en orden. Últimos 10 de los dos + H2H (máx. 6)."""
+    u = [cumple(m, gf, gc, True) for gf, gc, _ in hh[-10:]] + [cumple(m, gf, gc, False) for gf, gc, _ in ha[-10:]]
+    h = [cumple(m, gf, gc, True) for gf, gc, r in hh if r == aid][-6:]
+    if None in u: return None
+    r = {"u": sum(u), "un": len(u), "h": sum(h), "hn": len(h)}
+    r["ok"] = r["un"] >= 10 and r["u"] >= RESP_EQ * r["un"] and not (r["hn"] >= 2 and r["h"] < .5 * r["hn"])
+    return r
+
+
 def elegir(sels, prefer=None):
     """1) Si la casa paga una cuota mal puesta (valor >= +5 %), ese es el pick.
     2) Si no, el más probable entre 55 % y 75 % que NO tenga cuota de casa (la casa
@@ -72,6 +103,10 @@ def elegir(sels, prefer=None):
     if val:
         return dict(max(val, key=lambda s: s["valor"]), tipo="valor")
     apt = [s for s in sels if PMIN <= s["p"] <= PMAX and not s.get("cuota") and s["justa"] >= CUOTA_PISO]
+    con = [s for s in apt if (s.get("resp") or {}).get("ok")]
+    if con:                                    # primero lo que el historial respalda (el de mejor respaldo)
+        s = max(con, key=lambda s: (s["resp"]["u"] / s["resp"]["un"], s["p"]))
+        return dict(s, tipo="prob", minima=round(s["justa"] * MARGEN, 2))
     if prefer:
         pa = [s for s in prefer if s in apt]
         if pa:
@@ -184,6 +219,10 @@ def soccer(par, report):
         ms.fit(hi, ai, np.array(SH, float), np.array(SA, float), w, par["ridge"])
         conv = np.sum(w * (np.array(YH) + np.array(YA))) / max(np.sum(w * (np.array(SH) + np.array(SA))), 1)
         ws = par["wsot"]
+        heq = {}                               # equipo -> [(goles a favor, en contra, rival)] para el respaldo
+        for x in sorted(games, key=lambda x: x["at"]):
+            heq.setdefault(x["h"]["id"], []).append((x["h"]["s"], x["a"]["s"], x["a"]["id"]))
+            heq.setdefault(x["a"]["id"], []).append((x["a"]["s"], x["h"]["s"], x["h"]["id"]))
         for g in pre:
             if seen.get(g["h"]["id"], 0) < 4 or seen.get(g["a"]["id"], 0) < 4:
                 continue
@@ -210,6 +249,9 @@ def soccer(par, report):
                     if c and c["n"] >= CAL_MIN_N and c["paso"] < c["dijo"]:
                         s_["p"] = round(s_["p"] * c["paso"] / c["dijo"], 4); s_["justa"] = round(1 / max(s_["p"], 1e-6), 2); s_["cal"] = 1
             con_casa(sels, PESO["futbol"])
+            for s_ in sels:
+                r_ = respaldo_eq(s_["m"], heq.get(g["h"]["id"], []), heq.get(g["a"]["id"], []), g["h"]["id"], g["a"]["id"])
+                if r_: s_["resp"] = r_
             by = {s["m"]: s for s in sels}
             if key in LIGAS_SIMPLES:   # solo ganador, gana o empata, goles y ambos marcan; y solo mercados con historial suficiente
                 ok = lambda m: not cm or (cm.get(m) or {}).get("n", 0) >= CAL_MIN_N
@@ -629,7 +671,7 @@ def ledger(partidos, props_, extras=None):
                                             q=pk.get("casa"), tipo=pk.get("tipo"), valor=pk.get("valor"),
                                             cuota=pk.get("cuota") or pk["justa"], cuota_casa=bool(pk.get("cuota")),
                                             cq=ahora if pk.get("cuota") else None,
-                                            modelo=MODELO["partidos_" + g["dep"]]), ahora)
+                                            modelo=MODELO["partidos_" + g["dep"]], **({"resp": pk["resp"]} if pk.get("resp") else {})), ahora)
     for x in props_:
         if x["at"] <= ahora_m:
             continue
@@ -1080,6 +1122,8 @@ def main():
         pk = g["pick"]
         if not pk.get("bajo"):
             v = nivel_validacion(V, mercado("partidos", {"m": pk["m"], "dep": g["dep"], "lg": g["lg"]}))
+            if not v and (pk.get("resp") or {}).get("ok"):
+                v = {"e": "historial"}; con_resp += 1
             pk.update({"val": v} if v else {"oculto": True})
             ocultos += not v
         # cada mercado del partido también (de aquí salen los "errores de cuota" de la app y de los avisos)
@@ -1090,8 +1134,11 @@ def main():
         x = g.get("extra")
         if x:
             # como mucho 3 picks con respaldo por partido (los de mejor historial), para no amontonar picks parecidos
-            rq = sorted([q for q in x.get("picks", []) + x.get("jug", []) if (q.get("resp") or {}).get("ok")],
-                        key=lambda q: (-q["resp"]["u"] / q["resp"]["un"], -q["resp"]["un"], -q["p"]))[:3]
+            rq = sorted([q for q in x.get("picks", []) if (q.get("resp") or {}).get("ok")],
+                        key=lambda q: (-q["resp"]["u"] / q["resp"]["un"], -q["resp"]["un"], -q["p"]))
+            rj = sorted([q for q in x.get("jug", []) if (q.get("resp") or {}).get("ok")],
+                        key=lambda q: (-q["resp"]["u"] / q["resp"]["un"], -q["resp"]["un"], -q["p"]))
+            rq = rq[:3] + (rj[:1] if len(rq) < 3 else [])     # equipo y partido primero; como mucho 1 de jugador
             for q in x.get("picks", []) + x.get("jug", []):
                 v = nivel_validacion(V, mercado("extra", {**q, "lg": g["lg"]}))
                 if not v and any(q is z for z in rq):

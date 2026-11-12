@@ -499,7 +499,7 @@ def predict(soon, today_ord):
             vr = {sd: [e for e in L0.th.get(g[sd]["id"], []) if e["vs"] == _ab(g, "a" if sd == "h" else "h")][-5:][::-1]
                   for sd in ("h", "a")}
             out[g["id"]] = {"grupos": grupos, "picks": sorted(picks, key=lambda x: -x["p"]), "jug": jug, "cand_j": cand_j,
-                            "hist": hist, "vr": vr, "lg": {}, "tabla": tabla(L0, g)}
+                            "hist": hist, "vr": vr, "lg": {}, "tabla": tabla(L0, g) if key != "intl" else {"n": 0}}
             for sd in ("h", "a"):
                 for e in hist[sd]:
                     out[g["id"]]["lg"][e["vs"]] = L0.logo.get(e["vs"])

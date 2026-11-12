@@ -40,7 +40,8 @@ def load(key):
     games = [x for x in g.values() if x["st"] == "post" and x["h"] and x["a"] and x["at"] <= ahora
              and x["h"]["s"] is not None and x["a"]["s"] is not None]
     games.sort(key=lambda x: x["at"])
-    pre = [x for x in g.values() if x["st"] == "pre"]
+    from ligas import publicable
+    pre = [x for x in g.values() if x["st"] == "pre" and publicable(key, x)]   # selecciones: solo las conocidas
     if key != "nba":
         malos = choques(g)
         pre = [x for x in pre if x["id"] not in malos]
