@@ -39,7 +39,7 @@ function pReal(p0, grupo) {
 function corregirProps() {
   if (!HIST || HIST.error || !HIST.mercado || !D.props) return;
   for (const x of D.props) {
-    if (x.p0 != null) continue;
+    if (x.p0 != null || x.mil || x.dia) continue;   // reglas nuevas (líneas reales): su % ya es el medido en la prueba
     x.p0 = x.p;
     const g = "Jugadores NBA · " + x.tipo, m = HIST.mercado[g];
     // una sola corrección: el acierto real de su mercado frente a lo que decía (prob_media)
