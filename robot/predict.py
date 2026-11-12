@@ -614,7 +614,8 @@ def ledger(partidos, props_, extras=None):
                 vivos.add(("extra", k))
                 R.anotar(L, "extra", k, dict(base, hid=g["h"]["id"], aid=g["a"]["id"], m=x["m"], s=x["s"], sc=x["sc"],
                                             txt=x["txt"], p=x["p"], cuota=x["justa"], casa_real=False,
-                                            modelo=MODELO["nba_equipo"] if x["s"] == "pts" else MODELO["extra"]), ahora)
+                                            modelo=MODELO["nba_equipo"] if x["s"] == "pts" else MODELO["extra"],
+                                            **({"resp": x["resp"]} if x.get("resp") else {})), ahora)
         pk = g.get("pick")
         if pk and not pk.get("bajo"):
             viejo = L["partidos"].get(g["id"])      # registro anterior al sello (clave = id del partido)
@@ -1074,7 +1075,7 @@ def main():
     # regla del usuario (2026-11-11, opción 2): solo se MUESTRAN los tipos de pick validados o "en prueba"
     # (70 %+ real sin prueba completa). Los demás se marcan "oculto": se siguen anotando en el registro
     # sellado para que puedan ganarse la validación, pero la app no los muestra.
-    ocultos = 0
+    ocultos = con_resp = 0
     for g in f + nb:
         pk = g["pick"]
         if not pk.get("bajo"):
@@ -1088,15 +1089,23 @@ def main():
                 x.update({"val": v} if v else {"oculto": True})
         x = g.get("extra")
         if x:
+            # como mucho 3 picks con respaldo por partido (los de mejor historial), para no amontonar picks parecidos
+            rq = sorted([q for q in x.get("picks", []) + x.get("jug", []) if (q.get("resp") or {}).get("ok")],
+                        key=lambda q: (-q["resp"]["u"] / q["resp"]["un"], -q["resp"]["un"], -q["p"]))[:3]
             for q in x.get("picks", []) + x.get("jug", []):
                 v = nivel_validacion(V, mercado("extra", {**q, "lg": g["lg"]}))
+                if not v and any(q is z for z in rq):
+                    # pedido del usuario (2026-11-12): que el sitio no quede vacío. Un pick de 1.40+ con respaldo
+                    # del historial se muestra, marcado "experimental" (su tipo aún no demuestra 70 % real).
+                    v = {"e": "historial"}
+                    con_resp += 1
                 q.update({"val": v} if v else {"oculto": True})
                 ocultos += not v
     for q in pr:
         v = nivel_validacion(V, mercado("props", q))
         q.update({"val": v} if v else {"oculto": True})
         ocultos += not v
-    print(f"validación: {ocultos} picks ocultos (se registran, no se muestran)")
+    print(f"validación: {ocultos} picks ocultos (se registran, no se muestran); {con_resp} experimentales con respaldo del historial")
     for g in f + nb:
         if g["pick"].get("p", 0) >= TOP and not g["pick"].get("bajo"):
             g["pick"]["top"] = True

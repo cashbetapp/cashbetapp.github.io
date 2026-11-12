@@ -1617,6 +1617,7 @@ button.ajrow { background: none; color: inherit; font: inherit; border-left: 0; 
 img.crest.nba { border-radius: 0 !important; background: transparent !important; }
 .pcv { font-size: 11px; font-weight: 700; color: var(--tx2); margin-top: 6px; letter-spacing: .2px; }
 .pcv.validado { color: var(--g); }
+.pcv.historial { color: #ffb020; }
 
 /* ---- Odds Intelligence (panel de cuotas) ---- */
 .oiban { display: flex; align-items: center; gap: 12px; width: 100%; margin-top: 10px; padding: 11px 12px 11px 14px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); text-align: left; color: var(--tx); }

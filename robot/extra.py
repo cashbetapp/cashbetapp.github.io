@@ -333,11 +333,43 @@ def _txt(s, sc, lado, ln, quien=""):
     return f"{quien}: {base[0].lower() + base[1:]}" if quien else base
 
 
+def _cands(pov, lines):
+    """Todas las opciones publicables de un mercado (70 %+ y cuota justa >= 1.40), de mayor a menor probabilidad."""
+    c = [(p, "mas", ln) for p, ln in zip(pov, lines)] + [(1 - p, "menos", ln) for p, ln in zip(pov, lines)]
+    return sorted([x for x in c if PMIN <= x[0] <= min(MAXP, MAXP_PUB)], key=lambda x: -x[0])
+
+
 def _best(pov, lines):
     """Pick de un mercado: el lado/línea más probable con cuota justa >= CUOTA_MIN."""
-    c = [(p, "mas", ln) for p, ln in zip(pov, lines)] + [(1 - p, "menos", ln) for p, ln in zip(pov, lines)]
-    c = [x for x in c if PMIN <= x[0] <= min(MAXP, MAXP_PUB)]
-    return max(c, key=lambda x: x[0]) if c else None
+    c = _cands(pov, lines)
+    return c[0] if c else None
+
+
+# Respaldo del historial (prueba del 2026-11-12 sobre picks ya calificados, solo con partidos anteriores):
+# en la franja de cuota 1.40+, si la línea se cumplió en 8+ de los últimos 10 partidos el acierto subió
+# de 75 % (154 picks) a 84 % (43 picks); con H2H en contra bajó a 64 % (11 picks). Muestra corta (3 días):
+# NO es una validación, solo ordena y explica. No cambia ninguna probabilidad del modelo.
+RESP_ULT, RESP_MIN, RESP_H2H = 10, 0.8, 6
+
+
+def respaldo(ult, h2h, lado, ln):
+    """{"u": veces cumplida en los últimos 10, "un": partidos, "h"/"hn": lo mismo en el H2H (máx. 6), "ok"}."""
+    gana = (lambda v: v > ln) if lado == "mas" else (lambda v: v < ln)
+    u = [v for v in ult if v is not None][-RESP_ULT:]
+    h = [v for v in h2h if v is not None][-RESP_H2H:]
+    r = {"u": sum(map(gana, u)), "un": len(u), "h": sum(map(gana, h)), "hn": len(h)}
+    r["ok"] = r["un"] >= 5 and r["u"] >= RESP_MIN * r["un"] and not (r["hn"] >= 2 and r["h"] < 0.5 * r["hn"])
+    return r
+
+
+def _elegir_resp(cands, hist):
+    """Entre las opciones publicables, la de mejor respaldo del historial; si ninguna lo tiene, la más probable.
+    hist(lado, ln) -> respaldo. Devuelve (opción, respaldo) o (None, None)."""
+    if not cands:
+        return None, None
+    rs = [(c, hist(c[1], c[2])) for c in cands]
+    con = [x for x in rs if x[1]["ok"]]
+    return max(con, key=lambda x: (x[1]["u"] / x[1]["un"], x[0][0])) if con else rs[0]
 
 
 def _sel(m, p, txt, **kw):
@@ -426,13 +458,17 @@ def predict(soon, today_ord):
                         continue
                     pov = [p_over(M, ln, dsp) for ln in lines]
                     gr[sc] = [[ln, round(p, 4)] for ln, p in zip(lines, pov)]
-                    b = _best(pov, lines)
+                    tid = g["a" if sc == "a" else "h"]["id"]
+                    riv = _ab(g, "h" if sc == "a" else "a")
+                    th_ = L0.th.get(tid, [])
+                    vt = lambda e: (e[s] + e["o" + s]) if sc == "t" else e[s]
+                    b, rp = _elegir_resp(_cands(pov, lines), lambda lado, ln: respaldo(
+                        [vt(e) for e in th_], [vt(e) for e in th_ if e["vs"] == riv], lado, ln))
                     if b:
-                        tid = g["a" if sc == "a" else "h"]["id"]
-                        vals = [((e[s] + e["o" + s]) if sc == "t" else e[s], e["d"]) for e in L0.th.get(tid, [])]
+                        vals = [(vt(e), e["d"]) for e in th_]
                         picks.append(_sel(f"{s}|{sc}|{b[1]}|{b[2]:g}", b[0], _txt(s, "e", b[1], b[2], quien),
                                           s=s, sc=sc, prueba=acierto.get(f"{s}_{'t' if sc == 't' else 'e'}"),
-                                          temp=temporadas(vals, b[1], b[2]), esp=round(float(M), 2), disp=dsp))
+                                          temp=temporadas(vals, b[1], b[2]), esp=round(float(M), 2), disp=dsp, resp=rp))
                 if len(gr) > 3:
                     grupos.append(gr)
             jug, cand_j = [], []
@@ -445,7 +481,10 @@ def predict(soon, today_ord):
                 lines = PJ[s][1]
                 pov_j = [p_over(m, ln, 1.0) for ln in lines]
                 cand_j.append([r["pid"], r["n"], s, [[ln, round(float(p), 4)] for ln, p in zip(lines, pov_j)]])
-                b = _best(pov_j, lines)
+                ph_ = L0.ph.get(r["pid"], [])
+                riv = _ab(g, "a" if r["side"] == "h" else "h")
+                b, rp = _elegir_resp(_cands(pov_j, lines), lambda lado, ln: respaldo(
+                    [e[s] for e in ph_], [e[s] for e in ph_ if e["_vs"] == riv], lado, ln))
                 if b:
                     jug.append(_sel(f"{s}|j:{r['pid']}|{b[1]}|{b[2]:g}", b[0], _txt(s, "j", b[1], b[2], r["n"]),
                                     s=s, sc="j", pid=r["pid"], jugador=r["n"], side=r["side"],
@@ -454,7 +493,7 @@ def predict(soon, today_ord):
                                     vr=[[e[s], e["_d"], e["_l"]] for e in L0.ph.get(r["pid"], [])
                                         if e["_vs"] == _ab(g, "a" if r["side"] == "h" else "h")][-5:][::-1],
                                     temp=temporadas([(e[s], e["_d"]) for e in L0.ph.get(r["pid"], [])], b[1], b[2]),
-                                    est=estado(L0, r["pid"], g[r["side"]]["id"]), disp=1.0))
+                                    est=estado(L0, r["pid"], g[r["side"]]["id"]), disp=1.0, resp=rp))
             jug.sort(key=lambda x: -x["p"])
             hist = {sd: L0.th.get(g[sd]["id"], [])[-30:][::-1] for sd in ("h", "a")}
             vr = {sd: [e for e in L0.th.get(g[sd]["id"], []) if e["vs"] == _ab(g, "a" if sd == "h" else "h")][-5:][::-1]

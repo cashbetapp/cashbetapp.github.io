@@ -409,6 +409,8 @@ function pruebaDe(e) {
 }
 // primero los ERRORES DE CUOTA (más valor primero); después los de mayor probabilidad
 // pedido del usuario 2026-11-11: los de 74 %+ (máxima confianza) van primero
+// respaldo del historial: "cumplió 9 de sus últimos 10 · H2H 3 de 4"
+const respTxt = (r) => (r ? ` · cumplió ${r.u} de sus últimos ${r.un}${r.hn >= 2 ? ` · H2H ${r.h} de ${r.hn}` : ""}` : "");
 const ordenar = (xs) => xs.sort((a, b) => (b.p >= 0.74) - (a.p >= 0.74) || (b.val != null) - (a.val != null) || (b.val || 0) - (a.val || 0) || b.p - a.p || b.pr - a.pr);
 // cuota mínima para que valga la pena cuando no tenemos la cuota de la casa
 const vale = (justa) => Math.round(justa * (D.margen || 1.05) * 100) / 100;
@@ -509,7 +511,7 @@ function pcCard(e) {
     pill = `${up ? "Más" : "Menos"} de ${x.linea} ${x.tipo.toLowerCase()}`; attr = `data-pr="${D.props.indexOf(x)}"`; cuota = x.cuota; liga = "NBA";
   }
   return `<button class="pcard ${jug || pan ? "jg" : ""}" ${attr}>${img}<div class="pcm"><div class="pcl">${jug ? lab : esc(lab)}</div><div class="pct">${esc(tit)}</div><div class="pcs">${esc(sub)}</div>
-    <span class="pcpill ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(pill)}</span></span>${e.vl ? `<div class="pcv ${e.vl.e}">${e.vl.e === "validado" ? "Validado" : "En prueba"} · ${String(e.vl.ac).replace(".", ",")} % en ${e.vl.n} picks</div>` : ""}</div>
+    <span class="pcpill ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(pill)}</span></span>${e.vl ? `<div class="pcv ${e.vl.e}">${e.vl.e === "historial" ? `Experimental${respTxt(e.x && e.x.resp)}` : `${e.vl.e === "validado" ? "Validado" : "En prueba"} · ${String(e.vl.ac).replace(".", ",")} % en ${e.vl.n} picks`}</div>` : ""}</div>
     <div class="pcr"><span class="pcp"><i></i>${pct(e.p)}</span></div>
     <div class="pcb">${e.val != null ? `<span class="pcval">+${Math.round(e.val * 100)}%</span><span class="pcc">${odd(e.casa)}</span>` : e.prueba ? `<span class="pcc" title="Cuota de la casa (en prueba)">${odd(e.casa)}</span>` : `<span class="pcc" title="Vale la pena desde esta cuota">${odd(e.min || cuota)}</span>`}</div></button>`;
 }
