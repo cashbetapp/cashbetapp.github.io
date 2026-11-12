@@ -378,7 +378,7 @@ function mcAnalisis(p, q25, q75, media, ln, up, valor, N) {
 function pickItems() {
   if (!HIST && typeof cargarHist === "function") cargarHist();
   if (typeof corregirProps === "function") corregirProps();   // % real de los jugadores NBA
-  const hoy = D.partidos.filter((g) => hoyManana(g.at) && new Date(g.at) > Date.now());   // como iABET: hoy y mañana
+  const hoy = D.partidos.filter((g) => esHoy(g.at) && new Date(g.at) > Date.now());
   const it = [];
   for (const g of hoy) {
     if (!g.pick.bajo) it.push({ k: "g", g, p: g.pick.tipo === "valor" ? g.pick.pv : g.pick.p, mk: "res", dep: g.dep, eq: 1,
@@ -390,7 +390,7 @@ function pickItems() {
   }
   // jugadores NBA: solo con valor real contra la casa; 1 por jugador y 3 por partido
   const vistoJ = new Set(), porEv = {};
-  D.propsOk.filter((x) => hoyManana(x.at) && new Date(x.at) > Date.now() && x.cuota >= 1.4).forEach((x) => {
+  D.propsOk.filter((x) => esHoy(x.at) && new Date(x.at) > Date.now() && x.cuota >= 1.4).forEach((x) => {
     if (vistoJ.has(x.pl) || (porEv[x.ev] || 0) >= 3) return;
     vistoJ.add(x.pl); porEv[x.ev] = (porEv[x.ev] || 0) + 1;
     it.push({ k: "pr", x, p: x.p, mk: "nbaj", dep: "nba", eq: 0, val: x.prueba ? null : x.valor, casa: x.cuota, prueba: x.prueba });
@@ -476,11 +476,11 @@ function picks() {
   const total = it.length;
   it = it.slice(0, 80);
   const fil = ui.pdep !== "todos" || ui.pmk !== "todos" || (ui.pgame && ui.pgame !== "todos") || (ui.pord && ui.pord !== "conf");
-  return header("Predicciones", `${total} picks · hoy y mañana`) + `
+  return header("Predicciones", `${total} picks · ${fmtD.format(new Date())}`) + `
     <div class="pkbar"><div class="pktabs dark">${[["todos", "Todos"], ["jugadores", "Jugadores"], ["equipos", "Equipos"]].map(([k, l]) => `<button class="${ui.pseg === k ? "on" : ""}" data-act="pseg" data-k="${k}">${l}</button>`).join("")}</div>
       <button class="pkfil ${fil ? "on" : ""}" data-act="pfil" aria-label="Filtros">${ic(fil ? "filtro" : "ball")}</button></div>
     ${fil ? `<div class="small" style="margin:-2px 2px 10px">Filtro: ${ui.pdep === "todos" ? "todos los deportes" : ui.pdep === "nba" ? "NBA" : "Fútbol"} · ${esc(MK.find(([k]) => k === ui.pmk)?.[1] || "")}${ui.pgame && ui.pgame !== "todos" && D.byId[ui.pgame] ? ` · ${esc(abT(D.byId[ui.pgame].h))} vs ${esc(abT(D.byId[ui.pgame].a))}` : ""} · orden: ${esc((ORDS.find(([k]) => k === (ui.pord || "conf")) || [])[1] || "")}</div>` : ""}
-    <div class="pclist">${it.map(pcCard).join("") || `<div class="empty">No hay picks para hoy ni mañana con este filtro: solo salen los que pasan las reglas (cuota 1.40 o más). Mira el Calendario para los próximos días.</div>`}</div>`;
+    <div class="pclist">${it.map(pcCard).join("") || `<div class="empty">Hoy ya no quedan picks con este filtro. Los de mañana aparecen aquí desde mañana; puedes verlos antes en el Calendario.</div>`}</div>`;
 }
 // foto del jugador recortada, pegada al borde izquierdo de la ficha, con el logo de la liga
 function fotoJug(foto, nombre, tm, liga) {
