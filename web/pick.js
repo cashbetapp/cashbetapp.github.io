@@ -511,7 +511,7 @@ function pcCard(e) {
     pill = `${up ? "Más" : "Menos"} de ${x.linea} ${x.tipo.toLowerCase()}`; attr = `data-pr="${D.props.indexOf(x)}"`; cuota = x.cuota; liga = "NBA";
   }
   return `<button class="pcard ${jug || pan ? "jg" : ""}" ${attr}>${img}<div class="pcm"><div class="pcl">${jug ? lab : esc(lab)}</div><div class="pct">${esc(tit)}</div><div class="pcs">${esc(sub)}</div>
-    <span class="pcpill ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(pill)}</span></span>${e.vl ? `<div class="pcv ${e.vl.e}">${e.vl.e === "historial" ? `Experimental${respTxt(e.x && e.x.resp)}` : `${e.vl.e === "validado" ? "Validado" : "En prueba"} · ${String(e.vl.ac).replace(".", ",")} % en ${e.vl.n} picks`}</div>` : ""}</div>
+    <span class="pcpill ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(pill)}</span></span>${e.vl && e.vl.e === "validado" ? `<div class="pcv validado">Validado · ${String(e.vl.ac).replace(".", ",")} % en ${e.vl.n} picks</div>` : ""}</div>
     <div class="pcr"><span class="pcp"><i></i>${pct(e.p)}</span></div>
     <div class="pcb">${e.val != null ? `<span class="pcval">+${Math.round(e.val * 100)}%</span><span class="pcc">${odd(e.casa)}</span>` : e.prueba ? `<span class="pcc" title="Cuota de la casa (en prueba)">${odd(e.casa)}</span>` : `<span class="pcc" title="Vale la pena desde esta cuota">${odd(e.min || cuota)}</span>`}</div></button>`;
 }
