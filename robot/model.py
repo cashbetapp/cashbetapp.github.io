@@ -18,6 +18,10 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, "data")
 CORTE = "2026-02-01"          # antes: calibración / después: prueba
 SOCCER = ["eng.1", "esp.1", "ita.1", "ger.1", "fra.1", "uefa.champions", "col.1", "mex.1"]
+# SOCCER entrena los modelos (sin cambios). SOCCER_PRED también pronostica las ligas nuevas
+# (experimentales) con esos mismos ajustes; solo las que ya tienen historial descargado.
+from ligas import NUEVAS as _NUEVAS
+SOCCER_PRED = SOCCER + [k for k in _NUEVAS if os.path.exists(os.path.join(DATA, "hist", k + ".json"))]
 
 
 def day(at):

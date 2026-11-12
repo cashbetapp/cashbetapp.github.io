@@ -18,7 +18,9 @@ I.heartP = '<path d="M12 20.5s-7.5-4.6-9.3-9.4C1.4 7.6 3.8 4 7.4 4c2 0 3.5 1.1 4
 I.pen = '<path d="M4 20h4L19 9l-4-4L4 16z"/>';
 I.pin = '<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>';
 
-const ORDEN = ["eng.1", "esp.1", "ita.1", "ger.1", "fra.1", "uefa.champions", "col.1", "mex.1", "nba"];
+const ORDEN0 = ["eng.1", "esp.1", "ita.1", "ger.1", "fra.1", "uefa.champions", "col.1", "mex.1", "nba"];
+// ligas nuevas (experimentales) van después de las de siempre, antes de la NBA
+const ordenLigas = () => { const extra = Object.keys(D.ligas || {}).filter((k) => !ORDEN0.includes(k)); return [...ORDEN0.slice(0, -1), ...extra, "nba"]; };
 ui.calLg = ui.calLg || "todas"; ui.calOpen = ui.calOpen || {}; ui.gtab = "previa";
 const lgLogo = (k, s = 26) => { const L = (D.ligas || {})[k]; return L && L.logo ? `<img class="lglogo" src="${esc(L.logo)}" alt="" width="${s}" height="${s}">` : `<span class="lglogo crest-f" style="width:${s}px;height:${s}px">${esc(((L && L.n) || k).slice(0, 2))}</span>`; };
 const dotsF = (f) => (f || []).slice(0, 3).map((r) => `<span class="wl ${r.r}">${r.r}</span>`).join("");
@@ -48,7 +50,7 @@ function calendario() {
   if (ui.calLg !== "todas") gs = gs.filter((x) => x.lg === ui.calLg);
   const grupos = {};
   gs.forEach((x) => (grupos[x.lg] = grupos[x.lg] || []).push(x));
-  const keys = ORDEN.filter((k) => grupos[k]);
+  const keys = ordenLigas().filter((k) => grupos[k]);
   const dias = { [ui.cal]: dia };
   const lab = ui.cal === 0 ? "Hoy" : ui.cal === 1 ? "Mañana" : ui.cal === -1 ? "Ayer" : cap(fmtS.format(dia));
   const depTxt = ui.calDep === "futbol" ? "Fútbol" : ui.calDep === "nba" ? "Baloncesto" : "";
@@ -68,7 +70,7 @@ function calendario() {
 }
 function openCalFiltros() {
   const dep = [["todos", "Todos"], ["futbol", "Fútbol"], ["nba", "Baloncesto"]];
-  const lgs = ORDEN.filter((k) => ui.calDep === "todos" || (ui.calDep === "nba") === (k === "nba"));
+  const lgs = ordenLigas().filter((k) => ui.calDep === "todos" || (ui.calDep === "nba") === (k === "nba"));
   openSheet(`<h2 class="pkh2" style="margin-top:4px">Filtros</h2>
     <div class="fl">DEPORTE</div><div class="flist">${dep.map(([k, l]) => `<button class="${ui.calDep === k ? "on" : ""}" data-act="cdep" data-k="${k}"><span class="fli">${k === "nba" ? lgLogo("nba", 22) : ic("ball")}${l}</span>${ui.calDep === k ? ic("check") : ""}</button>`).join("")}</div>
     <div class="fl">LIGA</div><div class="flist">${[["todas", "Todas las ligas"], ...lgs.map((k) => [k, D.ligas[k].n])].map(([k, l]) => `<button class="${ui.calLg === k ? "on" : ""}" data-act="clg" data-k="${k}"><span class="fli">${k === "todas" ? "" : lgLogo(k, 22)}${esc(l)}</span>${ui.calLg === k ? ic("check") : ""}</button>`).join("")}</div>

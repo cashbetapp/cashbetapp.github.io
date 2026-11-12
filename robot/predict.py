@@ -13,7 +13,7 @@ from sklearn.linear_model import LogisticRegression
 from fetch import get, LEAGUES
 from extra import predict as extra_predict, outcome as extra_outcome
 from evaluar import mercado
-from model import (DATA, SOCCER, Poi, load, soccer_markets, nba_teams, is_preseason,
+from model import (DATA, SOCCER, SOCCER_PRED, Poi, load, soccer_markets, nba_teams, is_preseason,
                    nba_walk, STATS, stat_val)
 
 DIAS = 8  # cuántos días hacia adelante
@@ -151,7 +151,7 @@ def sel(mk, p, odd=None):
 def soccer(par, report):
     out = []
     acc = report["futbol"]["mercados"]
-    for key in SOCCER:
+    for key in SOCCER_PRED:
         games, det, pre = load(key)
         pre = [g for g in pre if g["h"] and g["a"] and soon(g["at"])]
         if not pre:
@@ -500,7 +500,7 @@ def props(injured, days=None):
 def form_table():
     """Últimos partidos de cada equipo (todas las ligas que tenemos)."""
     tab = {}
-    for key in SOCCER + ["nba"]:
+    for key in SOCCER_PRED + ["nba"]:
         games, _, _ = load(key)
         for g in games:
             if key == "nba" and is_preseason(g["at"][:10]):
@@ -642,13 +642,13 @@ def ledger(partidos, props_, extras=None):
                 e["ret"] = (coll, k) not in vivos
     # 3) calificar (una sola vez)
     res, names = {}, {}
-    for key in SOCCER + ["nba"]:
+    for key in SOCCER_PRED + ["nba"]:
         games, det, _ = load(key)
         for g in games:
             res[g["id"]] = (g["h"]["s"], g["a"]["s"], det.get(g["id"]))
     from model import choques
     malos = set()
-    for key in SOCCER:
+    for key in SOCCER_PRED:
         with open(os.path.join(DATA, "hist", key + ".json"), encoding="utf-8") as f:
             malos |= choques(json.load(f)["games"])
     for coll in ("partidos", "extra", "props"):
@@ -741,14 +741,8 @@ MERCADO = {"res": "Resultado", "cor": "Córners", "sot": "Tiros a puerta", "tir"
 
 
 def _mercado(coll, e):
-    if coll == "props":
-        return "Jugadores NBA · " + (e.get("tipo") or "")
-    if coll == "extra":
-        return MERCADO.get(e["s"], e["s"]) + (" (jugador)" if e["sc"] == "j" else " (partido)" if e["sc"] == "t" else " (equipo)")
-    m = e["m"]
-    if e.get("dep") == "nba":
-        return "NBA · " + ("Total de puntos" if m.startswith(("mas_", "menos_")) else "Hándicap" if m.startswith("hcp") else "Ganador")
-    return "Goles" if m.startswith(("mas_", "menos_", "btts")) else "Resultado"
+    """Mismo nombre que evaluar.mercado (las ligas nuevas son un mercado aparte)."""
+    return mercado(coll, e)
 
 
 def metricas(items):
@@ -1030,9 +1024,15 @@ def main():
     par = r["parametros"]
     f = soccer(par["futbol"], r)
     ex = extra_predict(soon, now().date().toordinal())
+    fuente = {"jug": {}, "jug_fuera": {}, "props": []}   # para candidatos.py (no se publica en picks.json)
     for g in f:
         x = ex.get(g["id"])
         if x:
+            cj = x.pop("cand_j", [])
+            if g["lg"] in LIGAS_SIN_JUGADORES:
+                fuente["jug_fuera"][g["id"]] = cj
+            else:
+                fuente["jug"][g["id"]] = [c for c in cj if g["lg"] not in LIGAS_SIMPLES or c[2] in MERCADOS_SIMPLES]
             if g["lg"] in LIGAS_SIMPLES:   # pedido del usuario: sin tiros, tiros a puerta ni faltas
                 x["grupos"] = [q for q in x["grupos"] if q.get("s") in MERCADOS_SIMPLES]
                 x["picks"] = [q for q in x["picks"] if q.get("s") in MERCADOS_SIMPLES]
@@ -1045,6 +1045,14 @@ def main():
     pr = props(injured)
     nba_ok = nba_probada()
     V = validacion()
+    fuente["props"] = [{k: x[k] for k in ("ev", "at", "partido", "jugador", "tipo", "linea", "lado", "p", "pm", "cuota", "valor")}
+                       for x in pr]
+    fuente["nba_ok"] = nba_ok
+    try:
+        json.dump(fuente, open(os.path.join(DATA, "model", "candidatos_fuente.json"), "w", encoding="utf-8"),
+                  ensure_ascii=False, separators=(",", ":"))
+    except Exception as e:
+        print("candidatos_fuente:", e)
     # solo picks de 70 %+ (y la NBA solo si ya lo demostró); lo demás no entra a listas ni al registro
     pr = [x for x in pr if nba_ok and PMIN <= x["p"]]
     try:
@@ -1067,18 +1075,18 @@ def main():
     for g in f + nb:
         pk = g["pick"]
         if not pk.get("bajo"):
-            v = nivel_validacion(V, mercado("partidos", {"m": pk["m"], "dep": g["dep"]}))
+            v = nivel_validacion(V, mercado("partidos", {"m": pk["m"], "dep": g["dep"], "lg": g["lg"]}))
             pk.update({"val": v} if v else {"oculto": True})
             ocultos += not v
         # cada mercado del partido también (de aquí salen los "errores de cuota" de la app y de los avisos)
         for x in g.get("mercados") or []:
             if x.get("m"):
-                v = nivel_validacion(V, mercado("partidos", {"m": x["m"], "dep": g["dep"]}))
+                v = nivel_validacion(V, mercado("partidos", {"m": x["m"], "dep": g["dep"], "lg": g["lg"]}))
                 x.update({"val": v} if v else {"oculto": True})
         x = g.get("extra")
         if x:
             for q in x.get("picks", []) + x.get("jug", []):
-                v = nivel_validacion(V, mercado("extra", q))
+                v = nivel_validacion(V, mercado("extra", {**q, "lg": g["lg"]}))
                 q.update({"val": v} if v else {"oculto": True})
                 ocultos += not v
     for q in pr:

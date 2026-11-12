@@ -29,7 +29,13 @@ MERCADO = {"cor": "Córners", "sot": "Tiros a puerta", "tir": "Tiros", "fal": "F
 
 
 def mercado(coll, e):
-    """Mismo nombre de mercado que usa la página Historial (predict._mercado)."""
+    """Mismo nombre de mercado que usa la página Historial (predict._mercado).
+    Las ligas nuevas son un mercado aparte (sus estadísticas no se mezclan)."""
+    from ligas import NUEVAS, SUFIJO
+    return _mercado_base(coll, e) + (SUFIJO if e.get("lg") in NUEVAS else "")
+
+
+def _mercado_base(coll, e):
     if coll == "props":
         return "Jugadores NBA · " + (e.get("tipo") or "")
     if coll == "extra":

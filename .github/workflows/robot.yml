@@ -76,6 +76,10 @@ jobs:
         working-directory: robot
         run: python predict.py
 
+      - name: Motor de candidatos (solo lee; embudo, motivos de descarte y ranking -> data/model/candidatos.json)
+        working-directory: robot
+        run: python candidatos.py || echo "candidatos falló, se sigue"
+
       - name: Noticias (ESPN en español)
         working-directory: robot
         run: python noticias.py || echo "noticias falló, se sigue"

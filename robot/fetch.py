@@ -25,6 +25,9 @@ LEAGUES = {
     "col.1": ("soccer", "col.1", "Liga BetPlay"),
     "mex.1": ("soccer", "mex.1", "Liga MX"),
 }
+# ligas nuevas (experimentales, ver ligas.py)
+from ligas import NUEVAS, DESDE, NUEVAS_POR_CORRIDA
+LEAGUES.update({k: ("soccer", k, v) for k, v in NUEVAS.items()})
 
 
 def get(url, tries=4):
@@ -113,10 +116,21 @@ def run(d0, d1, workers=4):
         days.append(d.strftime("%Y%m%d"))
         d += dt.timedelta(days=1)
     today = dt.datetime.now(dt.timezone.utc).replace(tzinfo=None).strftime("%Y%m%d")
+    nuevas = 0
     for key, (sp, lg, name) in LEAGUES.items():
         db = load(key)
+        dias = days
+        if key in NUEVAS and not db["days"]:
+            # liga nueva sin historial: se baja desde DESDE, pocas ligas por corrida (sin sobrecargar)
+            if nuevas >= NUEVAS_POR_CORRIDA:
+                continue
+            nuevas += 1
+            d, dias = dt.date.fromisoformat(DESDE), []
+            while d <= d1:
+                dias.append(d.strftime("%Y%m%d")); d += dt.timedelta(days=1)
+            print(f"{name}: liga nueva, bajando historial desde {DESDE} ({len(dias)} días)", flush=True)
         # pedir: días nunca pedidos, o con partidos sin terminar, o de hoy/futuros
-        todo = [x for x in days if x not in db["days"] or db["days"][x] == "open" or x >= today]
+        todo = [x for x in dias if x not in db["days"] or db["days"][x] == "open" or x >= today]
         if not todo:
             continue
         t0 = time.time()

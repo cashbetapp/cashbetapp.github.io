@@ -11,7 +11,7 @@ Uso:  python extra.py   -> prueba y guarda data/model/extra.json
 import json, os, math, time
 import numpy as np
 from scipy.stats import nbinom, poisson
-from model import DATA, SOCCER, CORTE, Poi, load, day, logloss, calib
+from model import DATA, SOCCER, SOCCER_PRED, CORTE, Poi, load, day, logloss, calib
 
 STATS = ["cor", "sot", "tir", "fal", "tar"]
 CAMPO = {"cor": "wonCorners", "sot": "shotsOnTarget", "tir": "totalShots", "fal": "foulsCommitted"}
@@ -397,7 +397,7 @@ def predict(soon, today_ord):
     aj, pub = rep["ajustes"], {k: v["publicar"] for k, v in rep["mercados"].items()}
     acierto = {k: v["acierto_picks"] for k, v in rep["mercados"].items()}
     out = {}
-    for key in SOCCER:
+    for key in SOCCER_PRED:
         ligas = {}
         for s in STATS:
             pr = (aj["equipo"][s]["xi"], aj["equipo"][s]["ridge"])
@@ -433,7 +433,7 @@ def predict(soon, today_ord):
                                           temp=temporadas(vals, b[1], b[2]), esp=round(float(M), 2), disp=dsp))
                 if len(gr) > 3:
                     grupos.append(gr)
-            jug = []
+            jug, cand_j = [], []
             for r in L0.players(g, lams):
                 s = r["s"]
                 if not pub.get(f"{s}_j"):
@@ -441,7 +441,9 @@ def predict(soon, today_ord):
                 m = pmean({k: np.array([v]) for k, v in r.items() if k in ("sum", "k", "prior", "ctx")},
                           aj["K"][s], aj["alpha"][s])[0]
                 lines = PJ[s][1]
-                b = _best([p_over(m, ln, 1.0) for ln in lines], lines)
+                pov_j = [p_over(m, ln, 1.0) for ln in lines]
+                cand_j.append([r["pid"], r["n"], s, [[ln, round(float(p), 4)] for ln, p in zip(lines, pov_j)]])
+                b = _best(pov_j, lines)
                 if b:
                     jug.append(_sel(f"{s}|j:{r['pid']}|{b[1]}|{b[2]:g}", b[0], _txt(s, "j", b[1], b[2], r["n"]),
                                     s=s, sc="j", pid=r["pid"], jugador=r["n"], side=r["side"],
@@ -455,7 +457,7 @@ def predict(soon, today_ord):
             hist = {sd: L0.th.get(g[sd]["id"], [])[-30:][::-1] for sd in ("h", "a")}
             vr = {sd: [e for e in L0.th.get(g[sd]["id"], []) if e["vs"] == _ab(g, "a" if sd == "h" else "h")][-5:][::-1]
                   for sd in ("h", "a")}
-            out[g["id"]] = {"grupos": grupos, "picks": sorted(picks, key=lambda x: -x["p"]), "jug": jug,
+            out[g["id"]] = {"grupos": grupos, "picks": sorted(picks, key=lambda x: -x["p"]), "jug": jug, "cand_j": cand_j,
                             "hist": hist, "vr": vr, "lg": {}, "tabla": tabla(L0, g)}
             for sd in ("h", "a"):
                 for e in hist[sd]:

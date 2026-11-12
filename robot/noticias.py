@@ -37,7 +37,10 @@ def foto(url):
 
 def main():
     vistas, out = set(), []
+    from ligas import NUEVAS
     for key, (sp, code, name) in LEAGUES.items():
+        if key in NUEVAS:
+            continue
         reg = REGION.get(key, "mx")
         d = _json(f"https://site.api.espn.com/apis/site/v2/sports/{sp}/{code}/news?lang=es&region={reg}&limit=6") or {}
         for a in d.get("articles", []):
