@@ -1,5 +1,8 @@
 // CASHBET · piezas del Inicio igual que IABET: Noticias (ESPN en español) y pantalla de Notificaciones.
 let NOTI = null, NOTI_CARGANDO = false;
+// novedades de la app (web/novedades.json; el robot también las manda como aviso push, una vez)
+let NOVS = [];
+fetch("novedades.json?" + Date.now()).then((r) => r.json()).then((x) => { NOVS = Array.isArray(x) ? x : []; if (typeof rerender === "function") rerender(); }).catch(() => {});
 I.news = '<path d="M4 5h13v14H5a1 1 0 0 1-1-1z"/><path d="M17 8h3v10a1 1 0 0 1-1 1h-2"/><path d="M7 9h7M7 12h7M7 15h4"/>';
 I.ext = '<path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>';
 I.play = '<path d="M8 5v14l11-7z"/>';
@@ -41,6 +44,7 @@ function noticiasSec() {
 // ---------------------------------------------------------------- Notificaciones
 function avisos() {
   const L = [], hoy = (D.partidos || []).filter((g) => esHoy(g.at));
+  NOVS.forEach((n) => L.push({ t: n.at, i: "spark", c: "v", h: n.t, s: n.b, go: n.go || "inicio" }));
   const gen = D.generado.replace("Z", ":00Z");
   const its = typeof pickItems === "function" ? (typeof soloNba20 === "function" ? soloNba20(pickItems()) : pickItems()) : [];
   const nMej = typeof mejores === "function" ? mejores(its.filter((e) => e.k !== "pr"), 3).length : its.length;

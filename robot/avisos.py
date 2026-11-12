@@ -15,6 +15,10 @@ PROYECTO = "cashbet-2562a"
 ROBOT = "robot-avisos@cashbet-2562a.firebaseapp.com"
 ERR_PMIN, ERR_MIN, P_TOPE = 0.6, 0.05, 0.75
 COL = dt.timezone(dt.timedelta(hours=-5))
+try:
+    NOVEDADES = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "web", "novedades.json"), encoding="utf-8"))
+except Exception:
+    NOVEDADES = []
 
 
 def _h(s):
@@ -142,6 +146,9 @@ def mensajes(u, D, H, errs, enviados, ahora):
             mej = max(juegos, key=pp)
             b = f"{len(juegos)} partidos con pick hoy" + (f" · {len(errs)} errores de cuota" if errs else "") + f". El más probable: {mej['pick']['txt']} ({round(pp(mej) * 100)}%)."
             out.append((f"dia|{hoy}", {"t": "Los picks de hoy ya están", "b": b, "u": "./#picks", "tag": "dia"}))
+    for n in NOVEDADES:                             # novedades de la app: una sola vez (clave con "_" -> no se borra a los 10 días)
+        if despierto and f"_nov|{n['id']}" not in enviados and ahora - dt.datetime.fromisoformat(n["at"].replace("Z", "+00:00")) < dt.timedelta(days=3):
+            out.append((f"_nov|{n['id']}", {"t": n["t"], "b": n["b"], "u": "./#" + n.get("go", "inicio"), "tag": "nov"}))
     if pref.get("err", True) and despierto:
         nuevos = [e for e in errs if f"err|{e['k']}" not in enviados]
         if nuevos:

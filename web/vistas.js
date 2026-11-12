@@ -100,8 +100,6 @@ function inicio() {
   return `<div class="top"><div class="logo">CASH<b>BET</b></div><div class="ic">
       <button class="icb" data-go="notificaciones" aria-label="Notificaciones">${ic("bell")}${typeof campana === "function" ? campana() : ""}</button><button class="icb" data-go="ajustes" aria-label="Perfil">${ic("user")}</button></div></div>
     <h1>Buen ${esc(dia)}${nom ? `, ${esc(nom)}` : ""}</h1><div class="sub2">${fmtD.format(new Date())} · ${typeof mezclaTodos === "function" ? mezclaTodos(pickItems()).length : its.length} picks listos</div>
-    <div class="ban">${ic("star")}<div>${sem.n ? `<b>CASHBET acertó ${sem.g}/${sem.n}</b><span>Últimos 7 días · picks reales</span>` : `<b>Registro real en marcha</b><span>Cada pick se califica al terminar el partido</span>`}</div>${esAdmin() ? `<button data-go="historial">Historial ${ic("right")}</button>` : ""}</div>
-    <button class="oiban" data-go="odds">${ic("scale")}<div><b>Odds Intelligence</b><span>Comparador de casas, oportunidades e historial</span></div>${ic("right")}</button>
     <div class="tiles t2">
       <div class="tile"><div class="k">Efectividad</div><div class="v">${real ? Math.round(rec.ef) : Math.round(efPrueba)}%<small>${real ? "real" : "prueba"}</small></div></div>
       <div class="tile"><div class="k">Racha</div><div class="v">${rec.n ? (/G$/.test(rec.racha) ? rec.racha.replace(" ", "") : "0") : "—"}</div></div>

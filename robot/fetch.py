@@ -39,6 +39,7 @@ def dia_intl(x):
             continue
         ok = True
         for ev in d.get("events", []):
+            ev["_comp"] = code
             evs[ev["id"]] = ev
     return {"events": list(evs.values())} if ok else None
 
@@ -163,6 +164,7 @@ def run(d0, d1, workers=4):
             for ev in evs:
                 g = slim(ev, key)
                 g["dq"] = day
+                if ev.get("_comp"): g["comp"] = ev["_comp"]          # selecciones: de qué competencia es
                 old = db["games"].get(g["id"]) or {}
                 # en vivo o terminado, la fuente cambia o borra las cuotas:
                 # conservar las últimas de antes del partido

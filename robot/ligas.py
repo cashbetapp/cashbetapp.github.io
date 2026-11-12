@@ -53,6 +53,8 @@ def publicable(key, g):
     """En selecciones solo se pronostica si las dos son conocidas; en las ligas, todo."""
     if key != "intl":
         return True
+    if g.get("comp") == "uefa.nations":            # Nations League: todos sus partidos (pedido del usuario)
+        return True
     return all(((g.get(s) or {}).get("fn") or (g.get(s) or {}).get("n")) in SELECCIONES for s in ("h", "a"))
 SUFIJO = " · liga nueva"
 DESDE = "2025-08-01"          # historial que se baja la primera vez (igual que las ligas actuales)
