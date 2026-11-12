@@ -31,7 +31,7 @@ NUEVAS = {
 SUFIJO = " · liga nueva"
 DESDE = "2025-08-01"          # historial que se baja la primera vez (igual que las ligas actuales)
 import os
-NUEVAS_POR_CORRIDA = int(os.environ.get("CASHBET_NUEVAS_POR_CORRIDA", 3))   # 3 ligas nuevas por corrida (sin sobrecargar)
+NUEVAS_POR_CORRIDA = int(os.environ.get("CASHBET_NUEVAS_POR_CORRIDA", 14))   # todas de una vez (pedido del usuario: 5 h era mucho; local tardó ~11 min)   # 3 ligas nuevas por corrida (sin sobrecargar)
 
 
 def es_nueva(lg):
