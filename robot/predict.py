@@ -509,7 +509,9 @@ NBA_MIL = {"Points Milestones": "Total Points", "Rebounds Milestones": "Total Re
            "3-Point Field Goals Milestones": "Total 3-Point Field Goals", "Points + Rebounds Milestones": "Total Points and Rebounds",
            "Points + Assists Milestones": "Total Points and Assists", "Rebounds + Assists Milestones": "Total Assists and Rebounds",
            "Points + Assists + Rebounds Milestones": "Total Points, Rebounds, and Assists"}
-NBA_MIL_PISO, NBA_MIL_PMIN, NBA_MIL_POR_PARTIDO = 1.60, 0.80, 2
+# 2026-11-12 (usuario: "nada de 1.40 ni 1.43, cuotas reales buenas y basadas en estadísticas"): cuota 1.60-2.30 y modelo 75 %+.
+# Prueba 8-12 nov: 25 picks, 72 % real, +25 % (la racha de iABET en esa franja: 43 %, -23 %).
+NBA_MIL_PISO, NBA_MIL_TECHO, NBA_MIL_PMIN, NBA_MIL_POR_PARTIDO = 1.60, 2.30, 0.75, 3
 
 
 def _min_bajon(prev):
@@ -537,7 +539,7 @@ def props_mil(ev, e, seq, names, ab_de, injured):
         riv = next((x for x in eq if x != mio), None)
         for p in ps:
             o = float(p["o"]); X = float(p["ln"])
-            if not (NBA_MIL_PISO <= o <= 2.6):
+            if not (NBA_MIL_PISO <= o <= NBA_MIL_TECHO):
                 continue
             mu, pm = prop_prob(prev, ks, X - 0.5)
             if pm < NBA_MIL_PMIN:
@@ -637,7 +639,7 @@ def props(injured, days=None):
             if not days and ev["at"] <= now().strftime("%Y-%m-%dT%H:%MZ"):
                 continue
             out += props_mil(ev, e, seq, names, ab_de, injured)
-            out += props_dia(ev, e, seq, names, injured)
+            # props_dia (racha 7/10 como iABET) APAGADO: con cuotas de 1.60+ acertó 43 % y perdió 23 % en la prueba
             pairs = {}
             for p in ev["props"]:
                 if p["t"] in PROP_TYPES and p["pl"] and p["ln"] is not None:
