@@ -12,7 +12,9 @@
 - Sin cuotas de The Odds API (no alcanzan los créditos gratis): no hay EV para ellas.
 """
 
-NUEVAS = {
+# 2026-11-12: el usuario NO quiere estas ligas (solo las principales del mundo + Colombia y México).
+# Quedan apagadas aquí; para volver a encenderlas, cambiar DESACTIVADAS por NUEVAS.
+DESACTIVADAS = {
     "eng.2": "Championship",
     "esp.2": "LaLiga 2",
     "ita.2": "Serie B",
@@ -28,6 +30,7 @@ NUEVAS = {
     "bra.1": "Brasileirão",
     "arg.1": "Liga Profesional (Argentina)",
 }
+NUEVAS = {}
 SUFIJO = " · liga nueva"
 DESDE = "2025-08-01"          # historial que se baja la primera vez (igual que las ligas actuales)
 import os
