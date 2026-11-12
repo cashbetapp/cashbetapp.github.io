@@ -563,6 +563,64 @@ def props_mil(ev, e, seq, names, ab_de, injured):
     return out
 
 
+# Picks NBA del día como iABET (pedido del usuario 2026-11-12, "ármalo"): hasta 15 por día. Primero los de la regla
+# estricta (props_mil); se completan con líneas X+ donde la casa da 54 %+ (cuota 1.40-1.77) y el jugador las cumplió en
+# 7+ de sus últimos 10. Prueba 8-12 nov: aciertan ~57 % (la casa decía 62 %) y PIERDEN ~12 %; el usuario lo sabe y lo
+# eligió. La probabilidad que se muestra es la REAL medida (la de la casa menos 5 puntos), no la racha.
+NBA_DIA_MAX, NBA_DIA_CUOTA, NBA_DIA_RACHA, NBA_DIA_AJUSTE = 15, (1.40, 1.77), 7, 0.05
+
+
+def props_dia(ev, e, seq, names, injured):
+    esc = {}
+    for p in ev["props"]:
+        if p["t"] in NBA_MIL and p["pl"] and p["ln"] is not None:
+            esc.setdefault((p["pl"], p["t"]), []).append(p)
+    out = []
+    for (pid, tm), ps in esc.items():
+        prev = seq.get(pid, [])
+        if len(prev) < 5 or pid in injured:
+            continue
+        ps = sorted(ps, key=lambda p: p["ln"]); os_ = [float(p["o"]) for p in ps]
+        if any(b <= a for a, b in zip(os_, os_[1:])):
+            continue
+        t = NBA_MIL[tm]; ks = PROP_TYPES[t]
+        for p in ps:
+            o = float(p["o"]); X = float(p["ln"])
+            if not (NBA_DIA_CUOTA[0] <= o <= NBA_DIA_CUOTA[1]):
+                continue
+            r10 = sum(sum(x[k] for k in ks) >= X for x in prev[-10:])
+            if r10 < NBA_DIA_RACHA:
+                continue
+            mu, pm = prop_prob(prev, ks, X - 0.5)
+            casa = 1 / o / 1.045
+            out.append({"ev": e, "at": ev["at"], "partido": ev["name"], "pl": pid, "jugador": names[pid][0], "equipo": names[pid][1],
+                        "tipo": NOMBRE[t], "t": t, "linea": X - 0.5, "lado": "mas", "esperado": round(mu, 1), "aus": 0,
+                        "p": round(casa - NBA_DIA_AJUSTE, 4), "pm": round(pm, 4), "cuota": o, "casa": round(1 / o, 4),
+                        "valor": round((casa - NBA_DIA_AJUSTE) * o - 1, 3), "dia": True, "prueba": True, "racha": r10,
+                        "ult": [sum(x[k] for k in ks) for x in prev[-10:]],
+                        "hist": [[sum(x[k] for k in ks), x.get("_vs"), 1 if x.get("_l") else 0, x.get("_at"), round(x["MIN"])] for x in prev[-40:]][::-1],
+                        "prom": round(float(np.mean([sum(x[k] for k in ks) for x in prev[-10:]])), 1)})
+    return out
+
+
+def elegir_dia(pr):
+    """Hasta NBA_DIA_MAX por día (hora Colombia): primero los estrictos; luego por racha y por lo que da la casa.
+    1 pick por jugador y máx. 3 por partido."""
+    dia = lambda x: (dt.datetime.fromisoformat(x["at"].replace("Z", "")) - dt.timedelta(hours=5)).strftime("%Y-%m-%d")
+    fijos = [x for x in pr if not x.get("dia")]
+    out = list(fijos)
+    for d in sorted({dia(x) for x in pr if x.get("dia")}):
+        est = [x for x in pr if x.get("mil") and dia(x) == d]
+        jug, pe = {x["pl"] for x in est}, {}
+        for x in est: pe[x["ev"]] = pe.get(x["ev"], 0) + 1
+        n = len(est)
+        for x in sorted([x for x in pr if x.get("dia") and dia(x) == d], key=lambda x: (-x["racha"], -x["p"])):
+            if n >= NBA_DIA_MAX: break
+            if x["pl"] in jug or pe.get(x["ev"], 0) >= 3: continue
+            jug.add(x["pl"]); pe[x["ev"]] = pe.get(x["ev"], 0) + 1; out.append(x); n += 1
+    return out
+
+
 def props(injured, days=None):
     games, det, _ = load("nba")
     out = []
@@ -579,6 +637,7 @@ def props(injured, days=None):
             if not days and ev["at"] <= now().strftime("%Y-%m-%dT%H:%MZ"):
                 continue
             out += props_mil(ev, e, seq, names, ab_de, injured)
+            out += props_dia(ev, e, seq, names, injured)
             pairs = {}
             for p in ev["props"]:
                 if p["t"] in PROP_TYPES and p["pl"] and p["ln"] is not None:
@@ -744,7 +803,8 @@ def ledger(partidos, props_, extras=None):
         k = f"{x['ev']}_{x['pl']}_{x['t']}_{x['linea']}"
         vivos.add(("props", k))
         rec = {kk: x.get(kk) for kk in ("ev", "at", "pl", "jugador", "equipo", "partido", "t", "tipo", "linea", "lado",
-                                         "p", "pm", "cuota", "casa", "valor")}
+                                         "p", "pm", "cuota", "casa", "valor", "racha")}
+        rec["regla"] = "estricta" if x.get("mil") else "dia" if x.get("dia") else None
         R.anotar(L, "props", k, dict(rec, dep="nba", liga="NBA", cuota_casa=True, cq=ahora, fuente=FUENTE,
                                      modelo=MODELO["props"], ver=ver), ahora)
     # 2) antes del partido: un pick que el modelo ya no publica queda "retirado" (no cuenta)
@@ -1166,7 +1226,8 @@ def main():
     except Exception as e:
         print("candidatos_fuente:", e)
     # solo picks de 70 %+ (y la NBA solo si ya lo demostró); lo demás no entra a listas ni al registro
-    pr = [x for x in pr if (x.get("mil") or (nba_ok and PMIN <= x["p"])) and (x.get("cuota") or x.get("justa") or 1 / x["p"]) >= CUOTA_PISO]
+    pr = [x for x in pr if (x.get("mil") or x.get("dia") or (nba_ok and PMIN <= x["p"])) and (x.get("cuota") or x.get("justa") or 1 / x["p"]) >= CUOTA_PISO]
+    pr = elegir_dia(pr)
     try:
         import nbaextra
         nbaextra.completar(nb, globals().get("NBA_ROWS") or [])       # puntos de equipo, defensa del rival, líderes, bajas
@@ -1216,7 +1277,7 @@ def main():
                 ocultos += not v
     for q in pr:
         v = nivel_validacion(V, mercado("props", q))
-        if not v and q.get("mil"):
+        if not v and (q.get("mil") or q.get("dia")):
             v = {"e": "historial"}; con_resp += 1          # regla de líneas reales de la casa (se mide en el registro)
         q.update({"val": v} if v else {"oculto": True})
         ocultos += not v
