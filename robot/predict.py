@@ -605,6 +605,47 @@ def props_dia(ev, e, seq, names, injured):
     return out
 
 
+# "MENOS DE" en las líneas PRINCIPALES de jugadores (las dos opciones, cuota ~1.80; la casa cobra menos margen que en X+).
+# Prueba 8-12 nov con cuotas reales: los 15 de cada día con mayor probabilidad del modelo (60 %+, cuota 1.60+) acertaron
+# 62,5 % a cuota media 1.80, +12 % (72 picks). Las "más de" de esas mismas líneas perdieron (46 %, -13 %): no se usan.
+# Qué cuota es "más": la que se parece a la de la línea X+ (X = línea + 0.5) de la misma casa.
+NBA_MENOS_PMIN, NBA_MENOS_PISO = 0.60, 1.60
+_MIL_DE = {v: k for k, v in NBA_MIL.items()}
+
+
+def props_menos(ev, e, seq, names, injured):
+    par, mil = {}, {}
+    for p in ev["props"]:
+        if p["t"] in PROP_TYPES and p["pl"] and p["ln"] is not None:
+            par.setdefault((p["pl"], p["t"], float(p["ln"])), []).append(float(p["o"]))
+        if p["t"] in NBA_MIL and p["pl"] and p["ln"] is not None:
+            mil[(p["pl"], NBA_MIL[p["t"]], float(p["ln"]))] = float(p["o"])
+    out = []
+    for (pid, t, ln), os_ in par.items():
+        prev = seq.get(pid, [])
+        if len(os_) != 2 or len(prev) < 5 or pid in injured or os_[0] == os_[1]:
+            continue
+        m = mil.get((pid, t, ln + 0.5))
+        if m is None:
+            continue
+        omas, omen = (os_[0], os_[1]) if abs(os_[0] - m) < abs(os_[1] - m) else (os_[1], os_[0])
+        if omen < NBA_MENOS_PISO:
+            continue
+        ks = PROP_TYPES[t]; mu, pmas = prop_prob(prev, ks, ln); pm = 1 - pmas
+        if pm < NBA_MENOS_PMIN:
+            continue
+        vig = 1 / omas + 1 / omen; casa = 1 / omen / vig
+        pv = round(0.5 * pm + 0.5 * casa, 4)
+        out.append({"ev": e, "at": ev["at"], "partido": ev["name"], "pl": pid, "jugador": names[pid][0], "equipo": names[pid][1],
+                    "tipo": NOMBRE[t], "t": t, "linea": ln, "lado": "menos", "esperado": round(mu, 1), "aus": 0,
+                    "p": pv, "pm": round(pm, 4), "cuota": omen, "casa": round(1 / omen, 4), "valor": round(pv * omen - 1, 3),
+                    "dia": True, "prueba": True,
+                    "ult": [sum(x[k] for k in ks) for x in prev[-10:]],
+                    "hist": [[sum(x[k] for k in ks), x.get("_vs"), 1 if x.get("_l") else 0, x.get("_at"), round(x["MIN"])] for x in prev[-40:]][::-1],
+                    "prom": round(float(np.mean([sum(x[k] for k in ks) for x in prev[-10:]])), 1)})
+    return out
+
+
 def elegir_dia(pr):
     """Hasta NBA_DIA_MAX por día (hora Colombia): primero los estrictos; luego por racha y por lo que da la casa.
     1 pick por jugador y máx. 3 por partido."""
@@ -616,7 +657,7 @@ def elegir_dia(pr):
         jug, pe = {x["pl"] for x in est}, {}
         for x in est: pe[x["ev"]] = pe.get(x["ev"], 0) + 1
         n = len(est)
-        for x in sorted([x for x in pr if x.get("dia") and dia(x) == d], key=lambda x: (-x["racha"], -x["p"])):
+        for x in sorted([x for x in pr if x.get("dia") and dia(x) == d], key=lambda x: -x["pm"]):   # los de mayor probabilidad del modelo
             if n >= NBA_DIA_MAX: break
             if x["pl"] in jug or pe.get(x["ev"], 0) >= 3: continue
             jug.add(x["pl"]); pe[x["ev"]] = pe.get(x["ev"], 0) + 1; out.append(x); n += 1
@@ -640,6 +681,7 @@ def props(injured, days=None):
                 continue
             out += props_mil(ev, e, seq, names, ab_de, injured)
             # props_dia (racha 7/10 como iABET) APAGADO: con cuotas de 1.60+ acertó 43 % y perdió 23 % en la prueba
+            out += props_menos(ev, e, seq, names, injured)
             pairs = {}
             for p in ev["props"]:
                 if p["t"] in PROP_TYPES and p["pl"] and p["ln"] is not None:
