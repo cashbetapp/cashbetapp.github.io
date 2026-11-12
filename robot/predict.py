@@ -1011,17 +1011,34 @@ def validacion():
         return None
 
 
+def _cifras(b):
+    """Cifras REALES del tipo de pick (validacion.json) para mostrarlas tal cual en la app:
+    n picks de 70 %+, aciertos, % real, probabilidad media estimada y progreso de la muestra verificable."""
+    m = b.get("p70") or {}
+    v = (b.get("verificable") or {}).get("p70") or {}
+    return {"ac": m.get("acierto"), "n": m.get("n", 0), "k": m.get("aciertos", 0), "pm": m.get("prob_media"),
+            "vn": v.get("n", 0), "vac": v.get("acierto")}
+
+
 def nivel_validacion(V, nombre):
-    """{"e": "validado"|"prueba", "ac": acierto real 70 %+, "n": picks} o None (no se muestra)."""
+    """{"e": "validado"|"prueba", ...cifras} o None (no se muestra como pick: queda "experimental").
+    "prueba" = EN EVALUACIÓN: 70 %+ real en el histórico, sin la prueba estadística completa."""
     b = (V or {}).get(nombre)
     if not b:
         return None
-    m = b["p70"]
     if b["estado"] == "validado":
-        return {"e": "validado", "ac": m["acierto"], "n": m["n"]}
+        return {"e": "validado", **_cifras(b)}
     if b["estado"].startswith("en camino"):
-        return {"e": "prueba", "ac": m["acierto"], "n": m["n"]}
+        return {"e": "prueba", **_cifras(b)}
     return None
+
+
+def experimental(V, nombre):
+    """Cifras del tipo de pick que NO califica (para la sección Experimental). Nunca cambia la probabilidad."""
+    b = (V or {}).get(nombre)
+    if not b:
+        return {"n": 0, "estado": "sin historial"}
+    return {**_cifras(b), "estado": b["estado"]}
 
 
 def main():
@@ -1068,7 +1085,7 @@ def main():
         pk = g["pick"]
         if not pk.get("bajo"):
             v = nivel_validacion(V, mercado("partidos", {"m": pk["m"], "dep": g["dep"]}))
-            pk.update({"val": v} if v else {"oculto": True})
+            pk.update({"val": v} if v else {"oculto": True, "exp": experimental(V, mercado("partidos", {"m": pk["m"], "dep": g["dep"]}))})
             ocultos += not v
         # cada mercado del partido también (de aquí salen los "errores de cuota" de la app y de los avisos)
         for x in g.get("mercados") or []:
@@ -1079,7 +1096,7 @@ def main():
         if x:
             for q in x.get("picks", []) + x.get("jug", []):
                 v = nivel_validacion(V, mercado("extra", q))
-                q.update({"val": v} if v else {"oculto": True})
+                q.update({"val": v} if v else {"oculto": True, "exp": experimental(V, mercado("extra", q))})
                 ocultos += not v
     for q in pr:
         v = nivel_validacion(V, mercado("props", q))

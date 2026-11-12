@@ -78,7 +78,9 @@ function openCalFiltros() {
 
 // ------------------------------------------------------------ INICIO
 function inicio() {
-  const its = mejores((typeof soloNba20 === "function" ? soloNba20(pickItems()) : pickItems()).filter((e) => e.k !== "pr"), 3);   // el mejor de cada partido (+ fuertes)
+  // hoy; si hoy no hay picks validados ni en evaluación, los de los próximos 3 días (nunca experimentales)
+  const PV = typeof pickItemsVis === "function" ? pickItemsVis() : { it: pickItems(), prox: false };
+  const its = mejores((typeof soloNba20 === "function" ? soloNba20(PV.it) : PV.it).filter((e) => e.k !== "pr"), 3);   // el mejor de cada partido (+ fuertes)
   const rec = (D.registro && D.registro.partidos) || { n: 0 }, sem = (D.registro && D.registro.semana) || { n: 0 };
   const a = D.acierto, nPrueba = a.futbol_partidos + a.nba_partidos;
   const efPrueba = (a.futbol_1x2 * a.futbol_partidos + a.nba_ganador * a.nba_partidos) / nPrueba;
@@ -90,14 +92,14 @@ function inicio() {
   const errs = (typeof erroresCuota === "function" ? erroresCuota() : []).slice(0, 3).map((e) => ({ ...e, gid: e.k === "g" ? e.g.id : e.x.ev + "|" + e.x.pl }));
   const top = [...errs, ...its].filter((e, i, a) => a.findIndex((y) => y.gid === e.gid) === i).slice(0, 3);   // 3 destacados como IABET: errores de cuota primero, partidos distintos
   // picks principales como IABET: jugadores y equipos mezclados, sin repetir partido (si faltan, se completa)
-  const lista = typeof mezclaTodos === "function" ? mezclaTodos(pickItems(), 30) : its, vistos = new Set(top.map((e) => e.gid));
+  const lista = typeof mezclaTodos === "function" ? mezclaTodos(PV.it, 30) : its, vistos = new Set(top.map((e) => e.gid));
   let resto = lista.filter((e) => !top.includes(e) && !vistos.has(e.gid) && vistos.add(e.gid)).slice(0, 10);
   if (resto.length < 6) resto = [...resto, ...lista.filter((e) => !top.includes(e) && !resto.includes(e))].slice(0, 10);
   const dia = new Date().toLocaleDateString("es-CO", { weekday: "long" });
   const nom = store.get("nombre", "");
   return `<div class="top"><div class="logo">CASH<b>BET</b></div><div class="ic">
       <button class="icb" data-go="notificaciones" aria-label="Notificaciones">${ic("bell")}${typeof campana === "function" ? campana() : ""}</button><button class="icb" data-go="ajustes" aria-label="Perfil">${ic("user")}</button></div></div>
-    <h1>Buen ${esc(dia)}${nom ? `, ${esc(nom)}` : ""}</h1><div class="sub2">${fmtD.format(new Date())} · ${typeof mezclaTodos === "function" ? mezclaTodos(pickItems()).length : its.length} picks listos</div>
+    <h1>Buen ${esc(dia)}${nom ? `, ${esc(nom)}` : ""}</h1><div class="sub2">${fmtD.format(new Date())} · ${PV.prox ? "hoy sin picks validados ni en evaluación" : `${typeof mezclaTodos === "function" ? mezclaTodos(PV.it).length : its.length} picks listos`}</div>
     <div class="ban">${ic("star")}<div>${sem.n ? `<b>CASHBET acertó ${sem.g}/${sem.n}</b><span>Últimos 7 días · picks reales</span>` : `<b>Registro real en marcha</b><span>Cada pick se califica al terminar el partido</span>`}</div>${esAdmin() ? `<button data-go="historial">Historial ${ic("right")}</button>` : ""}</div>
     <button class="oiban" data-go="odds">${ic("scale")}<div><b>Odds Intelligence</b><span>Comparador de casas, oportunidades e historial</span></div>${ic("right")}</button>
     <div class="tiles t2">
@@ -106,24 +108,25 @@ function inicio() {
       <div class="tile"><div class="k">Cuota prom.</div><div class="v">${cprom ? odd(cprom) : "—"}</div></div></div>
     ${top.length ? `<div class="sec"><h2 class="ih">${ic("bolt")}Picks destacados (${top.length})</h2><button class="pill dk" data-go="picks">Top picks</button></div>
       <div class="car">${top.map(heroPick).join("")}</div><div class="dots">${top.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</div>` : ""}
+    ${PV.prox && (top.length || resto.length) ? `<div class="ajnote catprox">Hoy no hay picks validados ni en evaluación: estos son los de los próximos días.</div>` : ""}
     <div class="sec"><h2 class="ih">${ic("trend")}Picks principales</h2><button class="pill dk" data-go="picks">Ver todo ${ic("right")}</button></div>
-    <div class="pclist">${resto.map(pcCard).join("") || `<div class="empty">Hoy ya no quedan partidos. Los de mañana aparecen aquí desde mañana; puedes verlos antes en el Calendario.</div>`}</div>
+    <div class="pclist">${resto.map(pcCard).join("") || `<div class="empty">No hay picks validados ni en evaluación en los próximos 3 días. En Picks &gt; Experimental puedes ver lo que el modelo calcula (sin validar).</div>`}</div>
     ${typeof noticiasSec === "function" ? noticiasSec() : ""}`;
 }
 function heroPick(e) {
   let chip, small, big, sub, pick, cuota, img, attr, up, lk;
   if (e.err != null && e.k === "g") {
     const g = e.g; up = isUp(e.x.m);
-    chip = g.liga; lk = g.lg; small = "Error de cuota"; big = `${g.h.n} vs ${g.a.n}`; sub = `${abT(g.h)} vs ${abT(g.a)} · ${hora(g.at)}`;
+    chip = g.liga; lk = g.lg; small = "Error de cuota"; big = `${g.h.n} vs ${g.a.n}`; sub = `${abT(g.h)} vs ${abT(g.a)} · ${typeof diaHora === "function" ? diaHora(g.at) : hora(g.at)}`;
     pick = e.x.txt; cuota = e.cuota; img = `<div class="hpimg dos">${crest(g.h, 84)}${crest(g.a, 84)}</div>`; attr = `data-g="${g.id}"`;
   } else if (e.k === "g") {
     const g = e.g; up = isUp(g.pick.m);
-    chip = g.liga; lk = g.lg; small = "Pick del partido"; big = `${g.h.n} vs ${g.a.n}`; sub = `${abT(g.h)} vs ${abT(g.a)} · ${hora(g.at)}`;
+    chip = g.liga; lk = g.lg; small = "Pick del partido"; big = `${g.h.n} vs ${g.a.n}`; sub = `${abT(g.h)} vs ${abT(g.a)} · ${typeof diaHora === "function" ? diaHora(g.at) : hora(g.at)}`;
     pick = g.pick.txt; cuota = g.pick.cuota || g.pick.justa; img = `<div class="hpimg dos">${crest(g.h, 84)}${crest(g.a, 84)}</div>`; attr = `data-mp="${g.id}"`;
   } else if (e.k === "x") {
     const g = e.g, x = e.x, P = pkFind(g.id, x.m), tm = pkTeam(P); up = P.lado === "mas";
     chip = g.liga; lk = g.lg; small = P.sc === "j" ? tm.n : P.sc === "t" ? "Total del partido" : "Total equipo";
-    big = P.sc === "j" ? x.jugador : P.sc === "t" ? `${g.h.n} vs ${g.a.n}` : tm.n; sub = `${abT(g.h)} vs ${abT(g.a)} · ${hora(g.at)}`;
+    big = P.sc === "j" ? x.jugador : P.sc === "t" ? `${g.h.n} vs ${g.a.n}` : tm.n; sub = `${abT(g.h)} vs ${abT(g.a)} · ${typeof diaHora === "function" ? diaHora(g.at) : hora(g.at)}`;
     pick = pkPill(P); cuota = x.justa; attr = `data-pk="${g.id}" data-m="${esc(x.m)}"`;
     img = P.sc === "j" ? (x.foto ? `<img class="hpimg foto" src="${esc(x.foto)}" alt="">` : sinFoto(x.jugador, tm, 120, "hpimg")) : P.sc === "t" ? `<div class="hpimg dos">${crest(g.h, 84)}${crest(g.a, 84)}</div>` : `<div class="hpimg">${crest(tm, 130)}</div>`;
   } else {
@@ -134,7 +137,7 @@ function heroPick(e) {
   }
   const pk = esc(pick).replace(/(\d+(?:\.\d+)?)/, "<em>$1</em>");
   return `<button class="hp${e.err != null ? " herr" : ""}" ${attr}><span class="hpchip">${lk ? lgLogo(lk, 16) : ""}${esc(chip)}</span><div class="hpt"><small>${esc(small)}</small><h3>${esc(big)}</h3><span>${esc(sub)}</span>
-      <div class="hpk">${pk}</div><div class="hpb"><span class="hc">${e.err != null ? `casa ${odd(e.cuota)} · justa ${odd(1 / e.p)} · <b>+${Math.round(e.err * 100)}%</b>` : e.val != null ? `casa ${odd(e.casa)} · <b>valor ${valTxt(e.val)}</b>` : `vale desde ${odd(e.min || cuota)}`}</span><span class="ha">${pct(e.p)} · Análisis ${ic("right")}</span></div></div>${img}</button>`;
+      <div class="hpk">${pk}</div>${typeof catTxt === "function" && catTxt(e) ? `<div class="hpcat">${esc(catTxt(e))}</div>` : ""}<div class="hpb"><span class="hc">${e.err != null ? `casa ${odd(e.cuota)} · justa ${odd(1 / e.p)} · <b>+${Math.round(e.err * 100)}%</b>` : e.val != null ? `casa ${odd(e.casa)} · <b>valor ${valTxt(e.val)}</b>` : `vale desde ${odd(e.min || cuota)}`}</span><span class="ha">${pct(e.p)} · Análisis ${ic("right")}</span></div></div>${img}</button>`;
 }
 
 // ------------------------------------------------------------ FICHA DE PARTIDO
@@ -157,7 +160,7 @@ function openGame(id, tab) {
       <div class="ghteams">${g.dep === "nba" ? `${tm("a", "VISITANTE")}<div class="vs">@</div>${tm("h", "LOCAL")}` : `${tm("h", "LOCAL")}<div class="vs">VS</div>${tm("a", "VISITANTE")}`}</div>
       ${g.ven ? `<div class="ghven">${ic("pin")}<span><b>${esc(g.ven)}</b>${g.city ? `<br>${esc(g.city)}` : ""}</span></div>` : ""}
       <div class="ghc">${c1 ? `<span>${c1}</span>` : ""}<b>${c2}</b></div></div>
-    ${g.pick.oculto ? `<div class="ajnote">Este tipo de pick todavía no demuestra 70 % de acierto real, así que no lo publicamos. Lo seguimos midiendo.</div>` : g.pick.bajo ? `<div class="ajnote">${g.pick.p > 0.75 ? `Favorito muy claro (${esc(g.pick.txt)}, ${pct(g.pick.p)}): paga demasiado poco para valer la pena.` : "La casa ya paga lo justo en este partido: no encontramos un error de cuota."} Mira Jugadores y Cuotas para otros mercados.</div>` : ""}
+    ${g.pick.oculto ? (typeof catNota === "function" ? catNota({ exp: g.pick.exp }) : `<div class="ajnote">Experimental · no validado: este tipo de pick todavía no demuestra 70 % de acierto real.</div>`) : g.pick.bajo ? `<div class="ajnote">${g.pick.p > 0.75 ? `Favorito muy claro (${esc(g.pick.txt)}, ${pct(g.pick.p)}): paga demasiado poco para valer la pena.` : "La casa ya paga lo justo en este partido: no encontramos un error de cuota."} Mira Jugadores y Cuotas para otros mercados.</div>` : ""}
     <div class="gpick" ${g.pick.bajo ? 'style="display:none"' : ""}><div><small>PICK DEL MODELO</small><span class="pcpill ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(g.pick.txt)}</span></span></div><div class="r"><b>${pct(g.pick.tipo === "valor" ? g.pick.pv : g.pick.p)}</b><span>${g.pick.tipo === "valor" ? `casa ${odd(g.pick.cuota)} · valor ${valTxt(g.pick.valor)}` : `vale desde ${odd(g.pick.minima || vale(g.pick.justa))}`}</span></div></div>
     ${g.pick.tipo === "valor" ? `<div class="pkvale v">${ic("bolt")}<span><b>Error de la casa:</b> paga ${odd(g.pick.cuota)} y según el modelo (mezclado con la propia casa) pasa ${pct(g.pick.pv)} de las veces. La cuota justa sería ${odd(1 / g.pick.pv)}.</span></div>` : ""}
     <div class="gacts"><button class="pkseg ${seg[id] ? "on" : ""}" data-act="seg">${ic(seg[id] ? "check" : "heart")}${seg[id] ? "Siguiendo" : "Seguir pick"}</button><button class="pkseg" data-act="tobank">${ic("plus")}Al bankroll</button></div>

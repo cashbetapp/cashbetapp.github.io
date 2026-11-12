@@ -60,6 +60,7 @@ function openMatchPick(gid, keep) {
         <span class="pkpill ${I.up ? "" : "bad"}">${ic(I.up ? "up" : "down")}<span>${esc(I.txt)}</span></span>
         <div class="pkprog ${p >= 0.7 ? "hi" : ""}"><span><i style="width:${p * 100}%"></i></span><b>${pct(p)}</b></div>
       </div>${big}</div>
+    ${typeof catNota === "function" ? catNota(g.pick.oculto ? { exp: g.pick.exp } : { val: g.pick.val }) : ""}
     <button class="pkseg ${seg[gid] ? "on" : ""}" data-act="mpfollow">${ic(seg[gid] ? "check" : "heart")}${seg[gid] ? "Siguiendo" : "Seguir Predicción"}</button>
     <div class="pktabs">${[["resumen", "Resumen"], ["contexto", "Contexto"], ["analisis", "Análisis IA"]].map(([k, l]) => `<button class="${tab === k ? "on" : ""}" data-act="mptab" data-k="${k}">${l}</button>`).join("")}</div>
     ${tab === "resumen" ? mpResumen(g, I, sd, p) : tab === "contexto" ? gPrevia(g) + (g.dep === "nba" && typeof nbaContexto === "function" ? nbaContexto(g, sd, { solo: true }) : "") : mpAnalisis(g, I, sd, p)}
@@ -80,13 +81,15 @@ function mpResumen(g, I, sd, p) {
   if (v10.length) lc.push([h10 / v10.length >= 0.6 ? "ok" : "warn", `Cumplió en ${h10} de sus últimos ${v10.length} (promedio ${n1(media(v10.map((e) => e.v)))} ${I.U})`]);
   const casa = sd === "h", lv = all.filter((e) => e.l === casa).slice(0, 10);
   if (lv.length >= 3) lc.push([lv.filter((e) => I.hit(e.v)).length / lv.length >= 0.5 ? "ok" : "warn", `De ${casa ? "local" : "visitante"}, como hoy: cumplió ${lv.filter((e) => I.hit(e.v)).length} de ${lv.length}`]);
-  const cuotaBox = g.pick.tipo === "valor" ? `<div class="pkbox"><div class="k">Cuota</div><b>${odd(g.pick.cuota)}</b></div><div class="pkbox ven"><div class="k">Ventaja ${ic("info")}</div><b>+${((g.pick.valor) * 100).toFixed(1)}%</b></div>` : `<div class="pkbox"><div class="k">Vale desde</div><b>${odd(g.pick.minima || vale(g.pick.justa))}</b></div>`;
+  const X = !!g.pick.oculto;   // experimental: sin "vale desde", sin ventaja, sin "error de la casa"
+  const cuotaBox = X ? `<div class="pkbox"><div class="k">Cuota justa</div><b>${odd(g.pick.justa)}</b></div>` : g.pick.tipo === "valor" ? `<div class="pkbox"><div class="k">Cuota</div><b>${odd(g.pick.cuota)}</b></div><div class="pkbox ven"><div class="k">Ventaja ${ic("info")}</div><b>+${((g.pick.valor) * 100).toFixed(1)}%</b></div>` : `<div class="pkbox"><div class="k">Vale desde</div><b>${odd(g.pick.minima || vale(g.pick.justa))}</b></div>`;
   const sideSw = !I.side ? `<div class="pkhint">Partidos de</div><div class="pk5 wide">${["h", "a"].map((s) => `<button class="${sd === s ? "on" : ""}" data-act="mpside" data-k="${s}">${esc(abT(g[s]))}</button>`).join("")}</div>` : "";
-  return `<div class="pk3 ${g.pick.tipo === "valor" ? "cuatro" : ""}">
+  return `<div class="pk3 ${!X && g.pick.tipo === "valor" ? "cuatro" : ""}">
       <div class="pkbox dir ${I.up ? "" : "bad"}"><div class="k">Dirección</div><b>${I.dir}</b></div>
       <div class="pkbox"><div class="k">Línea</div><b>${esc(I.lin)}</b></div>${cuotaBox}</div>
-    ${g.pick.tipo === "valor" ? `<div class="pkvale v">${ic("bolt")}<span><b>Error de la casa:</b> paga ${odd(g.pick.cuota)} y según el modelo (mezclado con la propia casa) pasa ${pct(p)} de las veces. La cuota justa sería ${odd(1 / p)}.</span></div>`
-      : `<div class="pkvale">${ic("info")}<span>Probabilidad ${pct(p)} → cuota justa ${odd(g.pick.justa)}. <b>Si tu casa paga ${odd(g.pick.minima || vale(g.pick.justa))} o más, es un error de la casa</b> a tu favor.</span></div>`}
+    ${X ? `<div class="pkvale">${ic("info")}<span>Probabilidad del modelo ${pct(p)} → cuota justa ${odd(g.pick.justa)}. Pick <b>experimental</b>: este tipo de pick no demuestra 70 % de acierto real, así que no se recomienda ni se calcula valor.</span></div>`
+      : g.pick.tipo === "valor" ? `<div class="pkvale v">${ic("bolt")}<span><b>Error de la casa:</b> paga ${odd(g.pick.cuota)} y según el modelo (mezclado con la propia casa) pasa ${pct(p)} de las veces. La cuota justa sería ${odd(1 / p)}.</span></div>`
+      : `<div class="pkvale">${ic("info")}<span>Probabilidad ${pct(p)} → cuota justa ${odd(g.pick.justa)}. Si tu casa paga ${odd(g.pick.minima || vale(g.pick.justa))} o más, <b>habría valor solo si el modelo tiene razón</b>; no es una ganancia segura.</span></div>`}
     <hr class="pkhr">
     ${lc.length ? `<div class="pkcard ol"><h4>Lo clave</h4><div class="small">Lo que dicen sus últimos partidos sobre el de hoy</div>${clvList(lc)}</div>` : ""}
     <div class="pkhist" style="margin-top:18px"><h4>Historial de ${esc(quien)}</h4><div class="pk5">${[5, 10, 20].map((k) => `<button class="${n === k ? "on" : ""}" data-act="mpn" data-k="${k}">${k}G</button>`).join("")}</div></div>

@@ -1665,3 +1665,19 @@ img.crest.nba { border-radius: 0 !important; background: transparent !important;
 .oigraf .cero { stroke: var(--line); stroke-dasharray: 4 4; vector-effect: non-scaling-stroke; }
 .oieje { display: flex; justify-content: space-between; gap: 8px; margin-top: 4px; white-space: nowrap; }
 @media (max-width: 440px) { .oinum { grid-template-columns: repeat(2, 1fr); row-gap: 10px; } }
+
+/* ---- categorías: validado / en evaluación / experimental ---- */
+.pcv.prueba { color: #f08a1c; }
+.pcv.exp { color: var(--tx3); }
+.pcard.exp { opacity: .78; }
+.pcard.exp .pcp i { background: var(--tx3) !important; box-shadow: none !important; }
+.ajnote.catexp { border-left: 3px solid var(--tx3); }
+.ajnote.catprox { border-left: 3px solid #f08a1c; margin: 0 0 12px; }
+.pcv { padding-right: 54px; line-height: 1.35; }
+.pktabs.cat4 { gap: 2px; }
+.pktabs.cat4 button { padding-left: 7px; padding-right: 7px; font-size: 13px; }
+@media (max-width: 400px) { .pktabs.cat4 button { padding-left: 5px; padding-right: 5px; font-size: 12.5px; } }
+.pcard.exp .pcp { color: var(--tx3); background: var(--chip); box-shadow: none; }
+.hpcat { font-size: 11px; font-weight: 700; color: #f6b26b; margin: 6px 0 -2px; }
+.hp:has(.hpcat) { height: auto; min-height: 196px; }
+.hp:has(.hpcat) .hpb { margin-top: 10px; }

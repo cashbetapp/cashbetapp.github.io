@@ -118,7 +118,8 @@ async function load() {
   // el robot los marca "oculto" (se registran para ganarse la validación, pero no se muestran)
   D.partidos.forEach((g) => {
     if (g.pick && g.pick.oculto) g.pick.bajo = true;
-    if (g.extra) { g.extra.picks = g.extra.picks.filter((x) => !x.oculto); g.extra.jug = g.extra.jug.filter((x) => !x.oculto); }
+    // los ocultos NO se borran: pasan a g.extra.exp (sección Experimental, sin alertas ni etiqueta de confianza)
+    if (g.extra) { g.extra.exp = [...g.extra.picks, ...g.extra.jug].filter((x) => x.oculto); g.extra.picks = g.extra.picks.filter((x) => !x.oculto); g.extra.jug = g.extra.jug.filter((x) => !x.oculto); }
   });
   D.propsOk = D.propsOk.filter((x) => !x.oculto);
   route();
