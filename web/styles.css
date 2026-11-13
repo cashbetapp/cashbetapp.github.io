@@ -1666,3 +1666,28 @@ img.crest.nba { border-radius: 0 !important; background: transparent !important;
 .oigraf .cero { stroke: var(--line); stroke-dasharray: 4 4; vector-effect: non-scaling-stroke; }
 .oieje { display: flex; justify-content: space-between; gap: 8px; margin-top: 4px; white-space: nowrap; }
 @media (max-width: 440px) { .oinum { grid-template-columns: repeat(2, 1fr); row-gap: 10px; } }
+
+/* Historial · Resumen del día (v92) */
+.hk.h3c { grid-template-columns: 1fr 1fr 1fr; } .hk.h3c b { font-size: 19px; }
+.hdr .hdt1 { font-weight: 700; font-size: 14px; margin-bottom: 10px; }
+.hdr .hdt1::first-letter { text-transform: uppercase; }
+.hdr .hk > div { background: var(--card2); }
+.hdc { margin-top: 10px; } .hdch { display: flex; justify-content: space-between; font-size: 12px; color: var(--tx2); margin-bottom: 8px; }
+.hdch i { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin: 0 3px 0 8px; vertical-align: -1px; }
+.hdch i.g, .hdcc .b i.h { background: #22c55e; } .hdch i.r, .hdcc .b i.m { background: #ef4444; }
+.hdcs { overflow-x: auto; scrollbar-width: none; } .hdcs::-webkit-scrollbar { display: none; }
+.hdcg { display: flex; gap: 6px; align-items: flex-end; }
+.hdcc { flex: 1; min-width: 40px; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 2px; border-radius: 10px; }
+.hdcc.on { background: var(--gsoft); }
+.hdcc .p { font-size: 11px; font-weight: 800; color: var(--tx2); } .hdcc .p.g { color: #22c55e; } .hdcc .p.r { color: #ef4444; }
+.hdcc .b { display: flex; flex-direction: column-reverse; width: 18px; height: 112px; }
+.hdcc .b i { display: block; width: 100%; border-radius: 3px; margin-top: 2px; }
+.hdcc .d { font-size: 11px; color: var(--tx2); text-transform: capitalize; } .hdcc .f { font-size: 10px; color: var(--tx3); }
+.hdt { margin-top: 10px; overflow-x: auto; } .hdt .tbl td { vertical-align: top; font-size: 13px; }
+.hdt .tbl td:nth-child(2), .hdt .tbl th:nth-child(2) { text-align: left; padding-left: 8px; } .hdt .tbl td:first-child { white-space: nowrap; color: var(--tx2); font-size: 12px; }
+.hdt .tbl td small { display: block; font-size: 11px; color: var(--tx3); margin-top: 2px; }
+.hdt .tbl td.g b { color: #22c55e; } .hdt .tbl td.r b { color: #ef4444; }
+.hdt .hpc { font-size: 11.5px; font-weight: 700; color: var(--gtx); }
+/* v92: en tema claro el encabezado de la ficha terminaba en blanco puro justo detrás de la foto
+   del jugador y la "lavaba" (se veía como un destello). Fondo verde parejo detrás de la foto. */
+:root.light { --pkhero: linear-gradient(110deg, #d9f5e3 0%, #e3f7ea 55%, #cfeedb 100%); }

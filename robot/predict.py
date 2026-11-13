@@ -827,11 +827,15 @@ def ledger(partidos, props_, extras=None):
                                             txt=x["txt"], p=x["p"], cuota=x["justa"], casa_real=False,
                                             modelo=MODELO["nba_equipo"] if x["s"] == "pts" else MODELO["extra"],
                                             **({"resp": x["resp"]} if x.get("resp") else {})), ahora)
+                if not x.get("oculto"):
+                    L["extra"][k].setdefault("vis", ahora)      # salió en la app (Historial: "Salieron en la app")
         pk = g.get("pick")
         if pk and not pk.get("bajo"):
             viejo = L["partidos"].get(g["id"])      # registro anterior al sello (clave = id del partido)
             if viejo and viejo.get("m") == pk["m"]:
                 vivos.add(("partidos", g["id"]))
+                if not pk.get("oculto"):
+                    viejo.setdefault("vis", ahora)
                 continue
             k = f"{g['id']}|{pk['m']}"
             vivos.add(("partidos", k))
@@ -841,6 +845,8 @@ def ledger(partidos, props_, extras=None):
                                             cuota=pk.get("cuota") or pk["justa"], cuota_casa=bool(pk.get("cuota")),
                                             cq=ahora if pk.get("cuota") else None,
                                             modelo=MODELO["partidos_" + g["dep"]], **({"resp": pk["resp"]} if pk.get("resp") else {})), ahora)
+            if not pk.get("oculto"):
+                L["partidos"][k].setdefault("vis", ahora)
     for x in props_:
         if x["at"] <= ahora_m:
             continue
@@ -851,6 +857,8 @@ def ledger(partidos, props_, extras=None):
         rec["regla"] = "estricta" if x.get("mil") else "dia" if x.get("dia") else None
         R.anotar(L, "props", k, dict(rec, dep="nba", liga="NBA", cuota_casa=True, cq=ahora, fuente=FUENTE,
                                      modelo=MODELO["props"], ver=ver), ahora)
+        if not x.get("oculto"):
+            L["props"][k].setdefault("vis", ahora)
     # 2) antes del partido: un pick que el modelo ya no publica queda "retirado" (no cuenta)
     for coll in ("partidos", "extra", "props"):
         for k, e in L[coll].items():
@@ -1015,9 +1023,12 @@ def historial(L, ahora, n, h):
                       "mk": _mercado(c, e), "sel": e.get("txt") or f"{e.get('jugador')}: {'más' if e.get('lado') == 'mas' else 'menos'} de {e.get('linea')} {(e.get('tipo') or '').lower()}",
                       "p": e["p"], "cu": e.get("cuota"), "cr": bool(e.get("cuota_casa")), "cq": e.get("cq"),
                       "st": e.get("estado"), "r": e.get("res") if e.get("res") is not None else e.get("real"),
-                      "mo": e.get("motivo"), "rt": 1 if e.get("ret") else None, "md": e.get("modelo"), "v": e.get("ver"), "h": (e.get("h_") or "")[:12]})
+                      "mo": e.get("motivo"), "rt": 1 if e.get("ret") else None, "md": e.get("modelo"), "v": e.get("ver"), "h": (e.get("h_") or "")[:12],
+                      "vs": 1 if e.get("vis") else None})
     filas.sort(key=lambda r: (r["at"], r["k"]), reverse=True)
-    out = {"generado": ahora, "sello": {"n": n, "h": h, "t": ahora},
+    # desde cuándo se sabe qué picks salieron en la app (antes no se guardaba)
+    vis_desde = min([e["vis"] for c, k, e in todos if isinstance(e.get("vis"), str)], default=None)
+    out = {"generado": ahora, "sello": {"n": n, "h": h, "t": ahora}, "vis_desde": vis_desde,
            "global": metricas(vis),
            "deporte": {k: metricas(v) for k, v in por_dep.items()},
            "mercado": {k: metricas(v) for k, v in sorted(por_mk.items(), key=lambda kv: -len(kv[1]))},

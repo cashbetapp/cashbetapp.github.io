@@ -12,7 +12,9 @@ Reglas:
 import hashlib, json
 
 # campos que pueden cambiar sin romper el registro (estado del partido / calificación)
-MUTABLES = {"ok", "real", "res", "estado", "ret", "motivo", "h_", "hr", "i", "ir"}
+# "vis" = el pick salió en la app (no estaba oculto) en alguna corrida antes del partido;
+# se marca después de anotar, por eso no entra en la huella
+MUTABLES = {"ok", "real", "res", "estado", "ret", "motivo", "h_", "hr", "i", "ir", "vis"}
 
 
 def _canon(d):
