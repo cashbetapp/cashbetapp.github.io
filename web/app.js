@@ -579,6 +579,7 @@ function act(a, el) {
     closeSheet(true); location.hash = "bankroll"; return;
   }
   if (a === "tema") { store.set("tema", k); applyTheme(); return rerender(); }
+  if (a === "sonido" || a === "vibra") { store.set(a, k === "1"); if (k === "1" && typeof tic === "function") tic(); return rerender(); }
   if (a === "nom") { store.set("nombre", $("#nom").value.trim().slice(0, 24)); return toast("Guardado"); }
   if (a === "novedades") { return toast(`Pronósticos actualizados: ${new Date(D.generado.replace("Z", ":00Z")).toLocaleString("es-CO", { hour: "numeric", minute: "2-digit", day: "numeric", month: "short" })}`); }
   const B = store.get("bank", { ini: 0, bets: [] });
