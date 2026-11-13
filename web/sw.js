@@ -1,6 +1,6 @@
 // CASHBET: guarda la app para abrir rápido; los pronósticos siempre se piden nuevos.
-const V = "cashbet-v89";
-const SHELL = ["./", "index.html", "styles.css?v=89", "app.js?v=89", "pick.js?v=89", "nba.js?v=89", "vistas.js?v=89", "historial.js?v=89", "privacidad.js?v=89", "cuenta.js?v=89", "seguidos.js?v=89", "matchpick.js?v=89", "inicio2.js?v=89", "resultados.js?v=89", "envivo.js?v=89", "futvivo.js?v=89", "bankroll.js?v=89", "previa.js?v=89", "proppick.js?v=89", "errores.js?v=89", "odds.js?v=89", "push.js?v=89", "manifest.webmanifest", "icon-192.png"];
+const V = "cashbet-v90";
+const SHELL = ["./", "index.html", "styles.css?v=90", "app.js?v=90", "pick.js?v=90", "nba.js?v=90", "vistas.js?v=90", "historial.js?v=90", "privacidad.js?v=90", "cuenta.js?v=90", "seguidos.js?v=90", "matchpick.js?v=90", "inicio2.js?v=90", "resultados.js?v=90", "envivo.js?v=90", "futvivo.js?v=90", "bankroll.js?v=90", "previa.js?v=90", "proppick.js?v=90", "errores.js?v=90", "odds.js?v=90", "push.js?v=90", "manifest.webmanifest", "icon-192.png"];
 self.addEventListener("install", (e) => { e.waitUntil(caches.open(V).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", (e) => {
   e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== V).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
@@ -19,7 +19,7 @@ self.addEventListener("fetch", (e) => {
 self.addEventListener("push", (e) => {
   let d = {};
   try { d = e.data ? e.data.json() : {}; } catch (x) { d = { b: e.data && e.data.text() }; }
-  e.waitUntil(self.registration.showNotification(d.t || "CASHBET", { body: d.b || "", icon: "icon-192.png", badge: "icon-192.png", tag: d.tag || undefined, data: { url: d.u || "./" } }));
+  e.waitUntil(self.registration.showNotification(d.t || "CASHBET", { body: d.b || "", icon: "icon-192.png", badge: "icon-192.png", tag: d.tag || undefined, renotify: !!d.tag, silent: false, vibrate: [200, 100, 200], requireInteraction: false, data: { url: d.u || "./" } }));
 });
 self.addEventListener("notificationclick", (e) => {
   e.notification.close();
