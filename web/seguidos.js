@@ -200,7 +200,7 @@ function seguidos() {
         ${real != null ? `<div class="sgnum ${bcls}" style="--x:${bar}%"><b>${esc(String(L && L.txt ? L.txt : real))}</b></div>` : ""}
         ${vivo ? "" : `<div class="sgv"><span>${e.st ? (e.r != null ? `Final ${esc(String(e.r))}` : lab) : L && L.st === "post" ? "Terminado · calificando" : lab}</span><em>${pct(v.p)}</em></div>`}</div></div>`;
   };
-  return `<div class="top"><div class="logo">CASH<b>BET</b></div><div class="ic"><button class="icb" data-go="ajustes" aria-label="Perfil">${ic("user")}</button></div></div>
+  return `<div class="top"><div class="logo"><img class="lgc" src="img/logo-cara.png" alt="">CASH<b>BET</b></div><div class="ic"><button class="icb" data-go="ajustes" aria-label="Perfil">${ic("user")}</button></div></div>
     <div class="sgh"><div><h1>Seguidos</h1><div class="sub2"><i class="sgdot"></i>${activos} ${activos === 1 ? "activo" : "activos"}</div></div>
       <div class="sgb"><button class="sgbt" data-act="sgrango">${ic("calR")}${ui.sgR === "todo" ? "Todo" : `${fCorta(ini)} – ${fCorta(new Date())}`}</button>
       <button class="sgbt ic ${fil ? "on" : ""}" data-act="sgfil" aria-label="Filtros">${ic("sliders")}</button></div></div>

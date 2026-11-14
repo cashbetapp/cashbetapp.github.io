@@ -129,7 +129,7 @@ function cuentaVista(arg) {
       <p class="ctp">Te enviamos un enlace a <b>${esc((FB && FB.auth.currentUser && FB.auth.currentUser.email) || "tu correo")}</b>. Ábrelo para confirmar tu cuenta y vuelve aquí. Si no aparece, mira en Spam.</p>
       <button class="cbtn" data-act="c_listo">${ic("check")}Ya lo confirmé</button>
       <button class="cbtn2" data-act="c_reenviar">Reenviar el enlace</button></div>`;
-  return `<div class="cta cini">${USER ? atras("ajustes") : `<div class="clogo">CASH<b>BET</b></div>`}
+  return `<div class="cta cini">${USER ? atras("ajustes") : `<img class="clogoimg" src="img/logo.jpg" alt="CASHBET · Tu mundo de apuestas">`}
       <span class="cico">${ic("shieldOk")}</span>
       <h1 class="cth big">Crea tu<br><em>cuenta CASHBET.</em></h1>
       <p class="ctp">Gratis. Crea tu cuenta para ver los picks, el análisis y el historial. Tus picks seguidos y tu bankroll quedan guardados en cualquier equipo.</p>

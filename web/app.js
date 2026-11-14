@@ -189,7 +189,7 @@ document.addEventListener("click", (e) => {
 
 // ------------------------------------------------------------ cabecera
 function header(title, sub) {
-  return `<div class="top"><div class="logo">CASH<b>BET</b></div><div class="ic">
+  return `<div class="top"><div class="logo"><img class="lgc" src="img/logo-cara.png" alt="">CASH<b>BET</b></div><div class="ic">
     <button class="icb" data-go="notificaciones" aria-label="Notificaciones">${ic("bell")}${typeof campana === "function" ? campana() : ""}</button>
     <button class="icb" data-go="ajustes" aria-label="Ajustes">${ic("user")}</button></div></div>
     <h1>${title}</h1>${sub ? `<div class="sub">${sub}</div>` : ""}`;

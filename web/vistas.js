@@ -97,7 +97,7 @@ function inicio() {
   if (resto.length < 6) resto = [...resto, ...lista.filter((e) => !top.includes(e) && !resto.includes(e))].slice(0, 10);
   const dia = new Date().toLocaleDateString("es-CO", { weekday: "long" });
   const nom = store.get("nombre", "");
-  return `<div class="top"><div class="logo">CASH<b>BET</b></div><div class="ic">
+  return `<div class="top"><div class="logo"><img class="lgc" src="img/logo-cara.png" alt="">CASH<b>BET</b></div><div class="ic">
       <button class="icb" data-go="notificaciones" aria-label="Notificaciones">${ic("bell")}${typeof campana === "function" ? campana() : ""}</button><button class="icb" data-go="ajustes" aria-label="Perfil">${ic("user")}</button></div></div>
     <h1>Buen ${esc(dia)}${nom ? `, ${esc(nom)}` : ""}</h1><div class="sub2">${fmtD.format(new Date())} · ${typeof mezclaTodos === "function" ? mezclaTodos(pickItems()).length : its.length} picks listos</div>
     <div class="tiles t2">

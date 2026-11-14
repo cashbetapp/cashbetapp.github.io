@@ -1696,3 +1696,8 @@ img.crest.nba { border-radius: 0 !important; background: transparent !important;
 .pcv.rsp { color: #39ff7a; display: inline-flex; align-items: center; gap: 4px; }
 .pcv.rsp svg { width: 12px; height: 12px; }
 .light .pcv.rsp { color: #0a8f3c; }
+
+/* logo oficial (2026-11-13) */
+.logo { display: inline-flex; align-items: center; }
+.logo .lgc { width: 32px; height: 32px; border-radius: 50%; margin-right: 8px; box-shadow: 0 0 10px rgba(57,255,122,.55); flex: none; }
+.clogoimg { display: block; width: min(74vw, 300px); margin: 6px auto 14px; border-radius: 20px; box-shadow: 0 0 28px rgba(57,255,122,.25); }
