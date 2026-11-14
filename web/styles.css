@@ -1726,3 +1726,9 @@ img.crest { border-radius: 0 !important; background: transparent !important; }
 .sgx1 img, .sgx1 .crest-f { filter: none !important; }
 .sgx1 img.crest { width: 84px !important; height: 84px !important; object-fit: contain !important; }
 .sgf { object-fit: cover; object-position: 50% 6%; -webkit-mask-image: none !important; mask-image: none !important; filter: none !important; }
+
+/* ===== Seguidos: imagen COMPLETA (jugador y escudo sin recortes), 2026-11-13 ===== */
+.sgtop { height: 150px !important; }
+.sgf { inset: 8px 0 0 0 !important; width: 100% !important; height: calc(100% - 8px) !important; object-fit: contain !important; object-position: center bottom !important; }
+.sgx1 img.crest { width: 110px !important; height: 110px !important; }
+.sgx2 img.crest, .sgx2 .crest-f { width: 70px !important; height: 70px !important; object-fit: contain !important; }
