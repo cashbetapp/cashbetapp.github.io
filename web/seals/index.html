@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d0f14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SEALS">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<title>SEALS · Control de Gemas</title>
+<style>
+:root{--bg:#0b0d14;--p:#141826;--p2:#1b2133;--l:#28304a;--t:#e8ebf2;--m:#8d95ad;--ok:#22c55e;--bad:#ff3b4e;--warn:#f59e0b;--ac:#2f6bff;--rj:#ff2d55;--fav:#38bdf8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:14px "Segoe UI",system-ui,sans-serif}
+header{border-top:3px solid;border-image:linear-gradient(90deg,var(--rj),var(--ac)) 1;display:flex;align-items:center;gap:12px;padding:12px 18px;background:var(--p);border-bottom:1px solid var(--l);flex-wrap:wrap;position:sticky;top:0;z-index:5}
+h1{font-size:18px;margin:0;letter-spacing:.5px}h1 b{color:var(--rj)}
+nav{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+nav button,.btn{background:var(--p2);border:1px solid var(--l);color:var(--t);padding:8px 13px;border-radius:9px;cursor:pointer;font:inherit}
+nav button.on{background:linear-gradient(90deg,var(--rj),var(--ac));border-color:transparent}.btn:hover{border-color:#4a5368}
+.btn.ac{background:var(--ac);border-color:var(--ac)}.btn.bad{background:#4a1515;border-color:var(--bad)}.btn.sm{padding:4px 9px;font-size:12px}
+main{padding:16px 18px;max-width:1300px;margin:auto}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:14px}
+.card{background:var(--p);border:1px solid var(--l);border-radius:12px;padding:12px 14px}
+.card span{color:var(--m);font-size:12px;text-transform:uppercase;letter-spacing:.5px}.card b{display:block;font-size:26px;margin-top:4px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+input,select,textarea{background:#0a0c10;border:1px solid var(--l);color:var(--t);border-radius:8px;padding:8px 10px;font:inherit}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--ac)}
+table{width:100%;border-collapse:collapse;background:var(--p);border:1px solid var(--l);border-radius:12px;overflow:hidden}
+th,td{padding:7px 9px;border-bottom:1px solid var(--l);text-align:left;white-space:nowrap}
+th{color:var(--m);font-weight:600;font-size:12px;background:var(--p2);cursor:pointer;user-select:none}
+tr:hover td{background:#1a1f2b}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+input.g{width:80px;text-align:right}
+.q{display:inline-flex;gap:3px}.q button{background:var(--p2);border:1px solid var(--l);color:var(--m);border-radius:6px;padding:3px 7px;cursor:pointer;font-size:12px}
+.q button:hover{color:var(--t);border-color:var(--ac)}
+.tag{padding:3px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.warn{color:var(--warn)}.fav{color:var(--fav)}
+.tag.ok{background:#0f2a1a}.tag.bad{background:#2a0f0f}.tag.warn{background:#2a1d06}.tag.fav{background:#062030}
+.muted{color:var(--m)}.small{font-size:12px}
+.bar{height:6px;background:var(--p2);border-radius:9px;overflow:hidden;width:90px;display:inline-block;vertical-align:middle}.bar i{display:block;height:100%}
+.hist td,.hist th{padding:5px 7px;font-size:12.5px}.wrap{overflow:auto;border-radius:12px}
+.box{background:var(--p);border:1px solid var(--l);border-radius:12px;padding:16px;margin-bottom:14px}
+.box h3{margin:0 0 10px;font-size:15px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,var(--rj),var(--ac));padding:10px 18px;border-radius:10px;display:none;z-index:9}
+@media (max-width:760px){
+  html,body{overflow-x:hidden}#guardado{display:none}.card{min-width:0}.card span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}main,header{max-width:100vw}
+  nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}nav button{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .q{flex-wrap:wrap}table.tp td[data-l]::before{width:92px !important}
+  .bar{display:none}
+  .row>select:first-child,.row>input[placeholder]{flex:1 1 100% !important}
+  header{padding:10px 12px;padding-top:max(10px,env(safe-area-inset-top))}h1{font-size:16px}nav{margin-left:0;width:100%}nav button{flex:1;padding:9px 4px;font-size:12.5px}
+  main{padding:12px 10px 40px}.cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.card b{font-size:22px}
+  .row input:not([type=checkbox]),.row select{flex:1;min-width:0}
+  table.tp,table.tp tbody,table.tp tr,table.tp td{display:block;width:100%}table.tp{background:none;border:0}
+  table.tp tr:first-child{display:none}
+  table.tp tr{background:var(--p);border:1px solid var(--l);border-radius:12px;margin-bottom:10px;padding:10px 12px;position:relative}
+  table.tp td{border:0;padding:3px 0;white-space:normal}table.tp td:first-child{position:absolute;right:12px;top:10px}
+  table.tp td.num{text-align:left}table.tp td[data-l]::before{content:attr(data-l);color:var(--m);font-size:12px;display:inline-block;width:110px}
+  table.tp input.g{width:110px;font-size:16px;padding:9px}.q button{padding:8px 9px;font-size:14px}
+  table.tm,table.tm tbody,table.tm tr,table.tm td{display:block;width:100%}table.tm tr:first-child{display:none}
+  table.tm tr{border-bottom:1px solid var(--l);padding:8px 10px}table.tm td{border:0;padding:2px 0;white-space:normal}
+  table.tm .btn.sm{padding:8px 10px;margin:3px 2px 0 0}
+  input,select,textarea{font-size:16px}
+}
+@media print{header,.row,.noprint{display:none}body{background:#fff;color:#000}table{border:1px solid #999}}
+</style>
+</head>
+<body>
+<header>
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="url(#sg)" stroke-width="2" stroke-linejoin="round"><defs><linearGradient id="sg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff2d55"/><stop offset="1" stop-color="#2f6bff"/></linearGradient></defs><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M12 21 8 9l4-6 4 6z"/></svg>
+  <h1><b>SEALS</b> <span style="font-weight:400;color:var(--m);font-size:14px">· control de gemas</span></h1>
+  <span class="muted small" id="guardado"></span>
+  <nav id="nav"></nav>
+</header>
+<main id="app"></main>
+<div class="toast" id="toast"></div>
+<script>
+const INICIAL = [["Sr Navas", "Jefe"], ["Xp Exclusive", "Subjefe"], ["Out Poxcholo", "Subjefe"], ["Shooterrrrrrr Unidenfiedddddddd", "Intermediario"], ["Baby Kitt", "Intermediario"], ["Miss Vanity", "Intermediario"], ["Fcknn Pelecoxxxx", "Intermediario"], ["Fran Ninaxxx", "Guerrillero"], ["Rogelito Ml", "Guerrillero"], ["Osama Xp", "Guerrillero"], ["Sin Lloraaaaar", "Guerrillero"], ["Arcg Bianca", "Guerrillero"], ["Aleman Fr", "Guerrillero"], ["Keelier Halim", "Guerrillero"], ["Luz Seals", "Guerrillero"], ["Giomar Cannabis", "Guerrillero"], ["Yeya Pty", "Guerrillero"], ["Bby Kitty", "Guerrillero"], ["Jose Cstro", "Guerrillero"], ["Gino Robin", "Guerrillero"], ["Toffi Pe", "Guerrillero"], ["Mr Vanity", "Guerrillero"], ["Beniiqx Mex", "Guerrillero"], ["Kroniker Allisonovski", "Guerrillero"], ["El Mynor", "Guerrillero"], ["Limited Edition", "Guerrillero"], ["El Fulinhox", "Guerrillero"], ["Arcangel Og", "Guerrillero"], ["Marcet Zarate", "Guerrillero"], ["Tomas Sombra", "Guerrillero"], ["Mohammed Binsalman", "Guerrillero"], ["Mr Fb", "Guerrillero"], ["Jaziel Greenn", "Asociado"], ["Eldrazko Exotic", "Asociado"], ["Bby Doll", "Asociado"], ["Arturo Gallardotierradereyes", "Recluta"], ["Jona Kxiser", "Recluta"], ["Mal Ejemplopty", "Recluta"], ["King Christiann", "Recluta"], ["Inge Lopez", "Recluta"], ["Xp Flex", "Recluta"], ["Og Shooters", "Recluta"], ["Favio Cuevas", "Recluta"], ["Kevinm Murriloo", "Recluta"], ["Duran Exotic", "Recluta"]];
+const KEY = "seals_gemas_v1";
+let D = cargar();
+let vista = "periodo", orden = "deuda", filtro = "", soloDeben = false;
+
+function nuevo() {
+  const t = Date.now();
+  return { cuota: 150, miembros: INICIAL.map(([nombre, rango], i) => ({ id: "s" + (i + 1), nombre, rango, desde: t })), periodos: [], actual: null };
+}
+function cargar() {
+  try { const d = JSON.parse(localStorage.getItem(KEY)); if (d && d.miembros && (d.miembros.length || d.periodos.length)) return d; } catch (e) {}
+  return nuevo();
+}
+function guardar() {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(D));
+    document.getElementById("guardado").textContent = "Guardado " + new Date().toLocaleTimeString("es");
+  } catch (e) { aviso("No se pudo guardar: descarga una copia de respaldo"); }
+}
+const uid = () => Math.random().toString(36).slice(2, 10);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const n0 = (n) => Number(n || 0).toLocaleString("es");
+function aviso(t) { const e = document.getElementById("toast"); e.textContent = t; e.style.display = "block"; clearTimeout(aviso.t); aviso.t = setTimeout(() => (e.style.display = "none"), 2200); }
+
+const per = () => D.periodos.find((p) => p.id === D.actual);
+// períodos que le cuentan a un miembro: desde que entró (y mientras esté activo)
+function cuenta(m, p) { return p.creado >= (m.desde || 0) - 1000 && (!m.baja || p.creado < m.baja); }
+// acumulado: positivo = debe gemas; negativo = tiene gemas a favor
+function acumulado(m, hasta) {
+  let s = 0;
+  for (const p of D.periodos) {
+    if (hasta && p.creado > hasta.creado) break;
+    if (!cuenta(m, p)) continue;
+    s += p.cuota - (Number(p.entregas[m.id]) || 0);
+  }
+  return s;
+}
+function estado(m, p) {
+  const e = Number(p.entregas[m.id]) || 0, a = acumulado(m, p);
+  if (a <= 0 && a < 0) return ["fav", "A favor " + n0(-a)];
+  if (a <= 0) return ["ok", "Al día"];
+  if (e === 0) return ["bad", "No entregó"];
+  return ["warn", "Debe " + n0(a)];
+}
+
+function nav() {
+  document.getElementById("nav").innerHTML = [["periodo", "Período"], ["miembros", "Miembros"], ["historial", "Historial"], ["respaldo", "Respaldo"]]
+    .map(([k, l]) => `<button class="${vista === k ? "on" : ""}" onclick="ir('${k}')">${l}</button>`).join("");
+}
+function ir(v) { vista = v; render(); }
+
+function render() {
+  nav();
+  const a = document.getElementById("app");
+  if (!D.miembros.length && vista !== "respaldo") vista = "miembros";
+  if (vista === "miembros") a.innerHTML = vMiembros();
+  else if (vista === "historial") a.innerHTML = vHistorial();
+  else if (vista === "respaldo") a.innerHTML = vRespaldo();
+  else a.innerHTML = vPeriodo();
+}
+
+/* ---------- Período actual */
+function vPeriodo() {
+  if (!D.periodos.length) return `<div class="box"><h3>Crea el primer período</h3><p class="muted">Un período es cada vez que hay que entregar gemas (por ejemplo, cada semana).</p>${formPeriodo()}</div>`;
+  const p = per();
+  const act = D.miembros.filter((m) => cuenta(m, p));
+  let filas = act.map((m) => ({ m, e: Number(p.entregas[m.id]) || 0, a: acumulado(m, p) }));
+  if (filtro) filas = filas.filter((f) => f.m.nombre.toLowerCase().includes(filtro.toLowerCase()));
+  if (soloDeben) filas = filas.filter((f) => f.a > 0);
+  filas.sort(orden === "nombre" ? (x, y) => x.m.nombre.localeCompare(y.m.nombre) : orden === "entrego" ? (x, y) => y.e - x.e : (x, y) => y.a - x.a || x.m.nombre.localeCompare(y.m.nombre));
+  const tot = act.reduce((s, m) => s + (Number(p.entregas[m.id]) || 0), 0);
+  const meta = act.length * p.cuota;
+  const cero = act.filter((m) => !(Number(p.entregas[m.id]) > 0)).length;
+  const completos = act.filter((m) => (Number(p.entregas[m.id]) || 0) >= p.cuota).length;
+  const deudaTotal = act.reduce((s, m) => s + Math.max(0, acumulado(m, p)), 0);
+  const deben = act.filter((m) => acumulado(m, p) > 0).length;
+  return `
+  <div class="row">
+    <select onchange="D.actual=this.value;guardar();render()">${D.periodos.slice().reverse().map((x) => `<option value="${x.id}" ${x.id === D.actual ? "selected" : ""}>${esc(x.nombre)} · cuota ${x.cuota}</option>`).join("")}</select>
+    <button class="btn ac" onclick="nuevoPeriodo()">+ Nuevo período</button>
+    <button class="btn sm" onclick="editarPeriodo()">Editar período</button>
+    <span style="flex:1"></span>
+    <button class="btn" onclick="copiarDeudores()">Copiar lista de los que deben</button>
+    <button class="btn" onclick="window.print()">Imprimir</button>
+  </div>
+  <div class="cards">
+    <div class="card"><span>Gemas entregadas</span><b>${n0(tot)}</b><small class="muted">de ${n0(meta)} (${meta ? Math.round(100 * tot / meta) : 0} %)</small></div>
+    <div class="card"><span>Cumplieron ${p.cuota}</span><b class="ok">${completos}</b><small class="muted">de ${act.length} miembros</small></div>
+    <div class="card"><span>Entregaron 0</span><b class="bad">${cero}</b></div>
+    <div class="card"><span>Deben (acumulado)</span><b class="warn">${deben}</b><small class="muted">${n0(deudaTotal)} gemas en total</small></div>
+  </div>
+  <div class="row">
+    <input placeholder="Buscar miembro…" value="${esc(filtro)}" oninput="filtro=this.value;render();setTimeout(()=>{const i=document.querySelector('input[placeholder^=Buscar]');i.focus();i.setSelectionRange(i.value.length,i.value.length)})">
+    <label><input type="checkbox" ${soloDeben ? "checked" : ""} onchange="soloDeben=this.checked;render()"> Solo los que deben</label>
+    <span class="muted small">Ordenar:</span>
+    <select onchange="orden=this.value;render()">${[["deuda", "Más deuda primero"], ["nombre", "Nombre"], ["entrego", "Más entregó"]].map(([k, l]) => `<option value="${k}" ${orden === k ? "selected" : ""}>${l}</option>`).join("")}</select>
+  </div>
+  <div class="wrap"><table class="tp">
+    <tr><th>#</th><th>Miembro</th><th>Entregó en este período</th><th>Rápido</th><th class="num">Le faltó aquí</th><th class="num">Acumulado</th><th>Estado</th></tr>
+    ${filas.map((f, i) => {
+      const [c, t] = estado(f.m, p), falta = Math.max(0, p.cuota - f.e), pc = Math.min(100, 100 * f.e / p.cuota);
+      return `<tr><td class="muted">${i + 1}</td><td><b>${esc(f.m.nombre)}</b>${f.m.rango ? `<div class="muted small">${esc(f.m.rango)}</div>` : ""}</td>
+      <td data-l="Entregó"><input class="g" type="number" inputmode="numeric" min="0" step="10" value="${f.e || ""}" placeholder="0" onchange="entrega('${f.m.id}',this.value)"> <span class="bar"><i style="width:${pc}%;background:${pc >= 100 ? "var(--ok)" : pc > 0 ? "var(--warn)" : "var(--bad)"}"></i></span></td>
+      <td data-l="Rápido"><span class="q">${[0, 50, 100, 150].map((v) => `<button onclick="entrega('${f.m.id}',${v})">${v}</button>`).join("")}<button onclick="entrega('${f.m.id}',${p.cuota})" title="Cuota completa">Completo</button></span></td>
+      <td data-l="Le faltó aquí" class="num ${falta ? "warn" : "ok"}">${falta ? n0(falta) : "—"}</td>
+      <td data-l="Acumulado" class="num ${f.a > 0 ? "bad" : f.a < 0 ? "fav" : "ok"}"><b>${f.a > 0 ? n0(f.a) : f.a < 0 ? "+" + n0(-f.a) : "0"}</b></td>
+      <td><span class="tag ${c}">${t}</span></td></tr>`;
+    }).join("") || `<tr><td colspan="7" class="muted">Sin resultados</td></tr>`}
+  </table></div>
+  <p class="muted small">"Acumulado" suma lo que le faltó en todos los períodos menos lo que entregó de más. Si alguien entrega más de ${p.cuota}, lo extra le descuenta la deuda (o le queda a favor).</p>`;
+}
+function entrega(id, v) {
+  const p = per(); v = Math.max(0, Number(v) || 0);
+  if (v) p.entregas[id] = v; else delete p.entregas[id];
+  guardar(); render();
+}
+function formPeriodo() {
+  const sug = "Semana del " + new Date().toLocaleDateString("es", { day: "numeric", month: "short" });
+  return `<div class="row"><input id="pn" value="${esc(sug)}" style="width:240px"><span class="muted">Cuota:</span><input id="pc" type="number" value="${D.cuota}" style="width:90px"><button class="btn ac" onclick="crearPeriodo()">Crear</button></div>`;
+}
+function nuevoPeriodo() {
+  const sug = "Semana del " + new Date().toLocaleDateString("es", { day: "numeric", month: "short" });
+  const n = prompt("Nombre del nuevo período (lo de los períodos anteriores queda guardado y la deuda se arrastra):", sug);
+  if (!n) return;
+  const c = Number(prompt("Gemas que debe entregar cada miembro:", per() ? per().cuota : D.cuota));
+  if (!c) return;
+  D.cuota = c; D.periodos.push({ id: uid(), nombre: n, cuota: c, creado: Date.now(), entregas: {} });
+  D.actual = D.periodos.at(-1).id; guardar(); render(); aviso("Período creado");
+}
+function crearPeriodo() {
+  const n = document.getElementById("pn").value.trim(), c = Number(document.getElementById("pc").value);
+  if (!n || !c) return aviso("Escribe nombre y cuota");
+  D.cuota = c; D.periodos.push({ id: uid(), nombre: n, cuota: c, creado: Date.now(), entregas: {} });
+  D.actual = D.periodos.at(-1).id; guardar(); render();
+}
+function editarPeriodo() {
+  const p = per();
+  const n = prompt("Nombre del período:", p.nombre); if (n === null) return;
+  const c = Number(prompt("Cuota de este período:", p.cuota)); if (!c) return;
+  p.nombre = n || p.nombre; p.cuota = c; guardar(); render();
+  if (confirm("¿Quieres BORRAR este período completo? (Cancelar = no borrar)") && confirm("Seguro: se pierden las entregas de " + p.nombre)) {
+    D.periodos = D.periodos.filter((x) => x !== p); D.actual = D.periodos.at(-1)?.id || null; guardar(); render();
+  }
+}
+function copiarDeudores() {
+  const p = per();
+  const l = D.miembros.filter((m) => cuenta(m, p)).map((m) => [m, acumulado(m, p)]).filter(([, a]) => a > 0).sort((a, b) => b[1] - a[1]);
+  const txt = `Gemas pendientes (${p.nombre}, cuota ${p.cuota}):\n` + (l.map(([m, a], i) => `${i + 1}. ${m.nombre}: debe ${a}`).join("\n") || "Todos al día");
+  navigator.clipboard.writeText(txt).then(() => aviso("Lista copiada: pégala en el chat"), () => prompt("Copia esta lista:", txt));
+}
+
+/* ---------- Miembros */
+function vMiembros() {
+  const act = D.miembros.filter((m) => !m.baja), baj = D.miembros.filter((m) => m.baja);
+  return `
+  <div class="box"><h3>Agregar miembros</h3>
+    <p class="muted small">Pega los nombres, uno por línea. Puedes poner el rango así: <b>Nombre - Guerrillero</b>. Los repetidos se ignoran.</p>
+    <textarea id="nn" rows="6" style="width:100%" placeholder="Nombre 1\nNombre 2\n…"></textarea>
+    <div class="row" style="margin-top:8px"><button class="btn ac" onclick="agregar()">Agregar</button>
+    ${!D.periodos.length ? `<span class="muted">Después ve a "Período actual" y crea el primero.</span>` : ""}</div></div>
+  <div class="wrap"><table class="tm"><tr><th>#</th><th>Miembro</th><th class="num">Acumulado</th><th>Desde</th><th></th></tr>
+    ${act.map((m, i) => { const a = per() ? acumulado(m, per()) : 0; return `<tr><td class="muted">${i + 1}</td><td><b>${esc(m.nombre)}</b>${m.rango ? ` <span class="muted small">· ${esc(m.rango)}</span>` : ""}</td>
+      <td class="num ${a > 0 ? "bad" : a < 0 ? "fav" : "ok"}">${a > 0 ? "debe " + n0(a) : a < 0 ? "+" + n0(-a) : "al día"}</td>
+      <td class="muted small">${new Date(m.desde).toLocaleDateString("es")}</td>
+      <td><button class="btn sm" onclick="renombrar('${m.id}')">Editar</button> <button class="btn sm" onclick="ajustar('${m.id}')">Ajustar deuda</button> <button class="btn sm" onclick="baja('${m.id}')">Dar de baja</button> <button class="btn sm bad" onclick="eliminar('${m.id}')">Eliminar</button></td></tr>`; }).join("") || `<tr><td colspan="5" class="muted">Todavía no hay miembros</td></tr>`}
+  </table></div>
+  ${baj.length ? `<div class="box" style="margin-top:14px"><h3>Dados de baja (${baj.length})</h3>${baj.map((m) => `<div class="row">${esc(m.nombre)} <span class="muted small">deuda al salir: ${n0(acumulado(m))}</span><button class="btn sm" onclick="volver('${m.id}')">Reactivar</button><button class="btn sm bad" onclick="eliminar('${m.id}')">Eliminar</button></div>`).join("")}</div>` : ""}`;
+}
+function agregar() {
+  const ya = new Set(D.miembros.map((m) => m.nombre.toLowerCase()));
+  let n = 0;
+  for (const raw of document.getElementById("nn").value.split(/\r?\n/)) {
+    const s = raw.replace(/^\s*\d+[.)-]?\s*/, "").trim();
+    const [nom, rango] = s.split(/\s+[-|]\s+/);
+    if (nom && !ya.has(nom.toLowerCase())) { D.miembros.push({ id: uid(), nombre: nom.trim(), rango: (rango || "Recluta").trim(), desde: Date.now() }); ya.add(nom.toLowerCase()); n++; }
+  }
+  guardar(); render(); aviso(n + " miembro(s) agregado(s)");
+}
+function renombrar(id) {
+  const m = D.miembros.find((x) => x.id === id);
+  const n = prompt("Nombre:", m.nombre); if (n === null) return;
+  const r = prompt("Rango (Jefe, Subjefe, Intermediario, Guerrillero, Asociado, Recluta):", m.rango || ""); if (r === null) return;
+  if (n.trim()) m.nombre = n.trim(); m.rango = r.trim(); guardar(); render();
+}
+function baja(id) { const m = D.miembros.find((x) => x.id === id); if (confirm(`¿Dar de baja a ${m.nombre}? Su historial se conserva y deja de sumar deuda.`)) { m.baja = Date.now(); guardar(); render(); } }
+function eliminar(id) {
+  const m = D.miembros.find((x) => x.id === id);
+  if (!confirm(`¿ELIMINAR a ${m.nombre}? Se borra junto con todo lo que entregó. (Si solo se fue de la pandilla, mejor usa "Dar de baja".)`)) return;
+  D.miembros = D.miembros.filter((x) => x.id !== id);
+  for (const p of D.periodos) delete p.entregas[id];
+  guardar(); render(); aviso(m.nombre + " eliminado");
+}
+function volver(id) { const m = D.miembros.find((x) => x.id === id); delete m.baja; guardar(); render(); }
+// corrección manual (por ejemplo, deuda que traía de antes): se guarda como entrega en el período actual
+function ajustar(id) {
+  const p = per(); if (!p) return aviso("Primero crea un período");
+  const m = D.miembros.find((x) => x.id === id), a = acumulado(m, p);
+  const v = prompt(`${m.nombre} tiene acumulado ${a} (positivo = debe). Escribe el acumulado correcto:`, a);
+  if (v === null || v === "") return;
+  const dif = a - Number(v);             // lo que hay que sumarle como entrega
+  p.entregas[id] = (Number(p.entregas[id]) || 0) + dif;
+  guardar(); render(); aviso("Ajustado");
+}
+
+/* ---------- Historial */
+function vHistorial() {
+  if (!D.periodos.length) return `<p class="muted">Aún no hay períodos.</p>`;
+  const ps = D.periodos;
+  const ms = D.miembros.slice().sort((a, b) => acumulado(b) - acumulado(a));
+  return `<div class="row"><span class="muted">Lo que entregó cada miembro en cada período. Rojo = 0, amarillo = incompleto, verde = completo.</span><span style="flex:1"></span><button class="btn" onclick="exportarCSV()">Descargar Excel (CSV)</button></div>
+  <div class="wrap"><table class="hist"><tr><th>Miembro</th>${ps.map((p) => `<th class="num" title="cuota ${p.cuota}">${esc(p.nombre)}</th>`).join("")}<th class="num">Total</th><th class="num">Acumulado</th></tr>
+  ${ms.map((m) => { let t = 0; const a = acumulado(m); return `<tr><td><b>${esc(m.nombre)}</b>${m.baja ? ' <span class="muted small">(baja)</span>' : ""}</td>${ps.map((p) => {
+      if (!cuenta(m, p)) return `<td class="num muted">—</td>`;
+      const e = Number(p.entregas[m.id]) || 0; t += e;
+      return `<td class="num ${e >= p.cuota ? "ok" : e > 0 ? "warn" : "bad"}">${n0(e)}</td>`; }).join("")}
+      <td class="num">${n0(t)}</td><td class="num ${a > 0 ? "bad" : a < 0 ? "fav" : "ok"}"><b>${a > 0 ? n0(a) : a < 0 ? "+" + n0(-a) : "0"}</b></td></tr>`; }).join("")}
+  </table></div>`;
+}
+function bajar(nombre, texto, tipo) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([texto], { type: tipo }));
+  a.download = nombre; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+function exportarCSV() {
+  const ps = D.periodos, q = (s) => `"${String(s).replace(/"/g, '""')}"`;
+  const l = [["Miembro", ...ps.map((p) => `${p.nombre} (cuota ${p.cuota})`), "Acumulado (positivo = debe)"].map(q).join(";")];
+  for (const m of D.miembros) l.push([m.nombre, ...ps.map((p) => (cuenta(m, p) ? Number(p.entregas[m.id]) || 0 : "")), acumulado(m)].map(q).join(";"));
+  bajar("seals-gemas-" + new Date().toISOString().slice(0, 10) + ".csv", "﻿" + l.join("\r\n"), "text/csv");
+}
+
+/* ---------- Respaldo */
+function vRespaldo() {
+  return `<div class="box"><h3>Copia de respaldo</h3>
+    <p class="muted">Todo se guarda solo en este dispositivo (en este navegador). Lo del PC y lo del celular son independientes: para pasar los datos, descarga la copia en uno y cárgala en el otro. Descarga una copia de vez en cuando por si borras el historial del navegador o cambias de PC.</p>
+    <div class="row"><button class="btn ac" onclick="respaldo()">Descargar copia</button>
+    <label class="btn">Cargar copia…<input type="file" accept=".json" style="display:none" onchange="restaurar(this.files[0])"></label></div>
+    <p class="muted small">Miembros: ${D.miembros.length} · Períodos: ${D.periodos.length}</p></div>
+  <div class="box"><h3>Empezar de cero</h3><button class="btn bad" onclick="if(confirm('¿Borrar TODO?')&&confirm('Seguro? Descarga antes una copia si la necesitas.')){D=nuevo();guardar();render()}">Borrar todos los datos</button></div>`;
+}
+function respaldo() { bajar("seals-respaldo-" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(D, null, 1), "application/json"); localStorage.setItem(KEY + "_ultimo_respaldo", Date.now()); }
+function restaurar(f) {
+  if (!f) return;
+  f.text().then((t) => {
+    const d = JSON.parse(t);
+    if (!d.miembros || !d.periodos) throw new Error();
+    if (confirm(`Cargar copia con ${d.miembros.length} miembros y ${d.periodos.length} períodos? Reemplaza lo actual.`)) { D = d; guardar(); render(); aviso("Copia cargada"); }
+  }).catch(() => aviso("Ese archivo no es una copia válida"));
+}
+
+render();
+if (location.protocol.startsWith("http") && "serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+if (D.periodos.length) document.getElementById("guardado").textContent = "Datos guardados en este PC";
+</script>
+</body>
+</html>
