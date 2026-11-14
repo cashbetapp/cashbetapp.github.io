@@ -81,7 +81,8 @@ input.g{width:80px;text-align:right}
 const INICIAL = [["Sr Navas", "Jefe"], ["Xp Exclusive", "Subjefe"], ["Out Poxcholo", "Subjefe"], ["Shooterrrrrrr Unidenfiedddddddd", "Intermediario"], ["Baby Kitt", "Intermediario"], ["Miss Vanity", "Intermediario"], ["Fcknn Pelecoxxxx", "Intermediario"], ["Fran Ninaxxx", "Guerrillero"], ["Rogelito Ml", "Guerrillero"], ["Osama Xp", "Guerrillero"], ["Sin Lloraaaaar", "Guerrillero"], ["Arcg Bianca", "Guerrillero"], ["Aleman Fr", "Guerrillero"], ["Keelier Halim", "Guerrillero"], ["Luz Seals", "Guerrillero"], ["Giomar Cannabis", "Guerrillero"], ["Yeya Pty", "Guerrillero"], ["Bby Kitty", "Guerrillero"], ["Jose Cstro", "Guerrillero"], ["Gino Robin", "Guerrillero"], ["Toffi Pe", "Guerrillero"], ["Mr Vanity", "Guerrillero"], ["Beniiqx Mex", "Guerrillero"], ["Kroniker Allisonovski", "Guerrillero"], ["El Mynor", "Guerrillero"], ["Limited Edition", "Guerrillero"], ["El Fulinhox", "Guerrillero"], ["Arcangel Og", "Guerrillero"], ["Marcet Zarate", "Guerrillero"], ["Tomas Sombra", "Guerrillero"], ["Mohammed Binsalman", "Guerrillero"], ["Mr Fb", "Guerrillero"], ["Jaziel Greenn", "Asociado"], ["Eldrazko Exotic", "Asociado"], ["Bby Doll", "Asociado"], ["Arturo Gallardotierradereyes", "Recluta"], ["Jona Kxiser", "Recluta"], ["Mal Ejemplopty", "Recluta"], ["King Christiann", "Recluta"], ["Inge Lopez", "Recluta"], ["Xp Flex", "Recluta"], ["Og Shooters", "Recluta"], ["Favio Cuevas", "Recluta"], ["Kevinm Murriloo", "Recluta"], ["Duran Exotic", "Recluta"]];
 const KEY = "seals_gemas_v1";
 let D = cargar();
-let vista = "periodo", orden = "deuda", filtro = "", soloDeben = false;
+let vista = "periodo", orden = "juego", filtro = "", soloDeben = false;
+let fijo = null;   // orden congelado: no reordenar mientras se anotan gemas
 
 function nuevo() {
   const t = Date.now();
@@ -130,6 +131,7 @@ function nav() {
 function ir(v) { vista = v; render(); }
 
 function render() {
+  const y = window.scrollY;
   nav();
   const a = document.getElementById("app");
   if (!D.miembros.length && vista !== "respaldo") vista = "miembros";
@@ -137,7 +139,9 @@ function render() {
   else if (vista === "historial") a.innerHTML = vHistorial();
   else if (vista === "respaldo") a.innerHTML = vRespaldo();
   else a.innerHTML = vPeriodo();
+  window.scrollTo(0, y);
 }
+function reordenar() { fijo = null; render(); }
 
 /* ---------- Período actual */
 function vPeriodo() {
@@ -147,7 +151,17 @@ function vPeriodo() {
   let filas = act.map((m) => ({ m, e: Number(p.entregas[m.id]) || 0, a: acumulado(m, p) }));
   if (filtro) filas = filas.filter((f) => f.m.nombre.toLowerCase().includes(filtro.toLowerCase()));
   if (soloDeben) filas = filas.filter((f) => f.a > 0);
-  filas.sort(orden === "nombre" ? (x, y) => x.m.nombre.localeCompare(y.m.nombre) : orden === "entrego" ? (x, y) => y.e - x.e : (x, y) => y.a - x.a || x.m.nombre.localeCompare(y.m.nombre));
+  const clave = orden + "|" + D.actual;
+  if (!fijo || fijo.k !== clave) {
+    const idx = (m) => D.miembros.indexOf(m);
+    const cmp = orden === "nombre" ? (x, y) => x.m.nombre.localeCompare(y.m.nombre)
+      : orden === "entrego" ? (x, y) => y.e - x.e || idx(x.m) - idx(y.m)
+      : orden === "deuda" ? (x, y) => y.a - x.a || idx(x.m) - idx(y.m)
+      : (x, y) => idx(x.m) - idx(y.m);
+    fijo = { k: clave, ids: filas.slice().sort(cmp).map((f) => f.m.id) };
+  }
+  const pos = (id) => { const i = fijo.ids.indexOf(id); return i < 0 ? 1e6 : i; };
+  filas.sort((x, y) => pos(x.m.id) - pos(y.m.id));
   const tot = act.reduce((s, m) => s + (Number(p.entregas[m.id]) || 0), 0);
   const meta = act.length * p.cuota;
   const cero = act.filter((m) => !(Number(p.entregas[m.id]) > 0)).length;
@@ -156,7 +170,7 @@ function vPeriodo() {
   const deben = act.filter((m) => acumulado(m, p) > 0).length;
   return `
   <div class="row">
-    <select onchange="D.actual=this.value;guardar();render()">${D.periodos.slice().reverse().map((x) => `<option value="${x.id}" ${x.id === D.actual ? "selected" : ""}>${esc(x.nombre)} · cuota ${x.cuota}</option>`).join("")}</select>
+    <select onchange="D.actual=this.value;guardar();reordenar()">${D.periodos.slice().reverse().map((x) => `<option value="${x.id}" ${x.id === D.actual ? "selected" : ""}>${esc(x.nombre)} · cuota ${x.cuota}</option>`).join("")}</select>
     <button class="btn ac" onclick="nuevoPeriodo()">+ Nuevo período</button>
     <button class="btn sm" onclick="editarPeriodo()">Editar período</button>
     <span style="flex:1"></span>
@@ -173,7 +187,7 @@ function vPeriodo() {
     <input placeholder="Buscar miembro…" value="${esc(filtro)}" oninput="filtro=this.value;render();setTimeout(()=>{const i=document.querySelector('input[placeholder^=Buscar]');i.focus();i.setSelectionRange(i.value.length,i.value.length)})">
     <label><input type="checkbox" ${soloDeben ? "checked" : ""} onchange="soloDeben=this.checked;render()"> Solo los que deben</label>
     <span class="muted small">Ordenar:</span>
-    <select onchange="orden=this.value;render()">${[["deuda", "Más deuda primero"], ["nombre", "Nombre"], ["entrego", "Más entregó"]].map(([k, l]) => `<option value="${k}" ${orden === k ? "selected" : ""}>${l}</option>`).join("")}</select>
+    <select onchange="orden=this.value;reordenar()">${[["juego", "Orden de la pandilla"], ["deuda", "Más deuda primero"], ["nombre", "Nombre (A-Z)"], ["entrego", "Más entregó"]].map(([k, l]) => `<option value="${k}" ${orden === k ? "selected" : ""}>${l}</option>`).join("")}</select>
   </div>
   <div class="wrap"><table class="tp">
     <tr><th>#</th><th>Miembro</th><th>Entregó en este período</th><th>Rápido</th><th class="num">Le faltó aquí</th><th class="num">Acumulado</th><th>Estado</th></tr>
@@ -193,6 +207,8 @@ function entrega(id, v) {
   const p = per(); v = Math.max(0, Number(v) || 0);
   if (v) p.entregas[id] = v; else delete p.entregas[id];
   guardar(); render();
+  const m = D.miembros.find((x) => x.id === id);
+  aviso(`${m ? m.nombre : ""}: ${v} gemas`);
 }
 function formPeriodo() {
   const sug = "Semana del " + new Date().toLocaleDateString("es", { day: "numeric", month: "short" });

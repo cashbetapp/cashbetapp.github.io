@@ -1,5 +1,5 @@
 // SEALS: guarda la app en el teléfono para que abra sin internet
-const V = "seals-v2";
+const V = "seals-v3";
 const ARCH = ["./", "index.html", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png"];
 self.addEventListener("install", (e) => { e.waitUntil(caches.open(V).then((c) => c.addAll(ARCH))); self.skipWaiting(); });
 self.addEventListener("activate", (e) => {
