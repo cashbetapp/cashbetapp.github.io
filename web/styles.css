@@ -1732,3 +1732,6 @@ img.crest { border-radius: 0 !important; background: transparent !important; }
 .sgf { inset: 8px 0 0 0 !important; width: 100% !important; height: calc(100% - 8px) !important; object-fit: contain !important; object-position: center bottom !important; }
 .sgx1 img.crest { width: 110px !important; height: 110px !important; }
 .sgx2 img.crest, .sgx2 .crest-f { width: 70px !important; height: 70px !important; object-fit: contain !important; }
+
+/* Historial admin: pestañas Picks del día / Nulos */
+.hntabs { margin: 12px 0 10px; }

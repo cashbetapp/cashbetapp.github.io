@@ -102,13 +102,20 @@ function resumenDia(H) {
         <span class="b"><i class="h" style="height:${(d.hit / max) * 110}px"></i><i class="m" style="height:${(d.miss / max) * 110}px"></i></span>
         <span class="d">${esc(diaN(k, { weekday: "short" }))}</span><span class="f">${esc(diaN(k, { day: "2-digit", month: "2-digit" }))}</span></button>`; }).join("")}</div></div></div>` : "";
   const ESTR = { acierto: ["Acierto", "g"], fallo: ["Fallo", "r"], push: ["Push", ""], nulo: ["Nulo", ""] };
-  const CORTO = 10, vis = ui.hrall ? list : list.slice(0, CORTO);
-  const tabla = list.length ? `<div class="pkcard hdt"><table class="tbl"><tr><th>Hora</th><th>Partido · pick</th><th>Cuota</th><th>Resultado</th></tr>
+  const esNulo = (r) => r.st === "push" || r.st === "nulo";
+  const nulos = list.filter(esNulo);
+  if (ui.hrt === "nulos" && !nulos.length) ui.hrt = "dia";
+  const verNulos = ui.hrt === "nulos";
+  const lista = verNulos ? nulos : list.filter((r) => !esNulo(r));
+  const tabs = `<div class="pktabs dark hntabs"><button class="${verNulos ? "" : "on"}" data-act="hrt" data-k="dia">Picks del día (${list.length - nulos.length})</button><button class="${verNulos ? "on" : ""}" data-act="hrt" data-k="nulos">Nulos (${nulos.length})</button></div>`;
+  const CORTO = 10, vis = ui.hrall ? lista : lista.slice(0, CORTO);
+  const nulosInfo = verNulos ? `<div class="small" style="margin:0 2px 8px">Picks anulados (el jugador no jugó, partido dudoso en la fuente o sin dato oficial) o push (la línea quedó exacta). No cuentan como acierto ni como fallo.</div>` : "";
+  const tabla = lista.length ? `${nulosInfo}<div class="pkcard hdt"><table class="tbl"><tr><th>Hora</th><th>Partido · pick</th><th>Cuota</th><th>${verNulos ? "Motivo" : "Resultado"}</th></tr>
     ${vis.map((r) => { const [t, c] = ESTR[r.st] || ["Pendiente", ""];
       return `<tr><td>${hora2(r.at)}</td><td><b>${esc(r.sel || "")}</b> <span class="hpc">${Math.round(r.p * 100)}%</span><small>${esc(r.pt || "")} · ${esc(r.lg || "")} · ${esc(r.mk || "")}</small></td>
-        <td>${r.cu ? odd(r.cu) : "—"}<small>${r.cu ? (r.cr ? "casa" : "justa") : ""}</small></td><td class="${c}"><b>${t}</b>${r.r != null ? `<small>${esc(String(r.r))}</small>` : ""}</td></tr>`; }).join("")}</table></div>
-    ${list.length > CORTO ? `<button class="bigbtn" data-act="hrall" style="margin-top:8px">${ui.hrall ? "Ocultar" : `Mostrar más (${list.length - CORTO})`}</button>` : ""}`
-    : `<div class="empty" style="padding:24px 10px">Todavía no hay picks ${ui.hrv === "app" ? "que hayan salido en la app " : ""}este día.</div>`;
+        <td>${r.cu ? odd(r.cu) : "—"}<small>${r.cu ? (r.cr ? "casa" : "justa") : ""}</small></td><td class="${c}"><b>${t}</b>${verNulos && r.mo ? `<small>${esc(String(r.mo))}</small>` : r.r != null ? `<small>${esc(String(r.r))}</small>` : ""}</td></tr>`; }).join("")}</table></div>
+    ${lista.length > CORTO ? `<button class="bigbtn" data-act="hrall" style="margin-top:8px">${ui.hrall ? "Ocultar" : `Mostrar más (${lista.length - CORTO})`}</button>` : ""}`
+    : `<div class="empty" style="padding:24px 10px">${verNulos ? "No hubo nulos este día." : `Todavía no hay picks ${ui.hrv === "app" ? "que hayan salido en la app " : ""}este día.`}</div>`;
   const vd = H.vis_desde;
   const aviso = ui.hrv !== "app" ? "" : !vd ? `<div class="small" style="margin:8px 2px 0">La marca "salió en la app" empieza a guardarse desde la próxima corrida del robot. Para días anteriores toca <b>Todos los anotados</b>.</div>`
     : sel < diaLoc(vd) ? `<div class="small" style="margin:8px 2px 0">Antes del ${esc(diaN(diaLoc(vd), { day: "numeric", month: "long" }))} no se guardaba qué picks salían en la app. Para ese día toca <b>Todos los anotados</b>.</div>` : "";
@@ -119,12 +126,12 @@ function resumenDia(H) {
     <div class="pkcard hdr"><div class="hdt1">${esc(diaN(sel, { weekday: "long", day: "numeric", month: "long", year: "numeric" }))}</div>
       <div class="hk h3c"><div><span>Efectividad</span><b class="${cls(s.pct)}">${s.pct != null ? s.pct + "%" : "—"}</b><small>${s.n} jugados${s.pend ? ` · ${s.pend} pendientes` : ""}</small></div>
         <div><span>Aciertos</span><b class="g">${s.hit}</b><small>ganados</small></div>
-        <div><span>Fallos</span><b class="r">${s.miss}</b><small>perdidos${s.nul ? ` · ${s.nul} push/nulos` : ""}</small></div></div>
+        <div><span>Fallos</span><b class="r">${s.miss}</b><small>perdidos</small></div></div>
       <div class="hk h3c" style="margin-top:8px"><div><span>Unidades</span><b class="${s.u > 0 ? "g" : s.u < 0 ? "r" : ""}">${s.nc ? ut(s.u) : "—"}</b><small>1 u a cada pick con cuota de casa (${s.nc})</small></div>
         <div><span>74 % o más</span><b>${b74.pct != null ? b74.pct + "%" : "—"}</b><small>${b74.hit} de ${b74.n}</small></div>
         <div><span>70–73 %</span><b>${b70.pct != null ? b70.pct + "%" : "—"}</b><small>${b70.hit} de ${b70.n}</small></div></div>
       ${bm.n ? `<div class="small" style="margin-top:8px">Menos de 70 %: ${bm.hit} de ${bm.n} (${bm.pct}%).</div>` : ""}</div>
-    ${graf}${tabla}`;
+    ${graf}${tabs}${tabla}`;
 }
 
 function historial() {
@@ -181,8 +188,9 @@ function historial() {
 function actHist(a, el) {
   const k = el.dataset.k;
   if (a === "hst" || a === "hdep" || a === "hmk" || a === "hdia") { ui[a] = k; ui.hn = 60; rerender(); return true; }
-  if (a === "hrv" || a === "hrd") { ui[a] = k; ui.hrall = false; rerender(); setTimeout(centrarDia, 0); return true; }
+  if (a === "hrv" || a === "hrd") { ui[a] = k; ui.hrall = false; ui.hrt = "dia"; rerender(); setTimeout(centrarDia, 0); return true; }
   if (a === "hrall") { ui.hrall = !ui.hrall; rerender(); return true; }
+  if (a === "hrt") { ui.hrt = el.dataset.k; ui.hrall = false; rerender(); return true; }
   if (a === "hmore") { ui.hn += 100; rerender(); return true; }
   if (a === "hreint") { HIST = null; HIST_ERR = null; rerender(); return true; }
   if (a === "hledger") {
