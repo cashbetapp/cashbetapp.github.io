@@ -1369,8 +1369,14 @@ def main():
     try:
         tit = titulares_nba()
         antes = len(pr)
-        pr = [x for x in pr if x.get("lado") != "mas" or tit(x.get("pl"), x.get("at"))]
-        print(f"props: {antes - len(pr)} 'Más' de suplentes descartados")
+        # excepción: un suplente sí puede ir al "Más" si lo cumplió en 8+ de sus últimos 10 Y el pick tiene valor
+        def racha_ok(x):
+            u = [v for v in (x.get("ult") or [])[:10] if isinstance(v, (int, float))]
+            return len(u) >= 8 and sum(1 for v in u if v > x["linea"]) >= 0.8 * len(u)
+        def vale(x):
+            return (x.get("valor") or -1) >= VALOR_MIN
+        pr = [x for x in pr if x.get("lado") != "mas" or tit(x.get("pl"), x.get("at")) or (racha_ok(x) and vale(x))]
+        print(f"props: {antes - len(pr)} 'Más' de suplentes descartados (sin racha 8/10 con valor)")
     except Exception as e:
         print("titulares_nba:", type(e).__name__, e)
     pr = elegir_dia(pr)
