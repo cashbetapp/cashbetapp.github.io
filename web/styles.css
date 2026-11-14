@@ -1691,3 +1691,8 @@ img.crest.nba { border-radius: 0 !important; background: transparent !important;
 /* v92: en tema claro el encabezado de la ficha terminaba en blanco puro justo detrás de la foto
    del jugador y la "lavaba" (se veía como un destello). Fondo verde parejo detrás de la foto. */
 :root.light { --pkhero: linear-gradient(110deg, #d9f5e3 0%, #e3f7ea 55%, #cfeedb 100%); }
+
+/* respaldado: estadística 75 %+ y mercado a favor (2026-11-13) */
+.pcv.rsp { color: #39ff7a; display: inline-flex; align-items: center; gap: 4px; }
+.pcv.rsp svg { width: 12px; height: 12px; }
+.light .pcv.rsp { color: #0a8f3c; }

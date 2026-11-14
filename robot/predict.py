@@ -120,6 +120,25 @@ def elegir(sels, prefer=None):
     return dict(max(sels, key=lambda s: s["p"]), bajo=True)
 
 
+RSP_EST = 0.75     # estadística: se cumplió en 75 %+ de sus últimos partidos (8 de 10)
+RSP_N = 8          # con al menos 8 partidos de muestra
+RSP_CASA = 0.50    # mercado: la casa (sin su margen) también lo da como lo más probable
+RSP_P = 0.70       # y la confianza final del pick es 70 %+ (con cuota 1.40+ el máximo posible es ~71 %)
+
+
+def marcar_respaldo(x, p, u, n, casa, h2h_contra):
+    """Marca x["rsp"] si estadística, mercado y modelo apuntan al mismo lado. Sin línea de la casa
+    no hay respaldo del mercado: no se marca (no se inventa). Devuelve 1 si lo marcó."""
+    x.pop("rsp", None)
+    if x.get("oculto") or x.get("bajo") or not casa or not p or not n or n < RSP_N or h2h_contra:
+        return 0
+    est = u / n
+    if est >= RSP_EST and casa >= RSP_CASA and p >= RSP_P:
+        x["rsp"] = {"est": round(est, 3), "u": u, "n": n, "casa": round(casa, 3)}
+        return 1
+    return 0
+
+
 def nba_probada():
     """La NBA solo entra a las listas si sus picks de 70 %+ ya calificados acertaron 70 %+
     (al menos NBA_MIN_N). Hasta el 8-nov iban 54 % en total y 61,5 % con 70 %+."""
@@ -829,6 +848,8 @@ def ledger(partidos, props_, extras=None):
                                             **({"resp": x["resp"]} if x.get("resp") else {})), ahora)
                 if not x.get("oculto"):
                     L["extra"][k].setdefault("vis", ahora)      # salió en la app (Historial: "Salieron en la app")
+                if x.get("rsp"):
+                    L["extra"][k].setdefault("rsp", ahora)
         pk = g.get("pick")
         if pk and not pk.get("bajo"):
             viejo = L["partidos"].get(g["id"])      # registro anterior al sello (clave = id del partido)
@@ -847,6 +868,8 @@ def ledger(partidos, props_, extras=None):
                                             modelo=MODELO["partidos_" + g["dep"]], **({"resp": pk["resp"]} if pk.get("resp") else {})), ahora)
             if not pk.get("oculto"):
                 L["partidos"][k].setdefault("vis", ahora)
+            if pk.get("rsp"):
+                L["partidos"][k].setdefault("rsp", ahora)    # respaldado (estadística + mercado); fuera del sello, como vis
     for x in props_:
         if x["at"] <= ahora_m:
             continue
@@ -859,6 +882,8 @@ def ledger(partidos, props_, extras=None):
                                      modelo=MODELO["props"], ver=ver), ahora)
         if not x.get("oculto"):
             L["props"][k].setdefault("vis", ahora)
+        if x.get("rsp"):
+            L["props"][k].setdefault("rsp", ahora)
     # 2) antes del partido: un pick que el modelo ya no publica queda "retirado" (no cuenta)
     for coll in ("partidos", "extra", "props"):
         for k, e in L[coll].items():
@@ -1024,7 +1049,7 @@ def historial(L, ahora, n, h):
                       "p": e["p"], "cu": e.get("cuota"), "cr": bool(e.get("cuota_casa")), "cq": e.get("cq"),
                       "st": e.get("estado"), "r": e.get("res") if e.get("res") is not None else e.get("real"),
                       "mo": e.get("motivo"), "rt": 1 if e.get("ret") else None, "md": e.get("modelo"), "v": e.get("ver"), "h": (e.get("h_") or "")[:12],
-                      "vs": 1 if e.get("vis") else None})
+                      "vs": 1 if e.get("vis") else None, "rs": 1 if e.get("rsp") else None})
     filas.sort(key=lambda r: (r["at"], r["k"]), reverse=True)
     # desde cuándo se sabe qué picks salieron en la app (antes no se guardaba)
     vis_desde = min([e["vis"] for c, k, e in todos if isinstance(e.get("vis"), str)], default=None)
@@ -1033,6 +1058,7 @@ def historial(L, ahora, n, h):
            "deporte": {k: metricas(v) for k, v in por_dep.items()},
            "mercado": {k: metricas(v) for k, v in sorted(por_mk.items(), key=lambda kv: -len(kv[1]))},
            "confianza": {k: metricas(por_conf[k]) for k in sorted(por_conf)},
+           "respaldados": metricas([e for e in vis if e.get("rsp")]),
            "filas": filas}
     with open(os.path.join(DATA, "historial.json"), "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
@@ -1337,6 +1363,23 @@ def main():
         q.update({"val": v} if v else {"oculto": True})
         ocultos += not v
     print(f"validación: {ocultos} picks ocultos (se registran, no se muestran); {con_resp} experimentales con respaldo del historial")
+    # pedido del usuario (2026-11-13): RESPALDADO = las estadísticas Y la línea del mercado lo apoyan
+    rsp_n = 0
+    for g in f + nb:
+        pk = g["pick"]
+        r = pk.get("resp") or {}
+        rsp_n += marcar_respaldo(pk, pk.get("pv", pk.get("p")) if pk.get("tipo") == "valor" else pk.get("p"),
+                                 r.get("u"), r.get("un"), pk.get("casa") if pk.get("tipo") == "valor" else None,
+                                 r.get("hn", 0) >= 2 and r.get("h", 0) < .5 * r.get("hn", 0))
+        for q in (g.get("extra") or {}).get("picks", []) + (g.get("extra") or {}).get("jug", []):
+            r = q.get("resp") or {}
+            rsp_n += marcar_respaldo(q, q.get("p"), r.get("u"), r.get("un"), q.get("casa"),
+                                     r.get("hn", 0) >= 2 and r.get("h", 0) < .5 * r.get("hn", 0))
+    for q in pr:
+        u = [v for v in (q.get("ult") or [])[:10] if v is not None]
+        cum = sum(1 for v in u if (v > q["linea"] if q["lado"] == "mas" else v < q["linea"]))
+        rsp_n += marcar_respaldo(q, q.get("p"), cum, len(u), q.get("casa"), False)
+    print(f"respaldados (estadística >= {RSP_EST:.0%} y mercado a favor): {rsp_n}")
     for g in f + nb:
         if g["pick"].get("p", 0) >= TOP and not g["pick"].get("bajo"):
             g["pick"]["top"] = True

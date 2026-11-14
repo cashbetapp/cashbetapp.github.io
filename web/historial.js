@@ -164,6 +164,7 @@ function historial() {
     <div class="small" style="margin:10px 2px 0">Cada pick se anota con fecha y hora <b>antes</b> de empezar el partido y nunca se edita ni se borra. Los fallos se quedan. El ROI solo se calcula con cuotas reales de casas de apuestas.</div>
     ${resumenDia(H)}
     <div class="sec"><h2>Rendimiento real</h2></div>${kpis(H.global)}
+    ${H.respaldados && H.respaldados.total ? `<div class="sec"><h2>Respaldados (estadística + mercado)</h2></div>${kpis(H.respaldados)}` : ""}
     <div class="sec"><h2>Dijimos vs. pasó</h2></div>${calibracion(H.confianza)}
     <div class="sec"><h2>Por deporte</h2></div>${tablaM(Object.fromEntries(Object.entries(H.deporte).map(([k, v]) => [k === "nba" ? "NBA" : "Fútbol", v])))}
     <div class="sec"><h2>Por mercado</h2></div>${tablaM(H.mercado)}

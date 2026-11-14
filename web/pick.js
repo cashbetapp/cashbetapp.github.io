@@ -395,7 +395,7 @@ function pickItems() {
     vistoJ.add(x.pl); porEv[x.ev] = (porEv[x.ev] || 0) + 1;
     it.push({ k: "pr", x, p: x.p, mk: "nbaj", dep: "nba", eq: 0, val: x.prueba ? null : x.valor, casa: x.cuota, prueba: x.prueba });
   });
-  it.forEach((e) => { e.gid = e.g ? e.g.id : e.x.ev; e.pr = pruebaDe(e); e.vl = e.k === "g" ? e.g.pick.val : e.x.val; });
+  it.forEach((e) => { e.gid = e.g ? e.g.id : e.x.ev; e.pr = pruebaDe(e); e.vl = e.k === "g" ? e.g.pick.val : e.x.val; e.rsp = e.k === "g" ? e.g.pick.rsp : e.x.rsp; });
   return it;
 }
 // hoy y mañana (hora del teléfono); en la tarjeta, los de mañana dicen "Mañana"
@@ -465,6 +465,7 @@ function picks() {
   let it = soloNba20(pickItems());
   if (ui.pseg === "jugadores") it = it.filter((e) => !e.eq);
   if (ui.pseg === "equipos") it = it.filter((e) => e.eq);
+  if (ui.pseg === "respaldados") it = it.filter((e) => e.rsp);
   if (ui.pdep !== "todos") it = it.filter((e) => e.dep === ui.pdep);
   if (ui.pmk !== "todos") it = it.filter((e) => e.mk === ui.pmk);
   if (ui.pgame && ui.pgame !== "todos") it = it.filter((e) => e.gid === ui.pgame);
@@ -473,14 +474,16 @@ function picks() {
   else it = [...top15(it.filter((e) => e.k !== "pr"), Infinity), ...it.filter((e) => e.k === "pr")];
   // como IABET: la lista va de mayor a menor confianza (%); los errores de cuota llevan su etiqueta +X%
   it = ui.pord && ui.pord !== "conf" ? ordenPor(it, ui.pord) : porConfianza(it);
+  it = [...it.filter((e) => e.rsp), ...it.filter((e) => !e.rsp)];     // los respaldados (estadística + mercado) primero
   const total = it.length;
   it = it.slice(0, 80);
   const fil = ui.pdep !== "todos" || ui.pmk !== "todos" || (ui.pgame && ui.pgame !== "todos") || (ui.pord && ui.pord !== "conf");
   return header("Predicciones", `${total} picks · ${fmtD.format(new Date())}`) + `
-    <div class="pkbar"><div class="pktabs dark">${[["todos", "Todos"], ["jugadores", "Jugadores"], ["equipos", "Equipos"]].map(([k, l]) => `<button class="${ui.pseg === k ? "on" : ""}" data-act="pseg" data-k="${k}">${l}</button>`).join("")}</div>
+    <div class="pkbar"><div class="pktabs dark">${[["todos", "Todos"], ["respaldados", "Respaldados"], ["jugadores", "Jugadores"], ["equipos", "Equipos"]].map(([k, l]) => `<button class="${ui.pseg === k ? "on" : ""}" data-act="pseg" data-k="${k}">${l}</button>`).join("")}</div>
       <button class="pkfil ${fil ? "on" : ""}" data-act="pfil" aria-label="Filtros">${ic(fil ? "filtro" : "ball")}</button></div>
     ${fil ? `<div class="small" style="margin:-2px 2px 10px">Filtro: ${ui.pdep === "todos" ? "todos los deportes" : ui.pdep === "nba" ? "NBA" : "Fútbol"} · ${esc(MK.find(([k]) => k === ui.pmk)?.[1] || "")}${ui.pgame && ui.pgame !== "todos" && D.byId[ui.pgame] ? ` · ${esc(abT(D.byId[ui.pgame].h))} vs ${esc(abT(D.byId[ui.pgame].a))}` : ""} · orden: ${esc((ORDS.find(([k]) => k === (ui.pord || "conf")) || [])[1] || "")}</div>` : ""}
-    <div class="pclist">${it.map(pcCard).join("") || `<div class="empty">Hoy ya no quedan picks con este filtro. Los de mañana aparecen aquí desde mañana; puedes verlos antes en el Calendario.</div>`}</div>`;
+    ${ui.pseg === "respaldados" ? `<div class="small" style="margin:-2px 2px 10px">Respaldado = se cumplió en 75 % o más de sus últimos partidos (mín. 8), la cuota de la casa también lo da como lo más probable y la confianza es 70 %+. Sin línea de la casa no se marca.</div>` : ""}
+    <div class="pclist">${it.map(pcCard).join("") || (ui.pseg === "respaldados" ? `<div class="empty">Hoy ningún pick tiene a la vez estadística de 75 %+ y la línea del mercado a favor. Es mejor no forzarlo.</div>` : "") || `<div class="empty">Hoy ya no quedan picks con este filtro. Los de mañana aparecen aquí desde mañana; puedes verlos antes en el Calendario.</div>`}</div>`;
 }
 // foto del jugador recortada, pegada al borde izquierdo de la ficha, con el logo de la liga
 function fotoJug(foto, nombre, tm, liga) {
@@ -514,7 +517,7 @@ function pcCard(e) {
     pill = `${up ? "Más" : "Menos"} de ${x.linea} ${x.tipo.toLowerCase()}`; attr = `data-pr="${D.props.indexOf(x)}"`; cuota = x.cuota; liga = "NBA";
   }
   return `<button class="pcard ${jug || pan ? "jg" : ""}" ${attr}>${img}<div class="pcm"><div class="pcl">${jug ? lab : esc(lab)}</div><div class="pct">${esc(tit)}</div><div class="pcs">${esc(sub)}</div>
-    <span class="pcpill ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(pill)}</span></span>${e.vl && e.vl.e === "validado" ? `<div class="pcv validado">Validado · ${String(e.vl.ac).replace(".", ",")} % en ${e.vl.n} picks</div>` : ""}</div>
+    <span class="pcpill ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc(pill)}</span></span>${e.rsp ? `<div class="pcv rsp">${ic("shield")}Respaldado · ${e.rsp.u} de ${e.rsp.n} · casa ${Math.round(e.rsp.casa * 100)} %</div>` : ""}${e.vl && e.vl.e === "validado" ? `<div class="pcv validado">Validado · ${String(e.vl.ac).replace(".", ",")} % en ${e.vl.n} picks</div>` : ""}</div>
     <div class="pcr"><span class="pcp"><i></i>${pct(e.p)}</span></div>
     <div class="pcb">${e.val != null ? `<span class="pcval">+${Math.round(e.val * 100)}%</span><span class="pcc">${odd(e.casa)}</span>` : e.prueba ? `<span class="pcc" title="Cuota de la casa (en prueba)">${odd(e.casa)}</span>` : `<span class="pcc" title="Vale la pena desde esta cuota">${odd(e.min || cuota)}</span>`}</div></button>`;
 }
