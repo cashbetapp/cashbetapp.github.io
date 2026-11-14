@@ -10,7 +10,7 @@ const FB_CFG = {
   appId: "1:797897281390:web:080d3f747e9652185a7b7f",
 };
 const FB_VER = "10.12.2";
-const SYNC = ["seg", "bank", "kelly", "nombre", "fmt", "tema"];
+const SYNC = ["seg", "bank", "kelly", "nombre", "fmt", "tema", "foto"];
 let FB = null, USER = null, fbCargando = null, AUTH_LISTO = false;
 // la app exige cuenta: hasta saber si hay sesión se muestra "cargando"
 const cuentaActiva = () => !!USER;
@@ -59,7 +59,7 @@ async function alCambiarUsuario(u) {
       const seg = Object.assign({}, nube.seg || {}, store.get("seg", {}));
       if (JSON.stringify(seg) !== JSON.stringify(store.get("seg", {}))) cambio = true;
       localStorage.setItem("cb_seg", JSON.stringify(seg));
-      for (const k of ["bank", "kelly", "nombre", "fmt", "tema"]) {
+      for (const k of ["bank", "kelly", "nombre", "fmt", "tema", "foto"]) {
         if (nube[k] != null && JSON.stringify(nube[k]) !== JSON.stringify(store.get(k, null))) { localStorage.setItem("cb_" + k, JSON.stringify(nube[k])); cambio = true; }
       }
       if (!store.get("nombre", "") && USER.displayName) { localStorage.setItem("cb_nombre", JSON.stringify(USER.displayName.split(" ")[0])); cambio = true; }

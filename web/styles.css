@@ -1701,3 +1701,28 @@ img.crest.nba { border-radius: 0 !important; background: transparent !important;
 .logo { display: inline-flex; align-items: center; }
 .logo .lgc { width: 32px; height: 32px; border-radius: 50%; margin-right: 8px; box-shadow: 0 0 10px rgba(57,255,122,.55); flex: none; }
 .clogoimg { display: block; width: min(74vw, 300px); margin: 6px auto 14px; border-radius: 20px; box-shadow: 0 0 28px rgba(57,255,122,.25); }
+
+/* ===== Perfil con foto (2026-11-13) ===== */
+.av.conf { padding: 0; overflow: hidden; background: none; }
+.av.conf img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+.pfcard { cursor: pointer; }
+.pfed { text-align: center; }
+.pfav { display: flex; justify-content: center; margin: 6px 0 14px; }
+.av.pfbig { width: 112px !important; height: 112px !important; font-size: 44px !important; box-shadow: 0 0 0 3px var(--g), 0 0 24px rgba(57,255,122,.35); border-radius: 50%; display: grid; place-items: center; }
+.pfbtns { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; }
+.pfcam { display: inline-flex !important; align-items: center; gap: 8px; width: auto !important; padding-left: 18px !important; padding-right: 18px !important; cursor: pointer; }
+.pfcam svg { width: 18px; height: 18px; }
+.pfed .inp { text-align: left; }
+.icb img.avt { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; display: block; box-shadow: 0 0 0 2px var(--g); }
+
+/* ===== Escudos completos: nunca recortados (Santa Fe y escudos altos) ===== */
+img.crest { border-radius: 0 !important; background: transparent !important; }
+.pjf.esc > img.crest { object-fit: contain !important; object-position: center !important; -webkit-mask-image: none !important; mask-image: none !important; }
+
+/* ===== Seguidos: sin el velo blanco/sombra encima de la foto o el escudo ===== */
+.sgtop::after { display: none !important; }
+.sgtop { background: var(--card2) !important; }
+.light .sgtop { background: #eef1ef !important; }
+.sgx1 img, .sgx1 .crest-f { filter: none !important; }
+.sgx1 img.crest { width: 84px !important; height: 84px !important; object-fit: contain !important; }
+.sgf { object-fit: cover; object-position: 50% 6%; -webkit-mask-image: none !important; mask-image: none !important; filter: none !important; }

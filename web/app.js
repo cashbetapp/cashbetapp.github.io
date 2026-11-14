@@ -551,6 +551,7 @@ function act(a, el) {
   if (typeof actPush === "function" && actPush(a, el)) return;
   if (typeof actPrev === "function" && actPrev(a, el)) return;
   if (typeof actPerfil2 === "function" && actPerfil2(a, el)) return;
+  if (typeof actFoto === "function" && actFoto(a, el)) return;
   if (typeof actProp === "function" && a.startsWith("pp") && actProp(a, el)) return;
   if (typeof actMatchPick === "function" && a.startsWith("mp") && actMatchPick(a, el)) return;
   if (typeof actVistas === "function" && actVistas(a, el)) return;
