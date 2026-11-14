@@ -1,0 +1,2507 @@
+{
+ "generado": "2026-11-14T14:18Z",
+ "reglas": {
+  "probabilidad": "70-85 %",
+  "cuota_minima": 1.4,
+  "objetivo_diario": "15-20 (no se rellena si no hay oportunidades)",
+  "categorias": "validado / en evaluación / experimental según validacion.json (sin cambios)",
+  "nba_en_listas": false
+ },
+ "cobertura": {
+  "2026-11-14": {
+   "futbol": 16,
+   "nba": 5
+  },
+  "2026-11-15": {
+   "futbol": 8,
+   "nba": 9
+  },
+  "2026-11-16": {
+   "futbol": 10,
+   "nba": 8
+  },
+  "2026-11-17": {
+   "futbol": 14,
+   "nba": 5
+  },
+  "2026-11-18": {
+   "futbol": 0,
+   "nba": 12
+  },
+  "2026-11-19": {
+   "futbol": 0,
+   "nba": 4
+  },
+  "2026-11-20": {
+   "futbol": 6,
+   "nba": 9
+  },
+  "2026-11-21": {
+   "futbol": 30,
+   "nba": 6
+  }
+ },
+ "ligas": {
+  "Selecciones": 40,
+  "NBA": 58,
+  "Liga MX": 8,
+  "Premier League": 7,
+  "Liga BetPlay": 7,
+  "Ligue 1": 6,
+  "LaLiga": 5,
+  "Serie A": 4,
+  "Bundesliga": 7
+ },
+ "candidatos": 39301,
+ "mercados_evaluados": 44,
+ "por_mercado": {
+  "Tiros (jugador)": 5292,
+  "Tiros (jugador) · liga nueva": 4242,
+  "Tiros a puerta (jugador)": 3528,
+  "Faltas (jugador)": 3528,
+  "Tiros a puerta (jugador) · liga nueva": 2828,
+  "Faltas (jugador) · liga nueva": 2828,
+  "Tarjetas (jugador)": 1764,
+  "Tarjetas (jugador) · liga nueva": 1414,
+  "pts (equipo)": 1160,
+  "Córners (equipo)": 880,
+  "Córners (equipo) · liga nueva": 800,
+  "Tiros a puerta (equipo) · liga nueva": 800,
+  "Tiros (equipo) · liga nueva": 800,
+  "Tarjetas (equipo)": 704,
+  "Faltas (equipo) · liga nueva": 640,
+  "Tarjetas (equipo) · liga nueva": 640,
+  "Tiros a puerta (equipo)": 580,
+  "Tiros (equipo)": 580,
+  "Tiros a puerta (partido) · liga nueva": 480,
+  "Tiros (partido) · liga nueva": 480,
+  "Faltas (equipo)": 464,
+  "Córners (partido)": 440,
+  "Tarjetas (partido)": 440,
+  "Córners (partido) · liga nueva": 400,
+  "Faltas (partido) · liga nueva": 400,
+  "Tarjetas (partido) · liga nueva": 400,
+  "Goles": 352,
+  "Tiros a puerta (partido)": 348,
+  "Tiros (partido)": 348,
+  "Goles · liga nueva": 320,
+  "Faltas (partido)": 290,
+  "Resultado": 264,
+  "Resultado · liga nueva": 240,
+  "NBA · Ganador": 116,
+  "Jugadores NBA · Puntos": 75,
+  "Jugadores NBA · Pts+Reb": 74,
+  "Jugadores NBA · Rebotes": 74,
+  "Jugadores NBA · Pts+Ast": 58,
+  "Jugadores NBA · Pts+Reb+Ast": 56,
+  "Jugadores NBA · Asistencias": 54,
+  "Jugadores NBA · Ast+Reb": 53,
+  "Jugadores NBA · Triples": 47,
+  "NBA · Hándicap": 10,
+  "NBA · Total de puntos": 10
+ },
+ "escenarios": {
+  "1.18": {
+   "descartes": {
+    "probabilidad < 70 %": 24078,
+    "probabilidad > 85 % (el modelo no publica tan alto)": 5264,
+    "liga sin picks de jugadores (pedido del usuario)": 4912,
+    "duplicado o correlacionado con otro pick del mismo partido": 2459,
+    "NBA bloqueada (no demostró 70 % real)": 95,
+    "cuota < 1.18": 2,
+    "cuota real sin valor (EV < 0)": 1
+   },
+   "descartes_pct": {
+    "probabilidad < 70 %": 61.3,
+    "probabilidad > 85 % (el modelo no publica tan alto)": 13.4,
+    "liga sin picks de jugadores (pedido del usuario)": 12.5,
+    "duplicado o correlacionado con otro pick del mismo partido": 6.3,
+    "NBA bloqueada (no demostró 70 % real)": 0.2,
+    "cuota < 1.18": 0.0,
+    "cuota real sin valor (EV < 0)": 0.0
+   },
+   "publicables_por_dia": {
+    "2026-11-14": 16,
+    "2026-11-15": 0,
+    "2026-11-16": 0,
+    "2026-11-17": 0,
+    "2026-11-18": 0,
+    "2026-11-19": 0,
+    "2026-11-20": 85,
+    "2026-11-21": 655
+   },
+   "experimentales_por_dia": {
+    "2026-11-14": 307,
+    "2026-11-15": 279,
+    "2026-11-16": 333,
+    "2026-11-17": 455,
+    "2026-11-18": 0,
+    "2026-11-19": 0,
+    "2026-11-20": 48,
+    "2026-11-21": 312
+   },
+   "por_mercado": {
+    "Faltas (jugador)": 462,
+    "Tiros (jugador) · liga nueva": 428,
+    "Tiros a puerta (jugador) · liga nueva": 123,
+    "Faltas (jugador) · liga nueva": 119,
+    "Córners (equipo)": 88,
+    "Tarjetas (equipo)": 80,
+    "Córners (equipo) · liga nueva": 80,
+    "Tiros (equipo) · liga nueva": 80,
+    "Tiros a puerta (equipo) · liga nueva": 80,
+    "Faltas (equipo) · liga nueva": 76,
+    "Tarjetas (equipo) · liga nueva": 65,
+    "Tiros (jugador)": 64,
+    "Tiros (equipo)": 58,
+    "Tiros a puerta (equipo)": 57,
+    "Faltas (equipo)": 56,
+    "Tarjetas (partido)": 44,
+    "Córners (partido)": 44,
+    "Resultado": 43,
+    "Goles": 41,
+    "Tiros (partido) · liga nueva": 40,
+    "Córners (partido) · liga nueva": 40,
+    "Faltas (partido) · liga nueva": 40,
+    "Tiros a puerta (partido) · liga nueva": 40,
+    "Tarjetas (partido) · liga nueva": 40,
+    "Goles · liga nueva": 37,
+    "Resultado · liga nueva": 33,
+    "Tiros (partido)": 29,
+    "Tiros a puerta (partido)": 29,
+    "Faltas (partido)": 29,
+    "Tiros a puerta (jugador)": 27,
+    "Tarjetas (jugador)": 12,
+    "Tarjetas (jugador) · liga nueva": 6
+   },
+   "por_categoria": {
+    "en evaluación": 756,
+    "experimental": 1734
+   }
+  },
+  "1.30": {
+   "descartes": {
+    "probabilidad < 70 %": 24078,
+    "probabilidad > 85 % (el modelo no publica tan alto)": 5264,
+    "liga sin picks de jugadores (pedido del usuario)": 4912,
+    "cuota < 1.30": 2699,
+    "duplicado o correlacionado con otro pick del mismo partido": 550,
+    "NBA bloqueada (no demostró 70 % real)": 88
+   },
+   "descartes_pct": {
+    "probabilidad < 70 %": 61.3,
+    "probabilidad > 85 % (el modelo no publica tan alto)": 13.4,
+    "liga sin picks de jugadores (pedido del usuario)": 12.5,
+    "cuota < 1.30": 6.9,
+    "duplicado o correlacionado con otro pick del mismo partido": 1.4,
+    "NBA bloqueada (no demostró 70 % real)": 0.2
+   },
+   "publicables_por_dia": {
+    "2026-11-14": 11,
+    "2026-11-15": 0,
+    "2026-11-16": 0,
+    "2026-11-17": 0,
+    "2026-11-18": 0,
+    "2026-11-19": 0,
+    "2026-11-20": 69,
+    "2026-11-21": 449
+   },
+   "experimentales_por_dia": {
+    "2026-11-14": 201,
+    "2026-11-15": 185,
+    "2026-11-16": 232,
+    "2026-11-17": 323,
+    "2026-11-18": 0,
+    "2026-11-19": 0,
+    "2026-11-20": 35,
+    "2026-11-21": 205
+   },
+   "por_mercado": {
+    "Faltas (jugador)": 261,
+    "Tiros (jugador) · liga nueva": 241,
+    "Faltas (jugador) · liga nueva": 141,
+    "Tiros (jugador)": 105,
+    "Tiros a puerta (jugador) · liga nueva": 77,
+    "Córners (equipo)": 62,
+    "Tiros a puerta (equipo) · liga nueva": 58,
+    "Córners (equipo) · liga nueva": 56,
+    "Faltas (equipo) · liga nueva": 51,
+    "Tiros (equipo) · liga nueva": 44,
+    "Córners (partido)": 42,
+    "Tarjetas (equipo) · liga nueva": 41,
+    "Tarjetas (equipo)": 40,
+    "Resultado": 38,
+    "Tiros a puerta (equipo)": 36,
+    "Córners (partido) · liga nueva": 36,
+    "Tiros a puerta (partido) · liga nueva": 35,
+    "Tiros (partido) · liga nueva": 34,
+    "Tiros a puerta (jugador)": 33,
+    "Faltas (equipo)": 33,
+    "Tiros (equipo)": 32,
+    "Tarjetas (partido) · liga nueva": 30,
+    "Faltas (partido) · liga nueva": 29,
+    "Tarjetas (partido)": 28,
+    "Resultado · liga nueva": 27,
+    "Tiros a puerta (partido)": 23,
+    "Faltas (partido)": 22,
+    "Tiros (partido)": 21,
+    "Goles": 19,
+    "Goles · liga nueva": 15
+   },
+   "por_categoria": {
+    "en evaluación": 529,
+    "experimental": 1181
+   }
+  },
+  "1.40": {
+   "descartes": {
+    "probabilidad < 70 %": 24078,
+    "probabilidad > 85 % (el modelo no publica tan alto)": 5264,
+    "liga sin picks de jugadores (pedido del usuario)": 4912,
+    "cuota < 1.40": 4416,
+    "NBA bloqueada (no demostró 70 % real)": 79,
+    "duplicado o correlacionado con otro pick del mismo partido": 40
+   },
+   "descartes_pct": {
+    "probabilidad < 70 %": 61.3,
+    "probabilidad > 85 % (el modelo no publica tan alto)": 13.4,
+    "liga sin picks de jugadores (pedido del usuario)": 12.5,
+    "cuota < 1.40": 11.2,
+    "NBA bloqueada (no demostró 70 % real)": 0.2,
+    "duplicado o correlacionado con otro pick del mismo partido": 0.1
+   },
+   "publicables_por_dia": {
+    "2026-11-14": 4,
+    "2026-11-15": 0,
+    "2026-11-16": 0,
+    "2026-11-17": 0,
+    "2026-11-18": 0,
+    "2026-11-19": 0,
+    "2026-11-20": 24,
+    "2026-11-21": 133
+   },
+   "experimentales_por_dia": {
+    "2026-11-14": 67,
+    "2026-11-15": 55,
+    "2026-11-16": 73,
+    "2026-11-17": 90,
+    "2026-11-18": 0,
+    "2026-11-19": 0,
+    "2026-11-20": 10,
+    "2026-11-21": 56
+   },
+   "por_mercado": {
+    "Tiros (jugador) · liga nueva": 64,
+    "Faltas (jugador)": 63,
+    "Faltas (jugador) · liga nueva": 58,
+    "Tiros (jugador)": 38,
+    "Tiros a puerta (jugador)": 26,
+    "Tiros a puerta (jugador) · liga nueva": 24,
+    "Tiros a puerta (equipo) · liga nueva": 19,
+    "Córners (equipo) · liga nueva": 17,
+    "Tiros a puerta (partido) · liga nueva": 17,
+    "Faltas (equipo) · liga nueva": 16,
+    "Córners (equipo)": 15,
+    "Tiros (partido) · liga nueva": 13,
+    "Tarjetas (partido)": 12,
+    "Córners (partido)": 11,
+    "Faltas (equipo)": 11,
+    "Tiros (equipo) · liga nueva": 11,
+    "Tiros (equipo)": 10,
+    "Tarjetas (equipo)": 10,
+    "Tiros a puerta (partido)": 10,
+    "Tiros a puerta (equipo)": 9,
+    "Faltas (partido) · liga nueva": 9,
+    "Tarjetas (equipo) · liga nueva": 8,
+    "Resultado": 8,
+    "Tarjetas (partido) · liga nueva": 8,
+    "Goles": 7,
+    "Goles · liga nueva": 6,
+    "Resultado · liga nueva": 5,
+    "Faltas (partido)": 3,
+    "Tiros (partido)": 2,
+    "Córners (partido) · liga nueva": 2
+   },
+   "por_categoria": {
+    "en evaluación": 161,
+    "experimental": 351
+   }
+  }
+ },
+ "ranking": {
+  "2026-11-14": [
+   {
+    "dia": "2026-11-14",
+    "at": "2026-11-14T20:30Z",
+    "dep": "futbol",
+    "liga": "Liga BetPlay",
+    "partido": "Cúcuta vs Jaguares",
+    "mercado": "Córners (equipo)",
+    "txt": "Jaguares: más de 2.5 córners",
+    "p": 0.7168,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     66.8,
+     89.3
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-14",
+    "at": "2026-11-14T23:00Z",
+    "dep": "futbol",
+    "liga": "Liga MX",
+    "partido": "Queretaro vs Monterrey",
+    "mercado": "Córners (equipo)",
+    "txt": "Queretaro: menos de 6.5 córners",
+    "p": 0.7162,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     66.8,
+     89.3
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-14",
+    "at": "2026-11-14T20:30Z",
+    "dep": "futbol",
+    "liga": "Liga BetPlay",
+    "partido": "Cali vs Tolima",
+    "mercado": "Córners (equipo)",
+    "txt": "Cali: más de 2.5 córners",
+    "p": 0.7108,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     66.8,
+     89.3
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-14",
+    "at": "2026-11-14T23:00Z",
+    "dep": "futbol",
+    "liga": "Liga MX",
+    "partido": "Queretaro vs Monterrey",
+    "mercado": "Córners (equipo)",
+    "txt": "Monterrey: menos de 6.5 córners",
+    "p": 0.7081,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     66.8,
+     89.3
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-14",
+    "at": "2026-11-14T20:30Z",
+    "dep": "futbol",
+    "liga": "Liga BetPlay",
+    "partido": "Águilas Doradas vs Ind. Medellín",
+    "mercado": "Córners (partido)",
+    "txt": "menos de 11.5 córners",
+    "p": 0.7159,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     56.6,
+     88.5
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-14",
+    "at": "2026-11-14T20:30Z",
+    "dep": "futbol",
+    "liga": "Liga BetPlay",
+    "partido": "Bucaramanga vs Fortaleza",
+    "mercado": "Tarjetas (equipo)",
+    "txt": "Fortaleza: menos de 3.5 tarjetas",
+    "p": 0.7102,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     53.9,
+     86.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-14",
+    "at": "2026-11-14T20:30Z",
+    "dep": "futbol",
+    "liga": "Liga BetPlay",
+    "partido": "Bucaramanga vs Fortaleza",
+    "mercado": "Tarjetas (equipo)",
+    "txt": "Bucaramanga: menos de 3.5 tarjetas",
+    "p": 0.7078,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     53.9,
+     86.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-14",
+    "at": "2026-11-14T20:30Z",
+    "dep": "futbol",
+    "liga": "Liga BetPlay",
+    "partido": "Atl. Nacional vs Once Caldas",
+    "mercado": "Tarjetas (equipo)",
+    "txt": "Once Caldas: menos de 3.5 tarjetas",
+    "p": 0.7077,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     53.9,
+     86.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-14",
+    "at": "2026-11-14T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Romania vs Poland",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Andrei Coubis: menos de 0.5 tiros",
+    "p": 0.7163,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-14",
+    "at": "2026-11-14T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "N Ireland vs Ukraine",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Jamie Donley: menos de 2.5 tiros",
+    "p": 0.7156,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-14",
+    "at": "2026-11-14T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Portugal vs Denmark",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Rasmus Kristensen: menos de 0.5 tiros",
+    "p": 0.7156,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-14",
+    "at": "2026-11-14T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Sweden vs Bosnia-Herz",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Gabriel Gudmundsson: menos de 0.5 tiros",
+    "p": 0.7149,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-14",
+    "at": "2026-11-14T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Romania vs Poland",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Jan Bednarek: menos de 0.5 tiros",
+    "p": 0.7105,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-14",
+    "at": "2026-11-14T17:00Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Georgia vs Hungary",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Dániel Lukács: menos de 1.5 tiros",
+    "p": 0.7084,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-14",
+    "at": "2026-11-14T17:00Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Norway vs Wales",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Lewis Koumas: menos de 1.5 tiros",
+    "p": 0.707,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-14",
+    "at": "2026-11-14T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "N Ireland vs Ukraine",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Yehor Nazaryna: menos de 1.5 tiros",
+    "p": 0.7065,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-14",
+    "at": "2026-11-14T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "N Ireland vs Ukraine",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Shea Charles: más de 0.5 tiros",
+    "p": 0.7064,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-14",
+    "at": "2026-11-14T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Austria vs Rep Ireland",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Jack Moylan: menos de 2.5 tiros",
+    "p": 0.7037,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-14",
+    "at": "2026-11-14T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Austria vs Rep Ireland",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Ryan Manning: menos de 1.5 tiros",
+    "p": 0.7009,
+    "justa": 1.43,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-14",
+    "at": "2026-11-14T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "N Ireland vs Ukraine",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Viktor Tsygankov: más de 0.5 tiros",
+    "p": 0.7005,
+    "justa": 1.43,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   }
+  ],
+  "2026-11-15": [
+   {
+    "dia": "2026-11-15",
+    "at": "2026-11-15T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Croatia vs Czechia",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Michal Sadílek: más de 0.5 tiros",
+    "p": 0.7154,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-15",
+    "at": "2026-11-15T17:00Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Finland vs San Marino",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Lorenzo Capicchioni: más de 0.5 tiros",
+    "p": 0.7123,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-15",
+    "at": "2026-11-15T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "France vs Türkiye",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Ousmane Dembélé: más de 1.5 tiros",
+    "p": 0.7117,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-15",
+    "at": "2026-11-15T14:00Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Latvia vs Armenia",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Artur Serobyan: más de 1.5 tiros",
+    "p": 0.7104,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-15",
+    "at": "2026-11-15T17:00Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Belarus vs Albania",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Valeri Gromyko: más de 0.5 tiros",
+    "p": 0.7091,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-15",
+    "at": "2026-11-15T14:00Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Cyprus vs Montenegro",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Ioannis Pittas: más de 1.5 tiros",
+    "p": 0.7084,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-15",
+    "at": "2026-11-15T14:00Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Cyprus vs Montenegro",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Marcus Edwards: más de 1.5 tiros",
+    "p": 0.7051,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-15",
+    "at": "2026-11-15T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Belgium vs Italy",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Pio Esposito: más de 1.5 tiros",
+    "p": 0.7043,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-15",
+    "at": "2026-11-15T17:00Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Belarus vs Albania",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Kirill Gomanov: menos de 0.5 tiros",
+    "p": 0.7041,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-15",
+    "at": "2026-11-15T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "France vs Türkiye",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Baris Alper Yilmaz: menos de 1.5 tiros",
+    "p": 0.7022,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-15",
+    "at": "2026-11-15T14:00Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Cyprus vs Montenegro",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Grigoris Kastanos: más de 0.5 tiros",
+    "p": 0.702,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-15",
+    "at": "2026-11-15T17:00Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Belarus vs Albania",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Artem Kontsevoy: más de 0.5 tiros",
+    "p": 0.7009,
+    "justa": 1.43,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-15",
+    "at": "2026-11-15T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Croatia vs Czechia",
+    "mercado": "Tiros a puerta (jugador) · liga nueva",
+    "txt": "Lukás Ambros: menos de 0.5 tiros a puerta",
+    "p": 0.7157,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     43.8,
+     100.0
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-15",
+    "at": "2026-11-15T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Spain vs England",
+    "mercado": "Tiros (partido) · liga nueva",
+    "txt": "menos de 28.5 tiros",
+    "p": 0.7154,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     43.8,
+     100.0
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-15",
+    "at": "2026-11-15T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Belgium vs Italy",
+    "mercado": "Tiros a puerta (jugador) · liga nueva",
+    "txt": "Michael Kayode: menos de 0.5 tiros a puerta",
+    "p": 0.7117,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     43.8,
+     100.0
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-15",
+    "at": "2026-11-15T17:00Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Finland vs San Marino",
+    "mercado": "Tiros a puerta (jugador) · liga nueva",
+    "txt": "Joel Pohjanpalo: menos de 1.5 tiros a puerta",
+    "p": 0.7115,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     43.8,
+     100.0
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-15",
+    "at": "2026-11-15T14:00Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Cyprus vs Montenegro",
+    "mercado": "Tiros (partido) · liga nueva",
+    "txt": "más de 20.5 tiros",
+    "p": 0.7103,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     43.8,
+     100.0
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-15",
+    "at": "2026-11-15T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Croatia vs Czechia",
+    "mercado": "Tiros a puerta (jugador) · liga nueva",
+    "txt": "Luka Modric: menos de 0.5 tiros a puerta",
+    "p": 0.7101,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     43.8,
+     100.0
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-15",
+    "at": "2026-11-15T17:00Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Belarus vs Albania",
+    "mercado": "Tiros (partido) · liga nueva",
+    "txt": "más de 18.5 tiros",
+    "p": 0.7047,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     43.8,
+     100.0
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-15",
+    "at": "2026-11-15T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Belgium vs Italy",
+    "mercado": "Faltas (jugador) · liga nueva",
+    "txt": "Youri Tielemans: más de 0.5 faltas",
+    "p": 0.7157,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     38.6,
+     81.5
+    ],
+    "cat": "experimental"
+   }
+  ],
+  "2026-11-16": [
+   {
+    "dia": "2026-11-16",
+    "at": "2026-11-16T17:00Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Iceland vs Luxembourg",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Enes Mahmutovic: menos de 0.5 tiros",
+    "p": 0.7164,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-16",
+    "at": "2026-11-16T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Germany vs Netherlands",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Joey Veerman: menos de 1.5 tiros",
+    "p": 0.7157,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-16",
+    "at": "2026-11-16T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Switzerland vs Scotland",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Ardon Jashari: menos de 1.5 tiros",
+    "p": 0.714,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-16",
+    "at": "2026-11-16T17:00Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Iceland vs Luxembourg",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Aiman Dardari: más de 0.5 tiros",
+    "p": 0.7137,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-16",
+    "at": "2026-11-16T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "North Macedonia vs Slovenia",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Mark Zabukovnik: menos de 1.5 tiros",
+    "p": 0.7125,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-16",
+    "at": "2026-11-16T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "North Macedonia vs Slovenia",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Mario Mladenovski: menos de 0.5 tiros",
+    "p": 0.7124,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-16",
+    "at": "2026-11-16T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "North Macedonia vs Slovenia",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Bojan Ilievski: menos de 0.5 tiros",
+    "p": 0.7115,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-16",
+    "at": "2026-11-16T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "North Macedonia vs Slovenia",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Matej Gashtarov: menos de 1.5 tiros",
+    "p": 0.7114,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-16",
+    "at": "2026-11-16T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Switzerland vs Scotland",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Oliver McBurnie: más de 0.5 tiros",
+    "p": 0.7087,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-16",
+    "at": "2026-11-16T15:00Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Kazakhstan vs Slovakia",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Dávid Hancko: menos de 2.5 tiros",
+    "p": 0.7063,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-16",
+    "at": "2026-11-16T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Gibraltar vs Malta",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Tjay De Barr: más de 0.5 tiros",
+    "p": 0.7061,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-16",
+    "at": "2026-11-16T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Switzerland vs Scotland",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Manuel Akanji: menos de 0.5 tiros",
+    "p": 0.7052,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-16",
+    "at": "2026-11-16T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Greece vs Serbia",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Sergej Milinkovic-Savic: menos de 1.5 tiros",
+    "p": 0.7044,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-16",
+    "at": "2026-11-16T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Greece vs Serbia",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Christos Zafeiris: menos de 1.5 tiros",
+    "p": 0.7041,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-16",
+    "at": "2026-11-16T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "North Macedonia vs Slovenia",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Danijel Sturm: menos de 2.5 tiros",
+    "p": 0.7041,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-16",
+    "at": "2026-11-16T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Switzerland vs Scotland",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Zachary Athekame: menos de 0.5 tiros",
+    "p": 0.7026,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-16",
+    "at": "2026-11-16T17:00Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Estonia vs Bulgaria",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Maksim Paskotši: menos de 1.5 tiros",
+    "p": 0.7023,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-16",
+    "at": "2026-11-16T17:00Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Lithuania vs Liechtenstein",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Justas Lasickas: menos de 1.5 tiros",
+    "p": 0.7013,
+    "justa": 1.43,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-16",
+    "at": "2026-11-16T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "North Macedonia vs Slovenia",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Elmin Rastoder: más de 0.5 tiros",
+    "p": 0.7012,
+    "justa": 1.43,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-16",
+    "at": "2026-11-16T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Greece vs Serbia",
+    "mercado": "Tiros a puerta (jugador) · liga nueva",
+    "txt": "Konstantinos Mavropanos: menos de 0.5 tiros a puerta",
+    "p": 0.7146,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     43.8,
+     100.0
+    ],
+    "cat": "experimental"
+   }
+  ],
+  "2026-11-17": [
+   {
+    "dia": "2026-11-17",
+    "at": "2026-11-17T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Ukraine vs Georgia",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Viktor Tsygankov: más de 0.5 tiros",
+    "p": 0.7164,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-17",
+    "at": "2026-11-17T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Bosnia-Herz vs Romania",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Sead Kolasinac: menos de 0.5 tiros",
+    "p": 0.7151,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-17",
+    "at": "2026-11-17T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Poland vs Sweden",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Yasin Ayari: menos de 1.5 tiros",
+    "p": 0.715,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-17",
+    "at": "2026-11-17T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Hungary vs N Ireland",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Willi Orbán: menos de 1.5 tiros",
+    "p": 0.712,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-17",
+    "at": "2026-11-17T13:10Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Japan vs Paraguay",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Daizen Maeda: menos de 1.5 tiros",
+    "p": 0.711,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-17",
+    "at": "2026-11-17T23:30Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Ecuador vs Bolivia",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "John Yeboah: menos de 2.5 tiros",
+    "p": 0.7107,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-17",
+    "at": "2026-11-17T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Denmark vs Norway",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Victor Froholdt: menos de 1.5 tiros",
+    "p": 0.7097,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-17",
+    "at": "2026-11-17T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Poland vs Sweden",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Sebastian Nanasi: menos de 1.5 tiros",
+    "p": 0.7097,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-17",
+    "at": "2026-11-17T23:00Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Chile vs Colombia",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Luis Suárez: más de 0.5 tiros",
+    "p": 0.7095,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-17",
+    "at": "2026-11-18T02:30Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Mexico vs Jamaica",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Roberto Alvarado: más de 0.5 tiros",
+    "p": 0.7087,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-17",
+    "at": "2026-11-17T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Israel vs Austria",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Stefan Posch: más de 0.5 tiros",
+    "p": 0.7082,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-17",
+    "at": "2026-11-17T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Poland vs Sweden",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Robert Lewandowski: más de 1.5 tiros",
+    "p": 0.7081,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-17",
+    "at": "2026-11-17T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Poland vs Sweden",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Jan Bednarek: menos de 0.5 tiros",
+    "p": 0.707,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-17",
+    "at": "2026-11-17T14:00Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Qatar vs South Korea",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Lee Han-Beom: menos de 0.5 tiros",
+    "p": 0.7055,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-17",
+    "at": "2026-11-17T23:00Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Chile vs Colombia",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Maximiliano Gutiérrez: menos de 2.5 tiros",
+    "p": 0.7033,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-17",
+    "at": "2026-11-17T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Ukraine vs Georgia",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Giorgi Kochorashvili: menos de 1.5 tiros",
+    "p": 0.7029,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-17",
+    "at": "2026-11-17T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Israel vs Austria",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Dor Turgeman: más de 0.5 tiros",
+    "p": 0.7015,
+    "justa": 1.43,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-17",
+    "at": "2026-11-17T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Poland vs Sweden",
+    "mercado": "Tiros (jugador) · liga nueva",
+    "txt": "Wiktor Nowak: más de 0.5 tiros",
+    "p": 0.7003,
+    "justa": 1.43,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     45.4,
+     88.3
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-17",
+    "at": "2026-11-17T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Bosnia-Herz vs Romania",
+    "mercado": "Tiros (partido) · liga nueva",
+    "txt": "menos de 24.5 tiros",
+    "p": 0.7157,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     43.8,
+     100.0
+    ],
+    "cat": "experimental"
+   },
+   {
+    "dia": "2026-11-17",
+    "at": "2026-11-17T19:45Z",
+    "dep": "futbol",
+    "liga": "Selecciones",
+    "partido": "Denmark vs Norway",
+    "mercado": "Tiros a puerta (jugador) · liga nueva",
+    "txt": "Rasmus Højlund: menos de 1.5 tiros a puerta",
+    "p": 0.7154,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     43.8,
+     100.0
+    ],
+    "cat": "experimental"
+   }
+  ],
+  "2026-11-18": [],
+  "2026-11-19": [],
+  "2026-11-20": [
+   {
+    "dia": "2026-11-20",
+    "at": "2026-11-20T19:45Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Troyes vs Le Havre AC",
+    "mercado": "Faltas (jugador)",
+    "txt": "Renaud Ripart: menos de 1.5 faltas",
+    "p": 0.7168,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-20",
+    "at": "2026-11-20T19:45Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Troyes vs Le Havre AC",
+    "mercado": "Faltas (jugador)",
+    "txt": "Mouhamed N'Diaye: más de 0.5 faltas",
+    "p": 0.7153,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-20",
+    "at": "2026-11-20T19:30Z",
+    "dep": "futbol",
+    "liga": "Bundesliga",
+    "partido": "Bayern vs Cologne",
+    "mercado": "Faltas (jugador)",
+    "txt": "Tom Krauss: menos de 1.5 faltas",
+    "p": 0.7138,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-20",
+    "at": "2026-11-20T19:45Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Troyes vs Le Havre AC",
+    "mercado": "Faltas (jugador)",
+    "txt": "Djibril Ouziad: más de 0.5 faltas",
+    "p": 0.711,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-20",
+    "at": "2026-11-20T19:45Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Troyes vs Le Havre AC",
+    "mercado": "Faltas (jugador)",
+    "txt": "Paolo Gozzi Iweru: menos de 1.5 faltas",
+    "p": 0.707,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-20",
+    "at": "2026-11-20T19:45Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Troyes vs Le Havre AC",
+    "mercado": "Faltas (jugador)",
+    "txt": "Rayan Fofana: menos de 1.5 faltas",
+    "p": 0.7062,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-20",
+    "at": "2026-11-20T19:45Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Troyes vs Le Havre AC",
+    "mercado": "Faltas (jugador)",
+    "txt": "Lucas Maronnier: más de 0.5 faltas",
+    "p": 0.7053,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-20",
+    "at": "2026-11-20T19:45Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Troyes vs Le Havre AC",
+    "mercado": "Faltas (jugador)",
+    "txt": "Rassoul Ndiaye: más de 0.5 faltas",
+    "p": 0.7033,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-20",
+    "at": "2026-11-20T20:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Athletic vs Espanyol",
+    "mercado": "Faltas (jugador)",
+    "txt": "Hugo Rincón: más de 0.5 faltas",
+    "p": 0.701,
+    "justa": 1.43,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-20",
+    "at": "2026-11-20T19:45Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Troyes vs Le Havre AC",
+    "mercado": "Tiros (jugador)",
+    "txt": "Josh Maja: menos de 2.5 tiros",
+    "p": 0.7166,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.4,
+     80.6
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-20",
+    "at": "2026-11-20T20:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Athletic vs Espanyol",
+    "mercado": "Tiros (jugador)",
+    "txt": "Roberto Fernández: menos de 2.5 tiros",
+    "p": 0.7115,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.4,
+     80.6
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-20",
+    "at": "2026-11-20T20:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Athletic vs Espanyol",
+    "mercado": "Tiros (jugador)",
+    "txt": "Quilindschy Hartman: menos de 0.5 tiros",
+    "p": 0.7112,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.4,
+     80.6
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-20",
+    "at": "2026-11-20T19:30Z",
+    "dep": "futbol",
+    "liga": "Bundesliga",
+    "partido": "Bayern vs Cologne",
+    "mercado": "Tiros (jugador)",
+    "txt": "Joshua Kimmich: menos de 1.5 tiros",
+    "p": 0.7094,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.4,
+     80.6
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-20",
+    "at": "2026-11-20T19:30Z",
+    "dep": "futbol",
+    "liga": "Bundesliga",
+    "partido": "Bayern vs Cologne",
+    "mercado": "Tiros (jugador)",
+    "txt": "Ismael Saibari: menos de 2.5 tiros",
+    "p": 0.7092,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.4,
+     80.6
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-20",
+    "at": "2026-11-20T19:45Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Troyes vs Le Havre AC",
+    "mercado": "Tiros (jugador)",
+    "txt": "Amir Richardson: menos de 1.5 tiros",
+    "p": 0.7003,
+    "justa": 1.43,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.4,
+     80.6
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-20",
+    "at": "2026-11-20T19:30Z",
+    "dep": "futbol",
+    "liga": "Bundesliga",
+    "partido": "Bayern vs Cologne",
+    "mercado": "Tiros a puerta (jugador)",
+    "txt": "Sebastian Sebulonsen: menos de 0.5 tiros a puerta",
+    "p": 0.7153,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.0,
+     84.8
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-20",
+    "at": "2026-11-20T19:30Z",
+    "dep": "futbol",
+    "liga": "Bundesliga",
+    "partido": "Bayern vs Cologne",
+    "mercado": "Tiros a puerta (jugador)",
+    "txt": "Linton Maina: menos de 0.5 tiros a puerta",
+    "p": 0.7153,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.0,
+     84.8
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-20",
+    "at": "2026-11-20T19:30Z",
+    "dep": "futbol",
+    "liga": "Bundesliga",
+    "partido": "Bayern vs Cologne",
+    "mercado": "Tiros a puerta (jugador)",
+    "txt": "Aleksandar Pavlovic: menos de 0.5 tiros a puerta",
+    "p": 0.7146,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.0,
+     84.8
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-20",
+    "at": "2026-11-20T20:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Athletic vs Espanyol",
+    "mercado": "Tiros a puerta (jugador)",
+    "txt": "Javi Hernandez: menos de 0.5 tiros a puerta",
+    "p": 0.712,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.0,
+     84.8
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-20",
+    "at": "2026-11-20T20:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Athletic vs Espanyol",
+    "mercado": "Tiros a puerta (jugador)",
+    "txt": "Edu Expósito: menos de 0.5 tiros a puerta",
+    "p": 0.712,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.0,
+     84.8
+    ],
+    "cat": "en evaluación"
+   }
+  ],
+  "2026-11-21": [
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-21T20:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Real Madrid vs Celta Vigo",
+    "mercado": "Faltas (jugador)",
+    "txt": "Ilaix Moriba: más de 0.5 faltas",
+    "p": 0.7164,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-21T13:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Alavés vs Deportivo",
+    "mercado": "Faltas (jugador)",
+    "txt": "Ángel Pérez: menos de 1.5 faltas",
+    "p": 0.7163,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-21T15:15Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Rayo vs Valencia",
+    "mercado": "Faltas (jugador)",
+    "txt": "Sergio Camello: menos de 1.5 faltas",
+    "p": 0.7163,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-21T15:00Z",
+    "dep": "futbol",
+    "liga": "Premier League",
+    "partido": "Aston Villa vs Sunderland",
+    "mercado": "Faltas (jugador)",
+    "txt": "Reinildo Mandava: menos de 1.5 faltas",
+    "p": 0.7162,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-21T17:30Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Sevilla vs Betis",
+    "mercado": "Faltas (jugador)",
+    "txt": "Isaac Romero: más de 0.5 faltas",
+    "p": 0.7162,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-21T20:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Real Madrid vs Celta Vigo",
+    "mercado": "Faltas (jugador)",
+    "txt": "Bernardo Silva: más de 0.5 faltas",
+    "p": 0.7153,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-21T15:00Z",
+    "dep": "futbol",
+    "liga": "Premier League",
+    "partido": "Bournemouth vs Nottm Forest",
+    "mercado": "Faltas (jugador)",
+    "txt": "Daniel Muñoz: menos de 1.5 faltas",
+    "p": 0.715,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-21T12:30Z",
+    "dep": "futbol",
+    "liga": "Premier League",
+    "partido": "Man City vs Fulham",
+    "mercado": "Faltas (jugador)",
+    "txt": "Rúben Dias: menos de 1.5 faltas",
+    "p": 0.7145,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-21T13:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Alavés vs Deportivo",
+    "mercado": "Faltas (jugador)",
+    "txt": "Mario Soriano Carreno: menos de 1.5 faltas",
+    "p": 0.7143,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-21T19:45Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Lens vs Toulouse",
+    "mercado": "Faltas (jugador)",
+    "txt": "Ruben Aguilar: más de 0.5 faltas",
+    "p": 0.7143,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-21T17:30Z",
+    "dep": "futbol",
+    "liga": "Bundesliga",
+    "partido": "Schalke vs Stuttgart",
+    "mercado": "Faltas (jugador)",
+    "txt": "Ermedin Demirovic: más de 0.5 faltas",
+    "p": 0.7142,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-21T15:00Z",
+    "dep": "futbol",
+    "liga": "Premier League",
+    "partido": "Bournemouth vs Nottm Forest",
+    "mercado": "Faltas (jugador)",
+    "txt": "Adrien Truffert: más de 0.5 faltas",
+    "p": 0.714,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-21T17:00Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Parma vs AS Roma",
+    "mercado": "Faltas (jugador)",
+    "txt": "Wesley: menos de 1.5 faltas",
+    "p": 0.7139,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-21T16:15Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Nice vs PSG",
+    "mercado": "Faltas (jugador)",
+    "txt": "Djibril Coulibaly: más de 0.5 faltas",
+    "p": 0.7136,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-21T16:15Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Nice vs PSG",
+    "mercado": "Faltas (jugador)",
+    "txt": "Niels Nkounkou: más de 0.5 faltas",
+    "p": 0.7136,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-21T19:45Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Monaco vs Auxerre",
+    "mercado": "Faltas (jugador)",
+    "txt": "Vanderson: más de 0.5 faltas",
+    "p": 0.7123,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-21T14:30Z",
+    "dep": "futbol",
+    "liga": "Bundesliga",
+    "partido": "Elversberg vs Freiburg",
+    "mercado": "Faltas (jugador)",
+    "txt": "Yannick Engelhardt: más de 0.5 faltas",
+    "p": 0.7121,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-21T17:30Z",
+    "dep": "futbol",
+    "liga": "Bundesliga",
+    "partido": "Schalke vs Stuttgart",
+    "mercado": "Faltas (jugador)",
+    "txt": "Hwang Hee-Chan: menos de 1.5 faltas",
+    "p": 0.7116,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-21T15:15Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Rayo vs Valencia",
+    "mercado": "Faltas (jugador)",
+    "txt": "Javi Guerra: más de 0.5 faltas",
+    "p": 0.7115,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-21T17:00Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Parma vs AS Roma",
+    "mercado": "Faltas (jugador)",
+    "txt": "Evan Ndicka: más de 0.5 faltas",
+    "p": 0.7115,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.8,
+     80.7
+    ],
+    "cat": "en evaluación"
+   }
+  ]
+ }
+}

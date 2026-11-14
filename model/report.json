@@ -1,0 +1,340 @@
+{
+ "fecha": "2026-11-14",
+ "corte": "2026-02-01",
+ "futbol": {
+  "ajustes": {
+   "xi": 0.0015,
+   "ridge": 6.0,
+   "wsot": 0.7,
+   "rho": -0.1,
+   "disp": 3.0
+  },
+  "partidos_prueba": 1867,
+  "1X2_acierto": 51.6,
+  "1X2_acierto_siempre_local": 44.9,
+  "1X2_por_liga": {
+   "eng.1": 46.6,
+   "esp.1": 54.4,
+   "ita.1": 57.3,
+   "ger.1": 55.3,
+   "fra.1": 52.6,
+   "uefa.champions": 64.1,
+   "col.1": 49.6,
+   "mex.1": 44.3
+  },
+  "mercados": {
+   "Gana local": {
+    "n": 1867,
+    "ll": 0.6351,
+    "ll_base": 0.6879,
+    "acierto": 0.6481,
+    "acierto_base": 0.5512
+   },
+   "Empate": {
+    "n": 1867,
+    "ll": 0.56,
+    "ll_base": 0.5642,
+    "acierto": 0.7483,
+    "acierto_base": 0.7483
+   },
+   "Gana visitante": {
+    "n": 1867,
+    "ll": 0.5595,
+    "ll_base": 0.6104,
+    "acierto": 0.7204,
+    "acierto_base": 0.7006
+   },
+   "Ambos marcan": {
+    "n": 1867,
+    "ll": 0.6795,
+    "ll_base": 0.6852,
+    "acierto": 0.5747,
+    "acierto_base": 0.5629
+   },
+   "Más de 1.5 goles": {
+    "n": 1867,
+    "ll": 0.5243,
+    "ll_base": 0.5311,
+    "acierto": 0.7766,
+    "acierto_base": 0.7766
+   },
+   "Más de 2.5 goles": {
+    "n": 1867,
+    "ll": 0.6774,
+    "ll_base": 0.6893,
+    "acierto": 0.5678,
+    "acierto_base": 0.5437
+   },
+   "Más de 3.5 goles": {
+    "n": 1867,
+    "ll": 0.5999,
+    "ll_base": 0.6153,
+    "acierto": 0.6984,
+    "acierto_base": 0.6947
+   },
+   "Más de 8.5 córners": {
+    "n": 1863,
+    "ll": 0.6857,
+    "ll_base": 0.67,
+    "acierto": 0.5513,
+    "acierto_base": 0.6071
+   },
+   "Más de 9.5 córners": {
+    "n": 1863,
+    "ll": 0.6935,
+    "ll_base": 0.693,
+    "acierto": 0.5346,
+    "acierto_base": 0.5072
+   },
+   "Más de 10.5 córners": {
+    "n": 1863,
+    "ll": 0.6582,
+    "ll_base": 0.6608,
+    "acierto": 0.6232,
+    "acierto_base": 0.6264
+   }
+  },
+  "calibracion": [
+   {
+    "rango": "50-60%",
+    "n": 7369,
+    "dijo": 54.7,
+    "paso": 54.8
+   },
+   {
+    "rango": "60-70%",
+    "n": 5112,
+    "dijo": 64.8,
+    "paso": 63.6
+   },
+   {
+    "rango": "70-80%",
+    "n": 4800,
+    "dijo": 74.3,
+    "paso": 74.7
+   },
+   {
+    "rango": "80-90%",
+    "n": 1296,
+    "dijo": 83.4,
+    "paso": 83.0
+   },
+   {
+    "rango": "90-100%",
+    "n": 81,
+    "dijo": 92.4,
+    "paso": 92.6
+   }
+  ],
+  "cal_mercado": {
+   "col.1": {
+    "1X": {
+     "n": 476,
+     "dijo": 0.7567,
+     "paso": 0.7857
+    },
+    "12": {
+     "n": 529,
+     "dijo": 0.7158,
+     "paso": 0.7202
+    },
+    "mas_1.5": {
+     "n": 494,
+     "dijo": 0.7176,
+     "paso": 0.7227
+    },
+    "menos_2.5": {
+     "n": 172,
+     "dijo": 0.6497,
+     "paso": 0.5814
+    },
+    "menos_3.5": {
+     "n": 519,
+     "dijo": 0.7691,
+     "paso": 0.7707
+    },
+    "X2": {
+     "n": 193,
+     "dijo": 0.6749,
+     "paso": 0.6269
+    },
+    "btts_no": {
+     "n": 57,
+     "dijo": 0.6287,
+     "paso": 0.5789
+    },
+    "1": {
+     "n": 65,
+     "dijo": 0.6567,
+     "paso": 0.6923
+    },
+    "btts_si": {
+     "n": 13,
+     "dijo": 0.6206,
+     "paso": 0.7692
+    },
+    "mas_2.5": {
+     "n": 17,
+     "dijo": 0.6383,
+     "paso": 0.5294
+    },
+    "2": {
+     "n": 1,
+     "dijo": 0.6421,
+     "paso": 0.0
+    }
+   },
+   "mex.1": {
+    "1X": {
+     "n": 313,
+     "dijo": 0.7343,
+     "paso": 0.7444
+    },
+    "12": {
+     "n": 414,
+     "dijo": 0.7425,
+     "paso": 0.7391
+    },
+    "mas_1.5": {
+     "n": 414,
+     "dijo": 0.7951,
+     "paso": 0.7923
+    },
+    "menos_3.5": {
+     "n": 357,
+     "dijo": 0.6828,
+     "paso": 0.6611
+    },
+    "X2": {
+     "n": 177,
+     "dijo": 0.6973,
+     "paso": 0.6723
+    },
+    "btts_si": {
+     "n": 119,
+     "dijo": 0.631,
+     "paso": 0.5378
+    },
+    "1": {
+     "n": 46,
+     "dijo": 0.6515,
+     "paso": 0.6957
+    },
+    "mas_2.5": {
+     "n": 101,
+     "dijo": 0.6382,
+     "paso": 0.5149
+    },
+    "menos_2.5": {
+     "n": 2,
+     "dijo": 0.6145,
+     "paso": 0.0
+    },
+    "2": {
+     "n": 3,
+     "dijo": 0.6258,
+     "paso": 0.6667
+    }
+   }
+  }
+ },
+ "nba": {
+  "ajustes": {
+   "xi": 0.012,
+   "freno": 5.0,
+   "coef_margen": 1.08,
+   "pts_por_ausencias": -18.78,
+   "pts_por_b2b": -1.48
+  },
+  "partidos_prueba": 775,
+  "ganador": {
+   "acierto_solo_ratings": 71.6,
+   "acierto_con_ausencias_y_cansancio": 72.5,
+   "acierto_siempre_local": 55.0,
+   "ll_solo_ratings": 0.5778,
+   "ll_con_factores": 0.5673,
+   "ll_base": 0.6884
+  },
+  "margen_error_medio": 11.78,
+  "total_error_medio": 14.82,
+  "total_error_medio_base": 15.96,
+  "calibracion_ganador": [
+   {
+    "rango": "50-60%",
+    "n": 266,
+    "dijo": 55.0,
+    "paso": 59.8
+   },
+   {
+    "rango": "60-70%",
+    "n": 230,
+    "dijo": 65.0,
+    "paso": 74.3
+   },
+   {
+    "rango": "70-80%",
+    "n": 180,
+    "dijo": 74.4,
+    "paso": 78.9
+   },
+   {
+    "rango": "80-90%",
+    "n": 88,
+    "dijo": 84.0,
+    "paso": 89.8
+   },
+   {
+    "rango": "90-100%",
+    "n": 11,
+    "dijo": 91.4,
+    "paso": 100.0
+   }
+  ]
+ },
+ "nba_props": {
+  "PTS": {
+   "n": 16372,
+   "error_modelo": 4.77,
+   "error_promedio_simple": 4.93,
+   "mejora_%": 3.2
+  },
+  "REB": {
+   "n": 16372,
+   "error_modelo": 1.93,
+   "error_promedio_simple": 1.96,
+   "mejora_%": 1.6
+  },
+  "AST": {
+   "n": 16372,
+   "error_modelo": 1.39,
+   "error_promedio_simple": 1.41,
+   "mejora_%": 1.7
+  },
+  "3PM": {
+   "n": 16372,
+   "error_modelo": 0.9,
+   "error_promedio_simple": 0.91,
+   "mejora_%": 1.2
+  }
+ },
+ "parametros": {
+  "futbol": {
+   "xi": 0.0015,
+   "ridge": 6.0,
+   "wsot": 0.7,
+   "rho": -0.1,
+   "disp": 3.0
+  },
+  "nba": {
+   "xi": 0.012,
+   "ridge": 5.0,
+   "coef": [
+    1.080369884133093,
+    -18.78157411149581,
+    -1.4813851214046565,
+    -0.33279821704979895
+   ],
+   "sd": 14.500658689624874
+  }
+ }
+}

@@ -1,0 +1,406 @@
+{
+ "corte": "2026-02-01",
+ "cuota_min": 1.18,
+ "ajustes": {
+  "equipo": {
+   "cor": {
+    "xi": 0.008,
+    "ridge": 24.0
+   },
+   "sot": {
+    "xi": 0.004,
+    "ridge": 24.0
+   },
+   "tir": {
+    "xi": 0.008,
+    "ridge": 24.0
+   },
+   "fal": {
+    "xi": 0.008,
+    "ridge": 24.0
+   },
+   "tar": {
+    "xi": 0.008,
+    "ridge": 24.0
+   }
+  },
+  "disp_t": {
+   "cor": 1.5,
+   "sot": 1.15,
+   "tir": 1.3,
+   "fal": 1.3,
+   "tar": 1.15
+  },
+  "disp_e": {
+   "cor": 1.5,
+   "sot": 1.15,
+   "tir": 1.8,
+   "fal": 1.15,
+   "tar": 1.0
+  },
+  "K": {
+   "sot": 8,
+   "tir": 4,
+   "fal": 8,
+   "tar": 32
+  },
+  "alpha": {
+   "sot": 0.5,
+   "tir": 0.5,
+   "fal": 0.5,
+   "tar": 0.0
+  }
+ },
+ "mercados": {
+  "cor_t": {
+   "titulo": "Córners del partido",
+   "n": 1863,
+   "ll": 0.6352,
+   "ll_base": 0.6444,
+   "mejora": 1.43,
+   "publicar": true,
+   "picks": 1863,
+   "acierto_picks": 76.7,
+   "dijo_picks": 75.8,
+   "calibracion": [
+    {
+     "rango": "70-80%",
+     "n": 1579,
+     "dijo": 74.7,
+     "paso": 76.1
+    },
+    {
+     "rango": "80-90%",
+     "n": 284,
+     "dijo": 81.9,
+     "paso": 80.3
+    }
+   ]
+  },
+  "cor_e": {
+   "titulo": "Córners por equipo",
+   "n": 3726,
+   "ll": 0.5875,
+   "ll_base": 0.6202,
+   "mejora": 5.27,
+   "publicar": true,
+   "picks": 3726,
+   "acierto_picks": 80.7,
+   "dijo_picks": 80.2,
+   "calibracion": [
+    {
+     "rango": "70-80%",
+     "n": 1696,
+     "dijo": 77.4,
+     "paso": 77.7
+    },
+    {
+     "rango": "80-90%",
+     "n": 2030,
+     "dijo": 82.5,
+     "paso": 83.3
+    }
+   ]
+  },
+  "sot_t": {
+   "titulo": "Tiros a puerta del partido",
+   "n": 1863,
+   "ll": 0.5734,
+   "ll_base": 0.5955,
+   "mejora": 3.7,
+   "publicar": true,
+   "picks": 1863,
+   "acierto_picks": 82.3,
+   "dijo_picks": 80.7,
+   "calibracion": [
+    {
+     "rango": "70-80%",
+     "n": 675,
+     "dijo": 77.8,
+     "paso": 79.1
+    },
+    {
+     "rango": "80-90%",
+     "n": 1188,
+     "dijo": 82.4,
+     "paso": 84.1
+    }
+   ]
+  },
+  "sot_e": {
+   "titulo": "Tiros a puerta por equipo",
+   "n": 3726,
+   "ll": 0.5123,
+   "ll_base": 0.5616,
+   "mejora": 8.78,
+   "publicar": true,
+   "picks": 3724,
+   "acierto_picks": 81.0,
+   "dijo_picks": 79.5,
+   "calibracion": [
+    {
+     "rango": "70-80%",
+     "n": 1898,
+     "dijo": 76.7,
+     "paso": 78.5
+    },
+    {
+     "rango": "80-90%",
+     "n": 1826,
+     "dijo": 82.4,
+     "paso": 83.6
+    }
+   ]
+  },
+  "sot_j": {
+   "titulo": "Tiros a puerta por jugador",
+   "n": 30132,
+   "ll": 0.3664,
+   "ll_base": 0.4154,
+   "mejora": 11.78,
+   "publicar": true,
+   "picks": 15013,
+   "acierto_picks": 80.8,
+   "dijo_picks": 78.3,
+   "calibracion": [
+    {
+     "rango": "70-80%",
+     "n": 8960,
+     "dijo": 75.4,
+     "paso": 78.7
+    },
+    {
+     "rango": "80-90%",
+     "n": 6053,
+     "dijo": 82.6,
+     "paso": 83.8
+    }
+   ]
+  },
+  "tir_t": {
+   "titulo": "Tiros del partido",
+   "n": 1863,
+   "ll": 0.535,
+   "ll_base": 0.5687,
+   "mejora": 5.93,
+   "publicar": true,
+   "picks": 1862,
+   "acierto_picks": 81.3,
+   "dijo_picks": 80.4,
+   "calibracion": [
+    {
+     "rango": "70-80%",
+     "n": 850,
+     "dijo": 77.6,
+     "paso": 78.4
+    },
+    {
+     "rango": "80-90%",
+     "n": 1012,
+     "dijo": 82.7,
+     "paso": 83.7
+    }
+   ]
+  },
+  "tir_e": {
+   "titulo": "Tiros por equipo",
+   "n": 3726,
+   "ll": 0.517,
+   "ll_base": 0.5963,
+   "mejora": 13.3,
+   "publicar": true,
+   "picks": 3718,
+   "acierto_picks": 80.6,
+   "dijo_picks": 79.4,
+   "calibracion": [
+    {
+     "rango": "70-80%",
+     "n": 1972,
+     "dijo": 76.5,
+     "paso": 78.7
+    },
+    {
+     "rango": "80-90%",
+     "n": 1746,
+     "dijo": 82.7,
+     "paso": 82.7
+    }
+   ]
+  },
+  "tir_j": {
+   "titulo": "Tiros por jugador",
+   "n": 30132,
+   "ll": 0.4734,
+   "ll_base": 0.5516,
+   "mejora": 14.17,
+   "publicar": true,
+   "picks": 18071,
+   "acierto_picks": 76.9,
+   "dijo_picks": 78.1,
+   "calibracion": [
+    {
+     "rango": "70-80%",
+     "n": 10149,
+     "dijo": 74.7,
+     "paso": 74.1
+    },
+    {
+     "rango": "80-90%",
+     "n": 7922,
+     "dijo": 82.5,
+     "paso": 80.5
+    }
+   ]
+  },
+  "fal_t": {
+   "titulo": "Faltas del partido",
+   "n": 1863,
+   "ll": 0.5776,
+   "ll_base": 0.6216,
+   "mejora": 7.08,
+   "publicar": true,
+   "picks": 1863,
+   "acierto_picks": 80.0,
+   "dijo_picks": 80.0,
+   "calibracion": [
+    {
+     "rango": "70-80%",
+     "n": 940,
+     "dijo": 77.7,
+     "paso": 78.4
+    },
+    {
+     "rango": "80-90%",
+     "n": 923,
+     "dijo": 82.4,
+     "paso": 81.6
+    }
+   ]
+  },
+  "fal_e": {
+   "titulo": "Faltas por equipo",
+   "n": 3726,
+   "ll": 0.5637,
+   "ll_base": 0.5998,
+   "mejora": 6.02,
+   "publicar": true,
+   "picks": 3674,
+   "acierto_picks": 77.8,
+   "dijo_picks": 78.4,
+   "calibracion": [
+    {
+     "rango": "70-80%",
+     "n": 1946,
+     "dijo": 74.7,
+     "paso": 73.6
+    },
+    {
+     "rango": "80-90%",
+     "n": 1728,
+     "dijo": 82.5,
+     "paso": 82.5
+    }
+   ]
+  },
+  "fal_j": {
+   "titulo": "Faltas por jugador",
+   "n": 30132,
+   "ll": 0.6023,
+   "ll_base": 0.6127,
+   "mejora": 1.69,
+   "publicar": true,
+   "picks": 24076,
+   "acierto_picks": 77.0,
+   "dijo_picks": 76.5,
+   "calibracion": [
+    {
+     "rango": "70-80%",
+     "n": 18419,
+     "dijo": 74.8,
+     "paso": 75.2
+    },
+    {
+     "rango": "80-90%",
+     "n": 5657,
+     "dijo": 82.3,
+     "paso": 82.7
+    }
+   ]
+  },
+  "tar_t": {
+   "titulo": "Tarjetas del partido",
+   "n": 1863,
+   "ll": 0.5458,
+   "ll_base": 0.5801,
+   "mejora": 5.9,
+   "publicar": true,
+   "picks": 1863,
+   "acierto_picks": 80.6,
+   "dijo_picks": 80.3,
+   "calibracion": [
+    {
+     "rango": "70-80%",
+     "n": 747,
+     "dijo": 76.7,
+     "paso": 75.2
+    },
+    {
+     "rango": "80-90%",
+     "n": 1116,
+     "dijo": 82.7,
+     "paso": 84.2
+    }
+   ]
+  },
+  "tar_e": {
+   "titulo": "Tarjetas por equipo",
+   "n": 3726,
+   "ll": 0.508,
+   "ll_base": 0.5311,
+   "mejora": 4.36,
+   "publicar": true,
+   "picks": 3251,
+   "acierto_picks": 81.1,
+   "dijo_picks": 80.5,
+   "calibracion": [
+    {
+     "rango": "70-80%",
+     "n": 1223,
+     "dijo": 76.9,
+     "paso": 76.4
+    },
+    {
+     "rango": "80-90%",
+     "n": 2028,
+     "dijo": 82.6,
+     "paso": 83.9
+    }
+   ]
+  },
+  "tar_j": {
+   "titulo": "Tarjetas por jugador",
+   "n": 30132,
+   "ll": 0.4223,
+   "ll_base": 0.4273,
+   "mejora": 1.16,
+   "publicar": true,
+   "picks": 15378,
+   "acierto_picks": 81.7,
+   "dijo_picks": 81.9,
+   "calibracion": [
+    {
+     "rango": "70-80%",
+     "n": 2981,
+     "dijo": 78.1,
+     "paso": 78.0
+    },
+    {
+     "rango": "80-90%",
+     "n": 12397,
+     "dijo": 82.8,
+     "paso": 82.5
+    }
+   ]
+  }
+ }
+}
