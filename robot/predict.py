@@ -130,13 +130,47 @@ def marcar_respaldo(x, p, u, n, casa, h2h_contra):
     """Marca x["rsp"] si estadística, mercado y modelo apuntan al mismo lado. Sin línea de la casa
     no hay respaldo del mercado: no se marca (no se inventa). Devuelve 1 si lo marcó."""
     x.pop("rsp", None)
-    if x.get("oculto") or x.get("bajo") or not casa or not p or not n or n < RSP_N or h2h_contra:
+    if x.get("oculto") or x.get("bajo") or not casa or not p or u is None or not n or n < RSP_N or h2h_contra:
         return 0
     est = u / n
     if est >= RSP_EST and casa >= RSP_CASA and p >= RSP_P:
         x["rsp"] = {"est": round(est, 3), "u": u, "n": n, "casa": round(casa, 3)}
         return 1
     return 0
+
+
+def marcar_todos(partidos, pr):
+    n = 0
+    def h2h_contra(r):
+        hn, h = r.get("hn") or 0, r.get("h") or 0
+        return hn >= 2 and h < .5 * hn
+    for g in partidos:
+        try:
+            pk = g.get("pick") or {}
+            r = pk.get("resp") or {}
+            valor = pk.get("tipo") == "valor"
+            n += marcar_respaldo(pk, pk.get("pv", pk.get("p")) if valor else pk.get("p"), r.get("u"), r.get("un"),
+                                 pk.get("casa") if valor else None, h2h_contra(r))
+        except Exception as e:
+            print("respaldo partido", g.get("id"), type(e).__name__, e)
+        ex = g.get("extra") or {}
+        for q in (ex.get("picks") or []) + (ex.get("jug") or []):
+            try:
+                r = q.get("resp") or {}
+                n += marcar_respaldo(q, q.get("p"), r.get("u"), r.get("un"), q.get("casa"), h2h_contra(r))
+            except Exception as e:
+                print("respaldo extra", g.get("id"), type(e).__name__, e)
+    for q in pr:
+        try:
+            ln, lado = q.get("linea"), q.get("lado")
+            if ln is None or lado not in ("mas", "menos"):
+                continue
+            u = [float(v) for v in (q.get("ult") or [])[:10] if isinstance(v, (int, float))]
+            cum = sum(1 for v in u if (v > ln if lado == "mas" else v < ln))
+            n += marcar_respaldo(q, q.get("p"), cum, len(u), q.get("casa"), False)
+        except Exception as e:
+            print("respaldo prop", q.get("pl"), type(e).__name__, e)
+    return n
 
 
 def nba_probada():
@@ -1365,21 +1399,12 @@ def main():
     print(f"validación: {ocultos} picks ocultos (se registran, no se muestran); {con_resp} experimentales con respaldo del historial")
     # pedido del usuario (2026-11-13): RESPALDADO = las estadísticas Y la línea del mercado lo apoyan
     rsp_n = 0
-    for g in f + nb:
-        pk = g["pick"]
-        r = pk.get("resp") or {}
-        rsp_n += marcar_respaldo(pk, pk.get("pv", pk.get("p")) if pk.get("tipo") == "valor" else pk.get("p"),
-                                 r.get("u"), r.get("un"), pk.get("casa") if pk.get("tipo") == "valor" else None,
-                                 r.get("hn", 0) >= 2 and r.get("h", 0) < .5 * r.get("hn", 0))
-        for q in (g.get("extra") or {}).get("picks", []) + (g.get("extra") or {}).get("jug", []):
-            r = q.get("resp") or {}
-            rsp_n += marcar_respaldo(q, q.get("p"), r.get("u"), r.get("un"), q.get("casa"),
-                                     r.get("hn", 0) >= 2 and r.get("h", 0) < .5 * r.get("hn", 0))
-    for q in pr:
-        u = [v for v in (q.get("ult") or [])[:10] if v is not None]
-        cum = sum(1 for v in u if (v > q["linea"] if q["lado"] == "mas" else v < q["linea"]))
-        rsp_n += marcar_respaldo(q, q.get("p"), cum, len(u), q.get("casa"), False)
+    try:
+        rsp_n = marcar_todos(f + nb, pr)
+    except Exception as e:                       # nunca tumbar el robot por esta etiqueta
+        print("respaldados: error", type(e).__name__, e)
     print(f"respaldados (estadística >= {RSP_EST:.0%} y mercado a favor): {rsp_n}")
+
     for g in f + nb:
         if g["pick"].get("p", 0) >= TOP and not g["pick"].get("bajo"):
             g["pick"]["top"] = True
