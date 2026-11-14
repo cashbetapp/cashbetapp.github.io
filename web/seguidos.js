@@ -185,8 +185,14 @@ function seguidos() {
     const L = sgVivo(id, v), va = L ? sgVa(L) : null;
     const lnF = L && L.ln != null ? L.ln : v.ln != null ? +v.ln : sgLinea(id, v);
     const real = L && L.val != null ? L.val : e.r != null && !isNaN(parseFloat(e.r)) && lnF != null ? parseFloat(e.r) : null;
-    const bar = L && L.vs ? (L.val + Math.max(L.ln, 0) > 0 ? Math.min(100, Math.round((L.val / (Math.max(L.ln, 0.5) * 1.25)) * 100)) : 40)
-      : real != null && lnF ? Math.min(100, Math.round((real / (+lnF * 1.25)) * 100)) : e.st === "acierto" || e.st === "fallo" ? 100 : Math.round((v.p || 0) * 100);
+    // barra como IABET: terminado (verde/rojo) = llena; en vivo = lo que lleva frente a la línea (100 % al alcanzarla);
+    // pendiente = confianza del pick. El número va en su posición real (la línea queda al 80 %).
+    const fin = e.st === "acierto" || e.st === "fallo" || (L && L.st === "post" && (va === "ok" || va === "no"));
+    const lnB = L && L.vs ? Math.max(L.ln, 0.5) : lnF ? Math.max(+lnF, 0.5) : null;
+    const pos = real != null && lnB ? Math.min(100, Math.round((real / (lnB * 1.25)) * 100)) : null;
+    const bar = fin ? 100
+      : L && L.vs ? (lnB ? Math.min(100, Math.round((Math.max(L.val, 0) / lnB) * 100)) : 40)
+      : real != null && lnB ? Math.min(100, Math.round((real / lnB) * 100)) : Math.round((v.p || 0) * 100);
     const vivo = L && L.st === "in";
     const bcls = e.st ? cls : va === "ok" ? "ok" : va === "no" ? "no" : vivo ? "vi" : cls;
     return `<div class="sgt ${cls}" ${at} role="button">
@@ -197,7 +203,7 @@ function seguidos() {
         <small>${new Date(v.at).toLocaleDateString("es-CO", { month: "short", day: "numeric" }).replace(".", "")} · ${hora(v.at)}</small>
         <span class="sgp ${up ? "" : "bad"}">${ic(up ? "up" : "down")}<span>${esc((v.pill || v.txt || "").toUpperCase())}</span></span>
         <i class="sgbar ${bcls}"><s style="width:${bar}%"></s></i>
-        ${real != null ? `<div class="sgnum ${bcls}" style="--x:${bar}%"><b>${esc(String(L && L.txt ? L.txt : real))}</b></div>` : ""}
+        ${real != null ? `<div class="sgnum ${bcls}" style="--x:${pos != null ? pos : bar}%"><b>${esc(String(L && L.txt ? L.txt : real))}</b></div>` : ""}
         ${vivo ? "" : `<div class="sgv"><span>${e.st ? (e.r != null ? `Final ${esc(String(e.r))}` : lab) : L && L.st === "post" ? "Terminado · calificando" : lab}</span><em>${pct(v.p)}</em></div>`}</div></div>`;
   };
   return `<div class="top"><div class="logo"><img class="lgc" src="img/logo-cara.png" alt="">CASH<b>BET</b></div><div class="ic"><button class="icb" data-go="ajustes" aria-label="Perfil">${ic("user")}</button></div></div>
