@@ -699,6 +699,29 @@ def props_menos(ev, e, seq, names, injured):
     return out
 
 
+TIT_MIN = 0.6      # titular = arrancó en 60 %+ de sus últimos 10 partidos jugados
+
+
+def titulares_nba():
+    """Devuelve f(pl, at) -> True si el jugador fue titular en 6+ de sus últimos 10 partidos antes de 'at'."""
+    games, det, _ = load("nba")
+    fecha = {g["id"]: g["at"] for g in games}
+    hist = {}
+    for gid, g in det.items():
+        f = fecha.get(gid)
+        if not f:
+            continue
+        for pid, x in (g.get("pl") or {}).items():
+            if (x.get("MIN") or 0) > 0:
+                hist.setdefault(str(pid), []).append((f, bool(x.get("st"))))
+    for v in hist.values():
+        v.sort()
+    def es(pl, at):
+        xs = [st for f, st in hist.get(str(pl), []) if not at or f < at][-10:]
+        return len(xs) >= 5 and sum(xs) / len(xs) >= TIT_MIN
+    return es
+
+
 def elegir_dia(pr):
     """Hasta NBA_DIA_MAX por día (hora Colombia): primero los estrictos; luego por racha y por lo que da la casa.
     1 pick por jugador y máx. 3 por partido."""
@@ -1342,6 +1365,14 @@ def main():
         print("candidatos_fuente:", e)
     # solo picks de 70 %+ (y la NBA solo si ya lo demostró); lo demás no entra a listas ni al registro
     pr = [x for x in pr if (x.get("mil") or x.get("dia") or (nba_ok and PMIN <= x["p"])) and (x.get("cuota") or x.get("justa") or 1 / x["p"]) >= CUOTA_PISO]
+    # pedido del usuario (2026-11-13): los "Más" de jugadores NBA solo para TITULARES (los suplentes no)
+    try:
+        tit = titulares_nba()
+        antes = len(pr)
+        pr = [x for x in pr if x.get("lado") != "mas" or tit(x.get("pl"), x.get("at"))]
+        print(f"props: {antes - len(pr)} 'Más' de suplentes descartados")
+    except Exception as e:
+        print("titulares_nba:", type(e).__name__, e)
     pr = elegir_dia(pr)
     try:
         import nbaextra
