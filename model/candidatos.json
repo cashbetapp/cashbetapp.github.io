@@ -1,0 +1,2526 @@
+{
+ "generado": "2026-11-21T21:19Z",
+ "reglas": {
+  "probabilidad": "70-85 %",
+  "cuota_minima": 1.4,
+  "objetivo_diario": "15-20 (no se rellena si no hay oportunidades)",
+  "categorias": "validado / en evaluación / experimental según validacion.json (sin cambios)",
+  "nba_en_listas": false
+ },
+ "cobertura": {
+  "2026-11-21": {
+   "futbol": 5,
+   "nba": 5
+  },
+  "2026-11-22": {
+   "futbol": 18,
+   "nba": 7
+  },
+  "2026-11-23": {
+   "futbol": 3,
+   "nba": 10
+  },
+  "2026-11-24": {
+   "futbol": 11,
+   "nba": 3
+  },
+  "2026-11-25": {
+   "futbol": 11,
+   "nba": 9
+  },
+  "2026-11-27": {
+   "futbol": 5,
+   "nba": 11
+  },
+  "2026-11-28": {
+   "futbol": 20,
+   "nba": 5
+  }
+ },
+ "ligas": {
+  "Champions League": 18,
+  "NBA": 50,
+  "Ligue 1": 9,
+  "Premier League": 7,
+  "Liga BetPlay": 5,
+  "Serie A": 10,
+  "Liga MX": 6,
+  "Bundesliga": 8,
+  "LaLiga": 10
+ },
+ "candidatos": 35257,
+ "mercados_evaluados": 28,
+ "por_mercado": {
+  "Tiros (jugador)": 8592,
+  "Tiros a puerta (jugador)": 5728,
+  "Faltas (jugador)": 5728,
+  "Tarjetas (jugador)": 2864,
+  "Córners (equipo)": 1460,
+  "Tiros a puerta (equipo)": 1240,
+  "Tiros (equipo)": 1240,
+  "Tarjetas (equipo)": 1168,
+  "pts (equipo)": 1000,
+  "Faltas (equipo)": 992,
+  "Tiros a puerta (partido)": 744,
+  "Tiros (partido)": 744,
+  "Córners (partido)": 730,
+  "Tarjetas (partido)": 730,
+  "Faltas (partido)": 620,
+  "Goles": 584,
+  "Resultado": 438,
+  "NBA · Ganador": 100,
+  "Jugadores NBA · Puntos": 77,
+  "Jugadores NBA · Pts+Reb": 75,
+  "Jugadores NBA · Rebotes": 74,
+  "Jugadores NBA · Pts+Reb+Ast": 69,
+  "Jugadores NBA · Pts+Ast": 66,
+  "Jugadores NBA · Ast+Reb": 64,
+  "Jugadores NBA · Asistencias": 61,
+  "Jugadores NBA · Triples": 49,
+  "NBA · Hándicap": 10,
+  "NBA · Total de puntos": 10
+ },
+ "escenarios": {
+  "1.18": {
+   "descartes": {
+    "probabilidad < 70 %": 22326,
+    "probabilidad > 85 % (el modelo no publica tan alto)": 4647,
+    "liga sin picks de jugadores (pedido del usuario)": 3568,
+    "duplicado o correlacionado con otro pick del mismo partido": 2345,
+    "NBA bloqueada (no demostró 70 % real)": 75,
+    "cuota < 1.18": 2,
+    "cuota real sin valor (EV < 0)": 1
+   },
+   "descartes_pct": {
+    "probabilidad < 70 %": 63.3,
+    "probabilidad > 85 % (el modelo no publica tan alto)": 13.2,
+    "liga sin picks de jugadores (pedido del usuario)": 10.1,
+    "duplicado o correlacionado con otro pick del mismo partido": 6.7,
+    "NBA bloqueada (no demostró 70 % real)": 0.2,
+    "cuota < 1.18": 0.0,
+    "cuota real sin valor (EV < 0)": 0.0
+   },
+   "publicables_por_dia": {
+    "2026-11-21": 20,
+    "2026-11-22": 492,
+    "2026-11-23": 91,
+    "2026-11-24": 258,
+    "2026-11-25": 257,
+    "2026-11-27": 145,
+    "2026-11-28": 608
+   },
+   "experimentales_por_dia": {
+    "2026-11-21": 20,
+    "2026-11-22": 107,
+    "2026-11-23": 16,
+    "2026-11-24": 64,
+    "2026-11-25": 65,
+    "2026-11-27": 32,
+    "2026-11-28": 118
+   },
+   "por_mercado": {
+    "Faltas (jugador)": 936,
+    "Córners (equipo)": 146,
+    "Tarjetas (equipo)": 127,
+    "Tiros a puerta (equipo)": 124,
+    "Faltas (equipo)": 124,
+    "Tiros a puerta (jugador)": 123,
+    "Tiros (equipo)": 123,
+    "Tiros (jugador)": 87,
+    "Tarjetas (partido)": 73,
+    "Córners (partido)": 73,
+    "Resultado": 73,
+    "Goles": 71,
+    "Tiros a puerta (partido)": 62,
+    "Faltas (partido)": 62,
+    "Tiros (partido)": 61,
+    "Tarjetas (jugador)": 28
+   },
+   "por_categoria": {
+    "en evaluación": 1871,
+    "experimental": 422
+   }
+  },
+  "1.30": {
+   "descartes": {
+    "probabilidad < 70 %": 22326,
+    "probabilidad > 85 % (el modelo no publica tan alto)": 4647,
+    "liga sin picks de jugadores (pedido del usuario)": 3568,
+    "cuota < 1.30": 2541,
+    "duplicado o correlacionado con otro pick del mismo partido": 538,
+    "NBA bloqueada (no demostró 70 % real)": 71
+   },
+   "descartes_pct": {
+    "probabilidad < 70 %": 63.3,
+    "probabilidad > 85 % (el modelo no publica tan alto)": 13.2,
+    "liga sin picks de jugadores (pedido del usuario)": 10.1,
+    "cuota < 1.30": 7.2,
+    "duplicado o correlacionado con otro pick del mismo partido": 1.5,
+    "NBA bloqueada (no demostró 70 % real)": 0.2
+   },
+   "publicables_por_dia": {
+    "2026-11-21": 15,
+    "2026-11-22": 354,
+    "2026-11-23": 64,
+    "2026-11-24": 181,
+    "2026-11-25": 193,
+    "2026-11-27": 101,
+    "2026-11-28": 427
+   },
+   "experimentales_por_dia": {
+    "2026-11-21": 6,
+    "2026-11-22": 68,
+    "2026-11-23": 10,
+    "2026-11-24": 26,
+    "2026-11-25": 34,
+    "2026-11-27": 18,
+    "2026-11-28": 69
+   },
+   "por_mercado": {
+    "Faltas (jugador)": 541,
+    "Tiros (jugador)": 179,
+    "Tiros a puerta (jugador)": 128,
+    "Córners (equipo)": 107,
+    "Faltas (equipo)": 79,
+    "Tiros a puerta (equipo)": 71,
+    "Tiros (equipo)": 71,
+    "Córners (partido)": 69,
+    "Tarjetas (equipo)": 54,
+    "Resultado": 53,
+    "Faltas (partido)": 51,
+    "Tarjetas (partido)": 46,
+    "Tiros a puerta (partido)": 44,
+    "Tiros (partido)": 38,
+    "Goles": 33,
+    "Tarjetas (jugador)": 2
+   },
+   "por_categoria": {
+    "en evaluación": 1335,
+    "experimental": 231
+   }
+  },
+  "1.40": {
+   "descartes": {
+    "probabilidad < 70 %": 22326,
+    "probabilidad > 85 % (el modelo no publica tan alto)": 4647,
+    "cuota < 1.40": 4164,
+    "liga sin picks de jugadores (pedido del usuario)": 3568,
+    "NBA bloqueada (no demostró 70 % real)": 67,
+    "duplicado o correlacionado con otro pick del mismo partido": 35
+   },
+   "descartes_pct": {
+    "probabilidad < 70 %": 63.3,
+    "probabilidad > 85 % (el modelo no publica tan alto)": 13.2,
+    "cuota < 1.40": 11.8,
+    "liga sin picks de jugadores (pedido del usuario)": 10.1,
+    "NBA bloqueada (no demostró 70 % real)": 0.2,
+    "duplicado o correlacionado con otro pick del mismo partido": 0.1
+   },
+   "publicables_por_dia": {
+    "2026-11-21": 4,
+    "2026-11-22": 111,
+    "2026-11-23": 23,
+    "2026-11-24": 49,
+    "2026-11-25": 57,
+    "2026-11-27": 35,
+    "2026-11-28": 122
+   },
+   "experimentales_por_dia": {
+    "2026-11-21": 1,
+    "2026-11-22": 17,
+    "2026-11-23": 2,
+    "2026-11-24": 3,
+    "2026-11-25": 8,
+    "2026-11-27": 2,
+    "2026-11-28": 16
+   },
+   "por_mercado": {
+    "Faltas (jugador)": 138,
+    "Tiros (jugador)": 86,
+    "Tiros a puerta (jugador)": 40,
+    "Córners (equipo)": 32,
+    "Córners (partido)": 25,
+    "Tarjetas (partido)": 19,
+    "Tiros a puerta (equipo)": 17,
+    "Resultado": 17,
+    "Tiros (equipo)": 16,
+    "Faltas (equipo)": 16,
+    "Tiros a puerta (partido)": 12,
+    "Goles": 11,
+    "Tarjetas (equipo)": 9,
+    "Tiros (partido)": 6,
+    "Faltas (partido)": 6
+   },
+   "por_categoria": {
+    "en evaluación": 401,
+    "experimental": 49
+   }
+  }
+ },
+ "ranking": {
+  "2026-11-21": [
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-22T03:00Z",
+    "dep": "futbol",
+    "liga": "Liga MX",
+    "partido": "Tigres vs América",
+    "mercado": "Córners (equipo)",
+    "txt": "América: menos de 5.5 córners",
+    "p": 0.7035,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     64.8,
+     86.2
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-21T23:00Z",
+    "dep": "futbol",
+    "liga": "Liga MX",
+    "partido": "Santos vs León",
+    "mercado": "Tarjetas (partido)",
+    "txt": "menos de 5.5 tarjetas",
+    "p": 0.7116,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     63.7,
+     90.8
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-22T01:00Z",
+    "dep": "futbol",
+    "liga": "Liga MX",
+    "partido": "UNAM vs Monterrey",
+    "mercado": "Córners (partido)",
+    "txt": "menos de 11.5 córners",
+    "p": 0.708,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     54.6,
+     84.4
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-22T03:00Z",
+    "dep": "futbol",
+    "liga": "Liga MX",
+    "partido": "Tigres vs América",
+    "mercado": "Córners (partido)",
+    "txt": "más de 8.5 córners",
+    "p": 0.7058,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     54.6,
+     84.4
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-21",
+    "at": "2026-11-22T01:15Z",
+    "dep": "futbol",
+    "liga": "Liga BetPlay",
+    "partido": "Once Caldas vs Atl. Nacional",
+    "mercado": "Tarjetas (equipo)",
+    "txt": "Once Caldas: menos de 3.5 tarjetas",
+    "p": 0.7132,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     42.3,
+     74.5
+    ],
+    "cat": "experimental"
+   }
+  ],
+  "2026-11-22": [
+   {
+    "dia": "2026-11-22",
+    "at": "2026-11-22T11:30Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Juventus vs Venezia",
+    "mercado": "Faltas (jugador)",
+    "txt": "Randal Kolo Muani: más de 0.5 faltas",
+    "p": 0.7142,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-22",
+    "at": "2026-11-22T16:30Z",
+    "dep": "futbol",
+    "liga": "Premier League",
+    "partido": "Liverpool vs Man Utd",
+    "mercado": "Faltas (jugador)",
+    "txt": "Bradley Barcola: menos de 1.5 faltas",
+    "p": 0.7137,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-22",
+    "at": "2026-11-22T16:15Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Lorient vs Rennes",
+    "mercado": "Faltas (jugador)",
+    "txt": "Noah Cadiou: menos de 1.5 faltas",
+    "p": 0.7134,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-22",
+    "at": "2026-11-22T17:30Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Osasuna vs Málaga",
+    "mercado": "Faltas (jugador)",
+    "txt": "Daniel Lorenzo: menos de 1.5 faltas",
+    "p": 0.7134,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-22",
+    "at": "2026-11-22T15:15Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Racing vs Real Sociedad",
+    "mercado": "Faltas (jugador)",
+    "txt": "Ander Barrenetxea: más de 0.5 faltas",
+    "p": 0.7132,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-22",
+    "at": "2026-11-22T14:00Z",
+    "dep": "futbol",
+    "liga": "Premier League",
+    "partido": "Hull vs Brighton",
+    "mercado": "Faltas (jugador)",
+    "txt": "Oliver McBurnie: menos de 1.5 faltas",
+    "p": 0.7131,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-22",
+    "at": "2026-11-22T14:00Z",
+    "dep": "futbol",
+    "liga": "Premier League",
+    "partido": "Hull vs Brighton",
+    "mercado": "Faltas (jugador)",
+    "txt": "Chema Andrés: más de 0.5 faltas",
+    "p": 0.7131,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-22",
+    "at": "2026-11-22T17:00Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Milan vs Frosinone",
+    "mercado": "Faltas (jugador)",
+    "txt": "Gabriele Bracaglia: menos de 1.5 faltas",
+    "p": 0.7113,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-22",
+    "at": "2026-11-22T13:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Barcelona vs Villarreal",
+    "mercado": "Faltas (jugador)",
+    "txt": "Carlos Macià: más de 0.5 faltas",
+    "p": 0.7109,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-22",
+    "at": "2026-11-22T14:00Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Bologna vs Udinese",
+    "mercado": "Faltas (jugador)",
+    "txt": "Nicoló Casale: más de 0.5 faltas",
+    "p": 0.7108,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-22",
+    "at": "2026-11-22T17:00Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Milan vs Frosinone",
+    "mercado": "Faltas (jugador)",
+    "txt": "Koni De Winter: más de 0.5 faltas",
+    "p": 0.7103,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-22",
+    "at": "2026-11-22T14:00Z",
+    "dep": "futbol",
+    "liga": "Premier League",
+    "partido": "Hull vs Brighton",
+    "mercado": "Faltas (jugador)",
+    "txt": "Maxim De Cuyper: menos de 1.5 faltas",
+    "p": 0.7093,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-22",
+    "at": "2026-11-22T16:15Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Lorient vs Rennes",
+    "mercado": "Faltas (jugador)",
+    "txt": "Isaak Touré: más de 0.5 faltas",
+    "p": 0.7088,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-22",
+    "at": "2026-11-22T14:00Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Paris FC vs Angers",
+    "mercado": "Faltas (jugador)",
+    "txt": "Pierre Lees-Melou: menos de 1.5 faltas",
+    "p": 0.7086,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-22",
+    "at": "2026-11-22T20:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Getafe vs Atlético",
+    "mercado": "Faltas (jugador)",
+    "txt": "Ramón Terrats: menos de 1.5 faltas",
+    "p": 0.7081,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-22",
+    "at": "2026-11-22T16:15Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Lorient vs Rennes",
+    "mercado": "Faltas (jugador)",
+    "txt": "Arthur Avom: más de 0.5 faltas",
+    "p": 0.7079,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-22",
+    "at": "2026-11-22T16:30Z",
+    "dep": "futbol",
+    "liga": "Bundesliga",
+    "partido": "Bremen vs Hamburg",
+    "mercado": "Faltas (jugador)",
+    "txt": "Martin Adeline: menos de 1.5 faltas",
+    "p": 0.7076,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-22",
+    "at": "2026-11-22T20:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Getafe vs Atlético",
+    "mercado": "Faltas (jugador)",
+    "txt": "Martín Satriano: más de 0.5 faltas",
+    "p": 0.7076,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-22",
+    "at": "2026-11-22T15:15Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Racing vs Real Sociedad",
+    "mercado": "Faltas (jugador)",
+    "txt": "Iván Martín: más de 0.5 faltas",
+    "p": 0.7074,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-22",
+    "at": "2026-11-22T19:45Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Marseille vs Le Mans",
+    "mercado": "Faltas (jugador)",
+    "txt": "Igor Paixão: menos de 1.5 faltas",
+    "p": 0.7068,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   }
+  ],
+  "2026-11-23": [
+   {
+    "dia": "2026-11-23",
+    "at": "2026-11-23T19:45Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Monza vs Fiorentina",
+    "mercado": "Faltas (jugador)",
+    "txt": "Mateo Pellegrino: más de 0.5 faltas",
+    "p": 0.7143,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-23",
+    "at": "2026-11-23T20:00Z",
+    "dep": "futbol",
+    "liga": "Premier League",
+    "partido": "Brentford vs Everton",
+    "mercado": "Faltas (jugador)",
+    "txt": "Keane Lewis-Potter: menos de 1.5 faltas",
+    "p": 0.7141,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-23",
+    "at": "2026-11-23T20:00Z",
+    "dep": "futbol",
+    "liga": "Premier League",
+    "partido": "Brentford vs Everton",
+    "mercado": "Faltas (jugador)",
+    "txt": "Harrison Armstrong: menos de 1.5 faltas",
+    "p": 0.7108,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-23",
+    "at": "2026-11-23T20:00Z",
+    "dep": "futbol",
+    "liga": "Premier League",
+    "partido": "Brentford vs Everton",
+    "mercado": "Faltas (jugador)",
+    "txt": "James Garner: menos de 1.5 faltas",
+    "p": 0.7108,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-23",
+    "at": "2026-11-23T20:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Levante vs Elche",
+    "mercado": "Faltas (jugador)",
+    "txt": "Iván Romero: más de 0.5 faltas",
+    "p": 0.7052,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-23",
+    "at": "2026-11-23T19:45Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Monza vs Fiorentina",
+    "mercado": "Faltas (jugador)",
+    "txt": "Ebenezer Akinsanmiro: menos de 1.5 faltas",
+    "p": 0.7036,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-23",
+    "at": "2026-11-23T19:45Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Monza vs Fiorentina",
+    "mercado": "Faltas (jugador)",
+    "txt": "Ricardo Mangas: menos de 1.5 faltas",
+    "p": 0.7036,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-23",
+    "at": "2026-11-23T19:45Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Monza vs Fiorentina",
+    "mercado": "Faltas (jugador)",
+    "txt": "Alieu Njie: menos de 1.5 faltas",
+    "p": 0.7034,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-23",
+    "at": "2026-11-23T19:45Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Monza vs Fiorentina",
+    "mercado": "Faltas (jugador)",
+    "txt": "Marco Brescianini: menos de 1.5 faltas",
+    "p": 0.7034,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-23",
+    "at": "2026-11-23T20:00Z",
+    "dep": "futbol",
+    "liga": "Premier League",
+    "partido": "Brentford vs Everton",
+    "mercado": "Faltas (jugador)",
+    "txt": "Merlin Röhl: más de 0.5 faltas",
+    "p": 0.7007,
+    "justa": 1.43,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-23",
+    "at": "2026-11-23T19:45Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Monza vs Fiorentina",
+    "mercado": "Tiros a puerta (jugador)",
+    "txt": "Nicolò Fagioli: menos de 0.5 tiros a puerta",
+    "p": 0.7111,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.7,
+     83.8
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-23",
+    "at": "2026-11-23T20:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Levante vs Elche",
+    "mercado": "Tiros a puerta (jugador)",
+    "txt": "Jon Ander Olasagasti: menos de 0.5 tiros a puerta",
+    "p": 0.7055,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.7,
+     83.8
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-23",
+    "at": "2026-11-23T19:45Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Monza vs Fiorentina",
+    "mercado": "Tiros a puerta (jugador)",
+    "txt": "Gustavo Varela: menos de 1.5 tiros a puerta",
+    "p": 0.7054,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.7,
+     83.8
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-23",
+    "at": "2026-11-23T20:00Z",
+    "dep": "futbol",
+    "liga": "Premier League",
+    "partido": "Brentford vs Everton",
+    "mercado": "Tiros (jugador)",
+    "txt": "Mamadou Sangare: más de 0.5 tiros",
+    "p": 0.7141,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     64.6,
+     77.4
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-23",
+    "at": "2026-11-23T20:00Z",
+    "dep": "futbol",
+    "liga": "Premier League",
+    "partido": "Brentford vs Everton",
+    "mercado": "Tiros (jugador)",
+    "txt": "Mathias Jensen: menos de 1.5 tiros",
+    "p": 0.7138,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     64.6,
+     77.4
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-23",
+    "at": "2026-11-23T20:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Levante vs Elche",
+    "mercado": "Tiros (jugador)",
+    "txt": "Nacho Pérez: menos de 0.5 tiros",
+    "p": 0.7076,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     64.6,
+     77.4
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-23",
+    "at": "2026-11-23T19:45Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Monza vs Fiorentina",
+    "mercado": "Tiros (jugador)",
+    "txt": "Jay Robinson: menos de 2.5 tiros",
+    "p": 0.7053,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     64.6,
+     77.4
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-23",
+    "at": "2026-11-23T20:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Levante vs Elche",
+    "mercado": "Tiros (jugador)",
+    "txt": "Germán Valera: más de 0.5 tiros",
+    "p": 0.7013,
+    "justa": 1.43,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     64.6,
+     77.4
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-23",
+    "at": "2026-11-23T20:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Levante vs Elche",
+    "mercado": "Tarjetas (partido)",
+    "txt": "menos de 5.5 tarjetas",
+    "p": 0.7135,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     63.7,
+     90.8
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-23",
+    "at": "2026-11-23T19:45Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Monza vs Fiorentina",
+    "mercado": "Tarjetas (partido)",
+    "txt": "más de 2.5 tarjetas",
+    "p": 0.7036,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     63.7,
+     90.8
+    ],
+    "cat": "en evaluación"
+   }
+  ],
+  "2026-11-24": [
+   {
+    "dia": "2026-11-24",
+    "at": "2026-11-24T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Como vs AEK Athens",
+    "mercado": "Faltas (jugador)",
+    "txt": "Yan Couto: menos de 1.5 faltas",
+    "p": 0.7152,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-24",
+    "at": "2026-11-24T17:45Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Galatasaray vs Aston Villa",
+    "mercado": "Faltas (jugador)",
+    "txt": "Victor Osimhen: menos de 1.5 faltas",
+    "p": 0.715,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-24",
+    "at": "2026-11-24T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "RB Leipzig vs Lens",
+    "mercado": "Faltas (jugador)",
+    "txt": "Ridle Baku: más de 0.5 faltas",
+    "p": 0.7146,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-24",
+    "at": "2026-11-24T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Real Madrid vs PSV",
+    "mercado": "Faltas (jugador)",
+    "txt": "Armando Obispo: menos de 1.5 faltas",
+    "p": 0.7125,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-24",
+    "at": "2026-11-24T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Como vs AEK Athens",
+    "mercado": "Faltas (jugador)",
+    "txt": "Jacobo Ramón: menos de 1.5 faltas",
+    "p": 0.7101,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-24",
+    "at": "2026-11-24T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Arsenal vs Dortmund",
+    "mercado": "Faltas (jugador)",
+    "txt": "Joey Veerman: menos de 1.5 faltas",
+    "p": 0.7096,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-24",
+    "at": "2026-11-24T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Arsenal vs Dortmund",
+    "mercado": "Faltas (jugador)",
+    "txt": "Julian Ryerson: menos de 1.5 faltas",
+    "p": 0.7088,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-24",
+    "at": "2026-11-24T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Real Madrid vs PSV",
+    "mercado": "Faltas (jugador)",
+    "txt": "Ruben Van Bommel: menos de 1.5 faltas",
+    "p": 0.7082,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-24",
+    "at": "2026-11-24T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Como vs AEK Athens",
+    "mercado": "Faltas (jugador)",
+    "txt": "Máximo Perrone: menos de 1.5 faltas",
+    "p": 0.7067,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-24",
+    "at": "2026-11-24T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Real Madrid vs PSV",
+    "mercado": "Faltas (jugador)",
+    "txt": "Sven Mijnans: menos de 1.5 faltas",
+    "p": 0.7062,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-24",
+    "at": "2026-11-24T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Feyenoord vs FC Porto",
+    "mercado": "Faltas (jugador)",
+    "txt": "Nacho Ferri: menos de 1.5 faltas",
+    "p": 0.7058,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-24",
+    "at": "2026-11-24T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "S Bratislava vs Betis",
+    "mercado": "Faltas (jugador)",
+    "txt": "Cristian Martínez: menos de 1.5 faltas",
+    "p": 0.7052,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-24",
+    "at": "2026-11-24T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "S Bratislava vs Betis",
+    "mercado": "Faltas (jugador)",
+    "txt": "César Blackman: menos de 1.5 faltas",
+    "p": 0.7042,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-24",
+    "at": "2026-11-24T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Feyenoord vs FC Porto",
+    "mercado": "Faltas (jugador)",
+    "txt": "Charles Vanhoutte: más de 0.5 faltas",
+    "p": 0.7015,
+    "justa": 1.43,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-24",
+    "at": "2026-11-24T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Feyenoord vs FC Porto",
+    "mercado": "Faltas (jugador)",
+    "txt": "Pablo Rosario: más de 0.5 faltas",
+    "p": 0.7014,
+    "justa": 1.43,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-24",
+    "at": "2026-11-24T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "RB Leipzig vs Lens",
+    "mercado": "Faltas (jugador)",
+    "txt": "Christopher Nkunku: más de 0.5 faltas",
+    "p": 0.701,
+    "justa": 1.43,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-24",
+    "at": "2026-11-24T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "RB Leipzig vs Lens",
+    "mercado": "Tiros a puerta (jugador)",
+    "txt": "Neil El Aynaoui: menos de 0.5 tiros a puerta",
+    "p": 0.7163,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.7,
+     83.8
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-24",
+    "at": "2026-11-24T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Man City vs Napoli",
+    "mercado": "Tiros a puerta (jugador)",
+    "txt": "Josko Gvardiol: menos de 0.5 tiros a puerta",
+    "p": 0.7093,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.7,
+     83.8
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-24",
+    "at": "2026-11-25T01:30Z",
+    "dep": "futbol",
+    "liga": "Liga BetPlay",
+    "partido": "América Cali vs Cali",
+    "mercado": "Córners (equipo)",
+    "txt": "Cali: menos de 4.5 córners",
+    "p": 0.7096,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     64.8,
+     86.2
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-24",
+    "at": "2026-11-24T17:45Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Galatasaray vs Aston Villa",
+    "mercado": "Tiros (jugador)",
+    "txt": "John McGinn: más de 0.5 tiros",
+    "p": 0.7167,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     64.6,
+     77.4
+    ],
+    "cat": "en evaluación"
+   }
+  ],
+  "2026-11-25": [
+   {
+    "dia": "2026-11-25",
+    "at": "2026-11-25T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Lille vs Bayern",
+    "mercado": "Faltas (jugador)",
+    "txt": "Luis Díaz: más de 0.5 faltas",
+    "p": 0.7149,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-25",
+    "at": "2026-11-25T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Sporting vs Man Utd",
+    "mercado": "Faltas (jugador)",
+    "txt": "Sergi Altimira: menos de 1.5 faltas",
+    "p": 0.7145,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-25",
+    "at": "2026-11-25T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Club Brugge vs Liverpool",
+    "mercado": "Faltas (jugador)",
+    "txt": "Virgil van Dijk: menos de 1.5 faltas",
+    "p": 0.7136,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-25",
+    "at": "2026-11-25T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Club Brugge vs Liverpool",
+    "mercado": "Faltas (jugador)",
+    "txt": "Florian Wirtz: menos de 1.5 faltas",
+    "p": 0.7127,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-25",
+    "at": "2026-11-25T17:45Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Sabah vs Barcelona",
+    "mercado": "Faltas (jugador)",
+    "txt": "Akim Zedadka: menos de 1.5 faltas",
+    "p": 0.7124,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-25",
+    "at": "2026-11-25T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Inter Milan vs Stuttgart",
+    "mercado": "Faltas (jugador)",
+    "txt": "Ramon Hendriks: menos de 1.5 faltas",
+    "p": 0.7112,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-25",
+    "at": "2026-11-25T17:45Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Sabah vs Barcelona",
+    "mercado": "Faltas (jugador)",
+    "txt": "Umarali Rakhmonaliev: menos de 1.5 faltas",
+    "p": 0.711,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-25",
+    "at": "2026-11-25T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Lille vs Bayern",
+    "mercado": "Faltas (jugador)",
+    "txt": "Jonathan Tah: menos de 1.5 faltas",
+    "p": 0.7099,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-25",
+    "at": "2026-11-25T17:45Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Slavia Prague vs Villarreal",
+    "mercado": "Faltas (jugador)",
+    "txt": "Santi Comesaña: más de 0.5 faltas",
+    "p": 0.7058,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-25",
+    "at": "2026-11-25T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Atlético vs Viking FK",
+    "mercado": "Faltas (jugador)",
+    "txt": "Marc Pubill: más de 0.5 faltas",
+    "p": 0.7056,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-25",
+    "at": "2026-11-25T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Shakhtar vs Fenerbahce",
+    "mercado": "Faltas (jugador)",
+    "txt": "Kauã Elias: menos de 1.5 faltas",
+    "p": 0.7035,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-25",
+    "at": "2026-11-25T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Club Brugge vs Liverpool",
+    "mercado": "Faltas (jugador)",
+    "txt": "Freddie Potts: más de 0.5 faltas",
+    "p": 0.7023,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-25",
+    "at": "2026-11-25T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Shakhtar vs Fenerbahce",
+    "mercado": "Faltas (jugador)",
+    "txt": "Vedat Muriqi: menos de 1.5 faltas",
+    "p": 0.7018,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-25",
+    "at": "2026-11-25T17:45Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Slavia Prague vs Villarreal",
+    "mercado": "Faltas (jugador)",
+    "txt": "Pau Navarro: menos de 1.5 faltas",
+    "p": 0.7014,
+    "justa": 1.43,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-25",
+    "at": "2026-11-25T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Lille vs Bayern",
+    "mercado": "Tiros a puerta (jugador)",
+    "txt": "Harry Kane: más de 0.5 tiros a puerta",
+    "p": 0.714,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.7,
+     83.8
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-25",
+    "at": "2026-11-25T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Club Brugge vs Liverpool",
+    "mercado": "Tiros a puerta (jugador)",
+    "txt": "Bradley Barcola: menos de 1.5 tiros a puerta",
+    "p": 0.7122,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.7,
+     83.8
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-25",
+    "at": "2026-11-25T17:45Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Slavia Prague vs Villarreal",
+    "mercado": "Tiros a puerta (jugador)",
+    "txt": "Wiktor Nowak: menos de 1.5 tiros a puerta",
+    "p": 0.711,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.7,
+     83.8
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-25",
+    "at": "2026-11-25T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Shakhtar vs Fenerbahce",
+    "mercado": "Tiros a puerta (jugador)",
+    "txt": "Archie Brown: menos de 0.5 tiros a puerta",
+    "p": 0.7109,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.7,
+     83.8
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-25",
+    "at": "2026-11-25T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "PSG vs AS Roma",
+    "mercado": "Tiros a puerta (jugador)",
+    "txt": "Achraf Hakimi: menos de 0.5 tiros a puerta",
+    "p": 0.708,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.7,
+     83.8
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-25",
+    "at": "2026-11-25T20:00Z",
+    "dep": "futbol",
+    "liga": "Champions League",
+    "partido": "Lille vs Bayern",
+    "mercado": "Tiros a puerta (jugador)",
+    "txt": "Tom Bischof: menos de 0.5 tiros a puerta",
+    "p": 0.7069,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.7,
+     83.8
+    ],
+    "cat": "en evaluación"
+   }
+  ],
+  "2026-11-27": [
+   {
+    "dia": "2026-11-27",
+    "at": "2026-11-27T20:00Z",
+    "dep": "futbol",
+    "liga": "Premier League",
+    "partido": "Nottm Forest vs Chelsea",
+    "mercado": "Faltas (jugador)",
+    "txt": "Xaver Schlager: menos de 1.5 faltas",
+    "p": 0.7159,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-27",
+    "at": "2026-11-27T19:30Z",
+    "dep": "futbol",
+    "liga": "Bundesliga",
+    "partido": "Bremen vs Gladbach",
+    "mercado": "Faltas (jugador)",
+    "txt": "Marco Friedl: menos de 1.5 faltas",
+    "p": 0.7153,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-27",
+    "at": "2026-11-27T19:45Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Venezia vs Bologna",
+    "mercado": "Faltas (jugador)",
+    "txt": "Matías Moreno: menos de 1.5 faltas",
+    "p": 0.7145,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-27",
+    "at": "2026-11-27T19:45Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Venezia vs Bologna",
+    "mercado": "Faltas (jugador)",
+    "txt": "Akor Adams: más de 0.5 faltas",
+    "p": 0.7143,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-27",
+    "at": "2026-11-27T19:30Z",
+    "dep": "futbol",
+    "liga": "Bundesliga",
+    "partido": "Bremen vs Gladbach",
+    "mercado": "Faltas (jugador)",
+    "txt": "Marco Grüll: menos de 1.5 faltas",
+    "p": 0.7141,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-27",
+    "at": "2026-11-27T20:00Z",
+    "dep": "futbol",
+    "liga": "Premier League",
+    "partido": "Nottm Forest vs Chelsea",
+    "mercado": "Faltas (jugador)",
+    "txt": "Wesley Fofana: menos de 1.5 faltas",
+    "p": 0.7134,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-27",
+    "at": "2026-11-27T19:45Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Venezia vs Bologna",
+    "mercado": "Faltas (jugador)",
+    "txt": "Antoine Hainaut: más de 0.5 faltas",
+    "p": 0.7132,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-27",
+    "at": "2026-11-27T19:45Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Brest vs Paris FC",
+    "mercado": "Faltas (jugador)",
+    "txt": "Kamory Doumbia: menos de 1.5 faltas",
+    "p": 0.7126,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-27",
+    "at": "2026-11-27T19:45Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Brest vs Paris FC",
+    "mercado": "Faltas (jugador)",
+    "txt": "Mama Baldé: menos de 1.5 faltas",
+    "p": 0.7126,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-27",
+    "at": "2026-11-27T19:45Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Venezia vs Bologna",
+    "mercado": "Faltas (jugador)",
+    "txt": "Nadir Zortea: menos de 1.5 faltas",
+    "p": 0.7122,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-27",
+    "at": "2026-11-27T20:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Levante vs Racing",
+    "mercado": "Faltas (jugador)",
+    "txt": "Jorge Salinas: menos de 1.5 faltas",
+    "p": 0.7122,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-27",
+    "at": "2026-11-27T19:45Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Brest vs Paris FC",
+    "mercado": "Faltas (jugador)",
+    "txt": "Luca Koleosho: más de 0.5 faltas",
+    "p": 0.7054,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-27",
+    "at": "2026-11-27T19:45Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Venezia vs Bologna",
+    "mercado": "Faltas (jugador)",
+    "txt": "Nicoló Casale: más de 0.5 faltas",
+    "p": 0.7053,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-27",
+    "at": "2026-11-27T19:45Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Brest vs Paris FC",
+    "mercado": "Faltas (jugador)",
+    "txt": "Pablo Pagis: menos de 1.5 faltas",
+    "p": 0.7022,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-27",
+    "at": "2026-11-27T20:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Levante vs Racing",
+    "mercado": "Faltas (jugador)",
+    "txt": "Iván Romero: más de 0.5 faltas",
+    "p": 0.7014,
+    "justa": 1.43,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-27",
+    "at": "2026-11-27T20:00Z",
+    "dep": "futbol",
+    "liga": "Premier League",
+    "partido": "Nottm Forest vs Chelsea",
+    "mercado": "Faltas (jugador)",
+    "txt": "Pedro Neto: menos de 1.5 faltas",
+    "p": 0.7004,
+    "justa": 1.43,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-27",
+    "at": "2026-11-27T20:00Z",
+    "dep": "futbol",
+    "liga": "Premier League",
+    "partido": "Nottm Forest vs Chelsea",
+    "mercado": "Faltas (jugador)",
+    "txt": "Morgan Rogers: menos de 1.5 faltas",
+    "p": 0.7003,
+    "justa": 1.43,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-27",
+    "at": "2026-11-27T20:00Z",
+    "dep": "futbol",
+    "liga": "Premier League",
+    "partido": "Nottm Forest vs Chelsea",
+    "mercado": "Tiros a puerta (jugador)",
+    "txt": "Neco Williams: menos de 0.5 tiros a puerta",
+    "p": 0.712,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.7,
+     83.8
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-27",
+    "at": "2026-11-27T19:45Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Brest vs Paris FC",
+    "mercado": "Tiros a puerta (jugador)",
+    "txt": "Lassine Sinayoko: menos de 1.5 tiros a puerta",
+    "p": 0.706,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.7,
+     83.8
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-27",
+    "at": "2026-11-27T20:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Levante vs Racing",
+    "mercado": "Tiros a puerta (jugador)",
+    "txt": "Yassir Zabiri: menos de 1.5 tiros a puerta",
+    "p": 0.7049,
+    "justa": 1.42,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     67.7,
+     83.8
+    ],
+    "cat": "en evaluación"
+   }
+  ],
+  "2026-11-28": [
+   {
+    "dia": "2026-11-28",
+    "at": "2026-11-28T14:30Z",
+    "dep": "futbol",
+    "liga": "Bundesliga",
+    "partido": "Cologne vs Elversberg",
+    "mercado": "Faltas (jugador)",
+    "txt": "Lukasz Poreba: más de 0.5 faltas",
+    "p": 0.716,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-28",
+    "at": "2026-11-28T19:45Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Inter Milan vs Genoa",
+    "mercado": "Faltas (jugador)",
+    "txt": "Mikael Ellertsson: menos de 1.5 faltas",
+    "p": 0.716,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-28",
+    "at": "2026-11-28T13:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Betis vs Rayo",
+    "mercado": "Faltas (jugador)",
+    "txt": "Pathé Ciss: más de 0.5 faltas",
+    "p": 0.7156,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-28",
+    "at": "2026-11-28T13:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Betis vs Rayo",
+    "mercado": "Faltas (jugador)",
+    "txt": "Jorge de Frutos: más de 0.5 faltas",
+    "p": 0.7156,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-28",
+    "at": "2026-11-28T20:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Real Madrid vs Alavés",
+    "mercado": "Faltas (jugador)",
+    "txt": "Jude Bellingham: menos de 1.5 faltas",
+    "p": 0.7155,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-28",
+    "at": "2026-11-28T20:00Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Real Madrid vs Alavés",
+    "mercado": "Faltas (jugador)",
+    "txt": "Aurélien Tchouaméni: menos de 1.5 faltas",
+    "p": 0.7155,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-28",
+    "at": "2026-11-28T14:30Z",
+    "dep": "futbol",
+    "liga": "Bundesliga",
+    "partido": "Hamburg vs Bayern",
+    "mercado": "Faltas (jugador)",
+    "txt": "Jonathan Tah: menos de 1.5 faltas",
+    "p": 0.7154,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-28",
+    "at": "2026-11-28T19:45Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Le Mans vs Lille",
+    "mercado": "Faltas (jugador)",
+    "txt": "Benjamin André: más de 0.5 faltas",
+    "p": 0.7151,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-28",
+    "at": "2026-11-28T17:00Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Torino vs Lazio",
+    "mercado": "Faltas (jugador)",
+    "txt": "Romano Floriani: menos de 1.5 faltas",
+    "p": 0.7148,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-28",
+    "at": "2026-11-28T17:30Z",
+    "dep": "futbol",
+    "liga": "Premier League",
+    "partido": "Ipswich vs Aston Villa",
+    "mercado": "Faltas (jugador)",
+    "txt": "Alysson: más de 0.5 faltas",
+    "p": 0.7145,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-28",
+    "at": "2026-11-28T19:45Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Le Havre AC vs Strasbourg",
+    "mercado": "Faltas (jugador)",
+    "txt": "Dário Essugo: más de 0.5 faltas",
+    "p": 0.7144,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-28",
+    "at": "2026-11-28T17:30Z",
+    "dep": "futbol",
+    "liga": "Bundesliga",
+    "partido": "Stuttgart vs Frankfurt",
+    "mercado": "Faltas (jugador)",
+    "txt": "Raphael Onyedika: más de 0.5 faltas",
+    "p": 0.7137,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-28",
+    "at": "2026-11-28T15:15Z",
+    "dep": "futbol",
+    "liga": "LaLiga",
+    "partido": "Málaga vs Athletic",
+    "mercado": "Faltas (jugador)",
+    "txt": "Carlos Puga: más de 0.5 faltas",
+    "p": 0.7133,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-28",
+    "at": "2026-11-28T14:30Z",
+    "dep": "futbol",
+    "liga": "Bundesliga",
+    "partido": "Paderborn vs Schalke",
+    "mercado": "Faltas (jugador)",
+    "txt": "Laurin Curda: más de 0.5 faltas",
+    "p": 0.7132,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-28",
+    "at": "2026-11-28T19:45Z",
+    "dep": "futbol",
+    "liga": "Ligue 1",
+    "partido": "Le Mans vs Lille",
+    "mercado": "Faltas (jugador)",
+    "txt": "Lucas Bretelle: más de 0.5 faltas",
+    "p": 0.7129,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-28",
+    "at": "2026-11-28T14:00Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Frosinone vs Parma",
+    "mercado": "Faltas (jugador)",
+    "txt": "Gabriele Bracaglia: menos de 1.5 faltas",
+    "p": 0.7121,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-28",
+    "at": "2026-11-28T17:30Z",
+    "dep": "futbol",
+    "liga": "Premier League",
+    "partido": "Ipswich vs Aston Villa",
+    "mercado": "Faltas (jugador)",
+    "txt": "Daizen Maeda: más de 0.5 faltas",
+    "p": 0.712,
+    "justa": 1.4,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-28",
+    "at": "2026-11-28T14:30Z",
+    "dep": "futbol",
+    "liga": "Bundesliga",
+    "partido": "Paderborn vs Schalke",
+    "mercado": "Faltas (jugador)",
+    "txt": "Satoshi Tanaka: más de 0.5 faltas",
+    "p": 0.7115,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-28",
+    "at": "2026-11-28T14:00Z",
+    "dep": "futbol",
+    "liga": "Serie A",
+    "partido": "Frosinone vs Parma",
+    "mercado": "Faltas (jugador)",
+    "txt": "El Bilal Toure: más de 0.5 faltas",
+    "p": 0.7109,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   },
+   {
+    "dia": "2026-11-28",
+    "at": "2026-11-28T14:30Z",
+    "dep": "futbol",
+    "liga": "Bundesliga",
+    "partido": "Paderborn vs Schalke",
+    "mercado": "Faltas (jugador)",
+    "txt": "Junior Adamu: más de 0.5 faltas",
+    "p": 0.7109,
+    "justa": 1.41,
+    "cuota": null,
+    "ev_pct": null,
+    "acierto_real_ic95": [
+     68.9,
+     79.9
+    ],
+    "cat": "en evaluación"
+   }
+  ]
+ }
+}
