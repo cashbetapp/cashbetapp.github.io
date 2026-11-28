@@ -1,0 +1,2516 @@
+{
+ "generado": "2026-11-28T14:18Z",
+ "objetivo": {
+  "acierto": 70.0,
+  "n_min": 100,
+  "regla": "límite inferior del intervalo de 95 % >= 70 % con 100+ picks de 70 %+"
+ },
+ "excluidos": {
+  "anotados_con_el_partido_empezado": 0
+ },
+ "sin_hora_de_publicacion": 2685,
+ "global": {
+  "todos": {
+   "n": 5045,
+   "aciertos": 3013,
+   "fallos": 2032,
+   "acierto": 59.7,
+   "ic95": [
+    58.4,
+    61.1
+   ],
+   "prob_media": 62.8,
+   "brier": 0.2343,
+   "logloss": 0.6608,
+   "roi": {
+    "n": 2190,
+    "unidades": -198.06,
+    "yield": -9.0,
+    "roi_banca_100": -198.06
+   },
+   "cuota_media": 1.77,
+   "clv": {
+    "n": 0,
+    "medio": null
+   }
+  },
+  "p70": {
+   "n": 1539,
+   "aciertos": 1106,
+   "fallos": 433,
+   "acierto": 71.9,
+   "ic95": [
+    69.6,
+    74.1
+   ],
+   "prob_media": 72.1,
+   "brier": 0.2014,
+   "logloss": 0.5922,
+   "roi": {
+    "n": 35,
+    "unidades": 2.37,
+    "yield": 6.8,
+    "roi_banca_100": 2.37
+   },
+   "cuota_media": 1.7,
+   "clv": {
+    "n": 0,
+    "medio": null
+   }
+  },
+  "p74": {
+   "n": 332,
+   "aciertos": 256,
+   "fallos": 76,
+   "acierto": 77.1,
+   "ic95": [
+    72.3,
+    81.3
+   ],
+   "prob_media": 75.5,
+   "brier": 0.1766,
+   "logloss": 0.5381,
+   "roi": {
+    "n": 12,
+    "unidades": 1.62,
+    "yield": 13.5,
+    "roi_banca_100": 1.62
+   },
+   "cuota_media": 1.7,
+   "clv": {
+    "n": 0,
+    "medio": null
+   }
+  },
+  "estado": "en camino (acierto 70 %+ sin prueba suficiente)"
+ },
+ "verificable": {
+  "todos": {
+   "n": 2360,
+   "aciertos": 1327,
+   "fallos": 1033,
+   "acierto": 56.2,
+   "ic95": [
+    54.2,
+    58.2
+   ],
+   "prob_media": 61.6,
+   "brier": 0.2433,
+   "logloss": 0.6797,
+   "roi": {
+    "n": 1556,
+    "unidades": -181.0,
+    "yield": -11.6,
+    "roi_banca_100": -181.0
+   },
+   "cuota_media": 1.77,
+   "clv": {
+    "n": 0,
+    "medio": null
+   }
+  },
+  "p70": {
+   "n": 778,
+   "aciertos": 534,
+   "fallos": 244,
+   "acierto": 68.6,
+   "ic95": [
+    65.3,
+    71.8
+   ],
+   "prob_media": 70.8,
+   "brier": 0.2161,
+   "logloss": 0.624,
+   "roi": {
+    "n": 17,
+    "unidades": 0.0,
+    "yield": 0.0,
+    "roi_banca_100": 0.0
+   },
+   "cuota_media": 1.67,
+   "clv": {
+    "n": 0,
+    "medio": null
+   }
+  },
+  "p74": {
+   "n": 2,
+   "aciertos": 0,
+   "fallos": 2,
+   "acierto": 0.0,
+   "ic95": [
+    0.0,
+    65.8
+   ],
+   "prob_media": 77.2,
+   "brier": 0.5965,
+   "logloss": 1.4801,
+   "roi": {
+    "n": 2,
+    "unidades": -2,
+    "yield": -100.0,
+    "roi_banca_100": -2
+   },
+   "cuota_media": 1.62,
+   "clv": {
+    "n": 0,
+    "medio": null
+   }
+  },
+  "estado": "no alcanza el 70 %"
+ },
+ "deporte": {
+  "futbol": {
+   "todos": {
+    "n": 2816,
+    "aciertos": 1861,
+    "fallos": 955,
+    "acierto": 66.1,
+    "ic95": [
+     64.3,
+     67.8
+    ],
+    "prob_media": 67.5,
+    "brier": 0.219,
+    "logloss": 0.629,
+    "roi": {
+     "n": 4,
+     "unidades": -0.58,
+     "yield": -14.5,
+     "roi_banca_100": -0.58
+    },
+    "cuota_media": 1.96,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 1504,
+    "aciertos": 1084,
+    "fallos": 420,
+    "acierto": 72.1,
+    "ic95": [
+     69.8,
+     74.3
+    ],
+    "prob_media": 72.1,
+    "brier": 0.2005,
+    "logloss": 0.5902,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 320,
+    "aciertos": 248,
+    "fallos": 72,
+    "acierto": 77.5,
+    "ic95": [
+     72.6,
+     81.7
+    ],
+    "prob_media": 75.4,
+    "brier": 0.175,
+    "logloss": 0.5349,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "en camino (acierto 70 %+ sin prueba suficiente)"
+  },
+  "nba": {
+   "todos": {
+    "n": 2229,
+    "aciertos": 1152,
+    "fallos": 1077,
+    "acierto": 51.7,
+    "ic95": [
+     49.6,
+     53.8
+    ],
+    "prob_media": 56.9,
+    "brier": 0.2538,
+    "logloss": 0.701,
+    "roi": {
+     "n": 2186,
+     "unidades": -197.48,
+     "yield": -9.0,
+     "roi_banca_100": -197.48
+    },
+    "cuota_media": 1.77,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 35,
+    "aciertos": 22,
+    "fallos": 13,
+    "acierto": 62.9,
+    "ic95": [
+     46.3,
+     76.8
+    ],
+    "prob_media": 74.2,
+    "brier": 0.2412,
+    "logloss": 0.6756,
+    "roi": {
+     "n": 35,
+     "unidades": 2.37,
+     "yield": 6.8,
+     "roi_banca_100": 2.37
+    },
+    "cuota_media": 1.7,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 12,
+    "aciertos": 8,
+    "fallos": 4,
+    "acierto": 66.7,
+    "ic95": [
+     39.1,
+     86.2
+    ],
+    "prob_media": 79.1,
+    "brier": 0.2205,
+    "logloss": 0.6254,
+    "roi": {
+     "n": 12,
+     "unidades": 1.62,
+     "yield": 13.5,
+     "roi_banca_100": 1.62
+    },
+    "cuota_media": 1.7,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "no alcanza el 70 %"
+  }
+ },
+ "mercados": {
+  "Faltas (jugador)": {
+   "todos": {
+    "n": 669,
+    "aciertos": 443,
+    "fallos": 226,
+    "acierto": 66.2,
+    "ic95": [
+     62.6,
+     69.7
+    ],
+    "prob_media": 67.1,
+    "brier": 0.22,
+    "logloss": 0.6312,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 318,
+    "aciertos": 228,
+    "fallos": 90,
+    "acierto": 71.7,
+    "ic95": [
+     66.5,
+     76.4
+    ],
+    "prob_media": 72.4,
+    "brier": 0.2016,
+    "logloss": 0.5924,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 79,
+    "aciertos": 62,
+    "fallos": 17,
+    "acierto": 78.5,
+    "ic95": [
+     68.2,
+     86.1
+    ],
+    "prob_media": 75.4,
+    "brier": 0.1697,
+    "logloss": 0.5229,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "en camino (acierto 70 %+ sin prueba suficiente)",
+   "prueba_historica": 77.0,
+   "sobreajuste": true
+  },
+  "Tiros (jugador)": {
+   "todos": {
+    "n": 560,
+    "aciertos": 346,
+    "fallos": 214,
+    "acierto": 61.8,
+    "ic95": [
+     57.7,
+     65.7
+    ],
+    "prob_media": 66.3,
+    "brier": 0.2328,
+    "logloss": 0.6579,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 232,
+    "aciertos": 163,
+    "fallos": 69,
+    "acierto": 70.3,
+    "ic95": [
+     64.1,
+     75.8
+    ],
+    "prob_media": 72.6,
+    "brier": 0.2077,
+    "logloss": 0.6055,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 71,
+    "aciertos": 56,
+    "fallos": 15,
+    "acierto": 78.9,
+    "ic95": [
+     68.0,
+     86.8
+    ],
+    "prob_media": 75.3,
+    "brier": 0.1681,
+    "logloss": 0.5198,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "en camino (acierto 70 %+ sin prueba suficiente)",
+   "prueba_historica": 77.0,
+   "sobreajuste": true
+  },
+  "Jugadores NBA · Puntos": {
+   "todos": {
+    "n": 343,
+    "aciertos": 168,
+    "fallos": 175,
+    "acierto": 49.0,
+    "ic95": [
+     43.7,
+     54.3
+    ],
+    "prob_media": 55.8,
+    "brier": 0.2545,
+    "logloss": 0.7025,
+    "roi": {
+     "n": 343,
+     "unidades": -36.99,
+     "yield": -10.8,
+     "roi_banca_100": -36.99
+    },
+    "cuota_media": 1.83,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 3,
+    "aciertos": 1,
+    "fallos": 2,
+    "acierto": 33.3,
+    "ic95": [
+     6.1,
+     79.2
+    ],
+    "prob_media": 72.6,
+    "brier": 0.394,
+    "logloss": 1.0158,
+    "roi": {
+     "n": 3,
+     "unidades": -1.18,
+     "yield": -39.3,
+     "roi_banca_100": -1.18
+    },
+    "cuota_media": 1.8,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 1,
+    "aciertos": 0,
+    "fallos": 1,
+    "acierto": 0.0,
+    "ic95": [
+     0.0,
+     79.3
+    ],
+    "prob_media": 76.1,
+    "brier": 0.5785,
+    "logloss": 1.4296,
+    "roi": {
+     "n": 1,
+     "unidades": -1,
+     "yield": -100.0,
+     "roi_banca_100": -1
+    },
+    "cuota_media": 1.8,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "datos insuficientes"
+  },
+  "Jugadores NBA · Rebotes": {
+   "todos": {
+    "n": 319,
+    "aciertos": 174,
+    "fallos": 145,
+    "acierto": 54.5,
+    "ic95": [
+     49.1,
+     59.9
+    ],
+    "prob_media": 57.8,
+    "brier": 0.2527,
+    "logloss": 0.6994,
+    "roi": {
+     "n": 319,
+     "unidades": -18.39,
+     "yield": -5.8,
+     "roi_banca_100": -18.39
+    },
+    "cuota_media": 1.73,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 8,
+    "aciertos": 5,
+    "fallos": 3,
+    "acierto": 62.5,
+    "ic95": [
+     30.6,
+     86.3
+    ],
+    "prob_media": 73.5,
+    "brier": 0.2659,
+    "logloss": 0.7413,
+    "roi": {
+     "n": 8,
+     "unidades": 0.27,
+     "yield": 3.4,
+     "roi_banca_100": 0.27
+    },
+    "cuota_media": 1.64,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 3,
+    "aciertos": 1,
+    "fallos": 2,
+    "acierto": 33.3,
+    "ic95": [
+     6.1,
+     79.2
+    ],
+    "prob_media": 77.2,
+    "brier": 0.4151,
+    "logloss": 1.0734,
+    "roi": {
+     "n": 3,
+     "unidades": -1.39,
+     "yield": -46.3,
+     "roi_banca_100": -1.39
+    },
+    "cuota_media": 1.62,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "datos insuficientes"
+  },
+  "Jugadores NBA · Pts+Reb": {
+   "todos": {
+    "n": 305,
+    "aciertos": 155,
+    "fallos": 150,
+    "acierto": 50.8,
+    "ic95": [
+     45.2,
+     56.4
+    ],
+    "prob_media": 55.4,
+    "brier": 0.2555,
+    "logloss": 0.7048,
+    "roi": {
+     "n": 305,
+     "unidades": -22.41,
+     "yield": -7.3,
+     "roi_banca_100": -22.41
+    },
+    "cuota_media": 1.82,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 5,
+    "aciertos": 2,
+    "fallos": 3,
+    "acierto": 40.0,
+    "ic95": [
+     11.8,
+     76.9
+    ],
+    "prob_media": 72.4,
+    "brier": 0.3422,
+    "logloss": 0.8947,
+    "roi": {
+     "n": 5,
+     "unidades": -1.43,
+     "yield": -28.6,
+     "roi_banca_100": -1.43
+    },
+    "cuota_media": 1.8,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 0
+   },
+   "estado": "datos insuficientes"
+  },
+  "Tiros a puerta (jugador)": {
+   "todos": {
+    "n": 271,
+    "aciertos": 179,
+    "fallos": 92,
+    "acierto": 66.1,
+    "ic95": [
+     60.2,
+     71.4
+    ],
+    "prob_media": 67.5,
+    "brier": 0.213,
+    "logloss": 0.6149,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 132,
+    "aciertos": 101,
+    "fallos": 31,
+    "acierto": 76.5,
+    "ic95": [
+     68.6,
+     82.9
+    ],
+    "prob_media": 72.6,
+    "brier": 0.1783,
+    "logloss": 0.5414,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 38,
+    "aciertos": 35,
+    "fallos": 3,
+    "acierto": 92.1,
+    "ic95": [
+     79.2,
+     97.3
+    ],
+    "prob_media": 75.4,
+    "brier": 0.1013,
+    "logloss": 0.3726,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "en camino (acierto 70 %+ sin prueba suficiente)",
+   "prueba_historica": 80.8,
+   "sobreajuste": true
+  },
+  "Jugadores NBA · Triples": {
+   "todos": {
+    "n": 259,
+    "aciertos": 133,
+    "fallos": 126,
+    "acierto": 51.4,
+    "ic95": [
+     45.3,
+     57.4
+    ],
+    "prob_media": 60.1,
+    "brier": 0.2553,
+    "logloss": 0.7046,
+    "roi": {
+     "n": 259,
+     "unidades": -42.05,
+     "yield": -16.2,
+     "roi_banca_100": -42.05
+    },
+    "cuota_media": 1.65,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 8,
+    "aciertos": 5,
+    "fallos": 3,
+    "acierto": 62.5,
+    "ic95": [
+     30.6,
+     86.3
+    ],
+    "prob_media": 73.0,
+    "brier": 0.2379,
+    "logloss": 0.6684,
+    "roi": {
+     "n": 8,
+     "unidades": -0.08,
+     "yield": -1.0,
+     "roi_banca_100": -0.08
+    },
+    "cuota_media": 1.57,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 3,
+    "aciertos": 2,
+    "fallos": 1,
+    "acierto": 66.7,
+    "ic95": [
+     20.8,
+     93.9
+    ],
+    "prob_media": 76.3,
+    "brier": 0.2197,
+    "logloss": 0.6281,
+    "roi": {
+     "n": 3,
+     "unidades": 0.33,
+     "yield": 11.0,
+     "roi_banca_100": 0.33
+    },
+    "cuota_media": 1.67,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "datos insuficientes"
+  },
+  "Jugadores NBA · Pts+Reb+Ast": {
+   "todos": {
+    "n": 246,
+    "aciertos": 127,
+    "fallos": 119,
+    "acierto": 51.6,
+    "ic95": [
+     45.4,
+     57.8
+    ],
+    "prob_media": 55.4,
+    "brier": 0.2519,
+    "logloss": 0.6968,
+    "roi": {
+     "n": 246,
+     "unidades": -14.83,
+     "yield": -6.0,
+     "roi_banca_100": -14.83
+    },
+    "cuota_media": 1.82,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 4,
+    "aciertos": 4,
+    "fallos": 0,
+    "acierto": 100.0,
+    "ic95": [
+     51.0,
+     100.0
+    ],
+    "prob_media": 73.0,
+    "brier": 0.0736,
+    "logloss": 0.3152,
+    "roi": {
+     "n": 4,
+     "unidades": 3.23,
+     "yield": 80.8,
+     "roi_banca_100": 3.23
+    },
+    "cuota_media": 1.81,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 1,
+    "aciertos": 1,
+    "fallos": 0,
+    "acierto": 100.0,
+    "ic95": [
+     20.7,
+     100.0
+    ],
+    "prob_media": 77.9,
+    "brier": 0.0488,
+    "logloss": 0.2496,
+    "roi": {
+     "n": 1,
+     "unidades": 0.84,
+     "yield": 84.0,
+     "roi_banca_100": 0.84
+    },
+    "cuota_media": 1.84,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "datos insuficientes"
+  },
+  "Jugadores NBA · Pts+Ast": {
+   "todos": {
+    "n": 246,
+    "aciertos": 123,
+    "fallos": 123,
+    "acierto": 50.0,
+    "ic95": [
+     43.8,
+     56.2
+    ],
+    "prob_media": 55.6,
+    "brier": 0.2586,
+    "logloss": 0.7111,
+    "roi": {
+     "n": 246,
+     "unidades": -22.34,
+     "yield": -9.1,
+     "roi_banca_100": -22.34
+    },
+    "cuota_media": 1.82,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 3,
+    "aciertos": 1,
+    "fallos": 2,
+    "acierto": 33.3,
+    "ic95": [
+     6.1,
+     79.2
+    ],
+    "prob_media": 73.6,
+    "brier": 0.3654,
+    "logloss": 0.9418,
+    "roi": {
+     "n": 3,
+     "unidades": -1.19,
+     "yield": -39.7,
+     "roi_banca_100": -1.19
+    },
+    "cuota_media": 1.79,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 1,
+    "aciertos": 1,
+    "fallos": 0,
+    "acierto": 100.0,
+    "ic95": [
+     20.7,
+     100.0
+    ],
+    "prob_media": 76.5,
+    "brier": 0.0551,
+    "logloss": 0.2675,
+    "roi": {
+     "n": 1,
+     "unidades": 0.81,
+     "yield": 81.0,
+     "roi_banca_100": 0.81
+    },
+    "cuota_media": 1.81,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "datos insuficientes"
+  },
+  "Jugadores NBA · Ast+Reb": {
+   "todos": {
+    "n": 244,
+    "aciertos": 117,
+    "fallos": 127,
+    "acierto": 48.0,
+    "ic95": [
+     41.8,
+     54.2
+    ],
+    "prob_media": 56.2,
+    "brier": 0.2573,
+    "logloss": 0.7077,
+    "roi": {
+     "n": 244,
+     "unidades": -37.87,
+     "yield": -15.5,
+     "roi_banca_100": -37.87
+    },
+    "cuota_media": 1.77,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 2,
+    "aciertos": 2,
+    "fallos": 0,
+    "acierto": 100.0,
+    "ic95": [
+     34.2,
+     100.0
+    ],
+    "prob_media": 80.3,
+    "brier": 0.0433,
+    "logloss": 0.2224,
+    "roi": {
+     "n": 2,
+     "unidades": 1.42,
+     "yield": 71.0,
+     "roi_banca_100": 1.42
+    },
+    "cuota_media": 1.71,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 1,
+    "aciertos": 1,
+    "fallos": 0,
+    "acierto": 100.0,
+    "ic95": [
+     20.7,
+     100.0
+    ],
+    "prob_media": 87.2,
+    "brier": 0.0164,
+    "logloss": 0.1369,
+    "roi": {
+     "n": 1,
+     "unidades": 0.7,
+     "yield": 70.0,
+     "roi_banca_100": 0.7
+    },
+    "cuota_media": 1.7,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "datos insuficientes"
+  },
+  "Jugadores NBA · Asistencias": {
+   "todos": {
+    "n": 221,
+    "aciertos": 129,
+    "fallos": 92,
+    "acierto": 58.4,
+    "ic95": [
+     51.8,
+     64.7
+    ],
+    "prob_media": 58.1,
+    "brier": 0.2451,
+    "logloss": 0.6829,
+    "roi": {
+     "n": 221,
+     "unidades": -1.06,
+     "yield": -0.5,
+     "roi_banca_100": -1.06
+    },
+    "cuota_media": 1.7,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 2,
+    "aciertos": 2,
+    "fallos": 0,
+    "acierto": 100.0,
+    "ic95": [
+     34.2,
+     100.0
+    ],
+    "prob_media": 85.3,
+    "brier": 0.0216,
+    "logloss": 0.1585,
+    "roi": {
+     "n": 2,
+     "unidades": 1.33,
+     "yield": 66.5,
+     "roi_banca_100": 1.33
+    },
+    "cuota_media": 1.67,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 2,
+    "aciertos": 2,
+    "fallos": 0,
+    "acierto": 100.0,
+    "ic95": [
+     34.2,
+     100.0
+    ],
+    "prob_media": 85.3,
+    "brier": 0.0216,
+    "logloss": 0.1585,
+    "roi": {
+     "n": 2,
+     "unidades": 1.33,
+     "yield": 66.5,
+     "roi_banca_100": 1.33
+    },
+    "cuota_media": 1.67,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "datos insuficientes"
+  },
+  "Córners (equipo)": {
+   "todos": {
+    "n": 138,
+    "aciertos": 97,
+    "fallos": 41,
+    "acierto": 70.3,
+    "ic95": [
+     62.2,
+     77.3
+    ],
+    "prob_media": 67.9,
+    "brier": 0.2029,
+    "logloss": 0.5952,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 73,
+    "aciertos": 56,
+    "fallos": 17,
+    "acierto": 76.7,
+    "ic95": [
+     65.8,
+     84.9
+    ],
+    "prob_media": 72.8,
+    "brier": 0.1817,
+    "logloss": 0.5506,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 25,
+    "aciertos": 18,
+    "fallos": 7,
+    "acierto": 72.0,
+    "ic95": [
+     52.4,
+     85.7
+    ],
+    "prob_media": 75.2,
+    "brier": 0.2049,
+    "logloss": 0.6017,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "en camino (acierto 70 %+ sin prueba suficiente)"
+  },
+  "Tiros a puerta (equipo)": {
+   "todos": {
+    "n": 121,
+    "aciertos": 85,
+    "fallos": 36,
+    "acierto": 70.2,
+    "ic95": [
+     61.6,
+     77.7
+    ],
+    "prob_media": 67.4,
+    "brier": 0.2134,
+    "logloss": 0.6181,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 58,
+    "aciertos": 43,
+    "fallos": 15,
+    "acierto": 74.1,
+    "ic95": [
+     61.6,
+     83.7
+    ],
+    "prob_media": 72.4,
+    "brier": 0.1949,
+    "logloss": 0.5796,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 13,
+    "aciertos": 9,
+    "fallos": 4,
+    "acierto": 69.2,
+    "ic95": [
+     42.4,
+     87.3
+    ],
+    "prob_media": 75.5,
+    "brier": 0.2199,
+    "logloss": 0.6355,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "en camino (acierto 70 %+ sin prueba suficiente)"
+  },
+  "Tiros (equipo)": {
+   "todos": {
+    "n": 114,
+    "aciertos": 80,
+    "fallos": 34,
+    "acierto": 70.2,
+    "ic95": [
+     61.2,
+     77.8
+    ],
+    "prob_media": 67.5,
+    "brier": 0.2078,
+    "logloss": 0.6063,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 51,
+    "aciertos": 38,
+    "fallos": 13,
+    "acierto": 74.5,
+    "ic95": [
+     61.1,
+     84.5
+    ],
+    "prob_media": 72.6,
+    "brier": 0.1909,
+    "logloss": 0.57,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 14,
+    "aciertos": 10,
+    "fallos": 4,
+    "acierto": 71.4,
+    "ic95": [
+     45.4,
+     88.3
+    ],
+    "prob_media": 75.4,
+    "brier": 0.2045,
+    "logloss": 0.5992,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "en camino (acierto 70 %+ sin prueba suficiente)"
+  },
+  "Tarjetas (equipo)": {
+   "todos": {
+    "n": 109,
+    "aciertos": 61,
+    "fallos": 48,
+    "acierto": 56.0,
+    "ic95": [
+     46.6,
+     64.9
+    ],
+    "prob_media": 64.6,
+    "brier": 0.246,
+    "logloss": 0.6858,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 41,
+    "aciertos": 26,
+    "fallos": 15,
+    "acierto": 63.4,
+    "ic95": [
+     48.1,
+     76.4
+    ],
+    "prob_media": 72.2,
+    "brier": 0.2387,
+    "logloss": 0.6724,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 9,
+    "aciertos": 6,
+    "fallos": 3,
+    "acierto": 66.7,
+    "ic95": [
+     35.4,
+     87.9
+    ],
+    "prob_media": 75.2,
+    "brier": 0.2273,
+    "logloss": 0.6488,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "no alcanza el 70 %"
+  },
+  "Faltas (equipo)": {
+   "todos": {
+    "n": 103,
+    "aciertos": 63,
+    "fallos": 40,
+    "acierto": 61.2,
+    "ic95": [
+     51.5,
+     70.0
+    ],
+    "prob_media": 66.0,
+    "brier": 0.234,
+    "logloss": 0.6609,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 47,
+    "aciertos": 32,
+    "fallos": 15,
+    "acierto": 68.1,
+    "ic95": [
+     53.8,
+     79.6
+    ],
+    "prob_media": 72.8,
+    "brier": 0.2182,
+    "logloss": 0.6283,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 15,
+    "aciertos": 11,
+    "fallos": 4,
+    "acierto": 73.3,
+    "ic95": [
+     48.0,
+     89.1
+    ],
+    "prob_media": 75.6,
+    "brier": 0.1936,
+    "logloss": 0.5747,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "no alcanza el 70 %"
+  },
+  "Tarjetas (partido)": {
+   "todos": {
+    "n": 81,
+    "aciertos": 57,
+    "fallos": 24,
+    "acierto": 70.4,
+    "ic95": [
+     59.7,
+     79.2
+    ],
+    "prob_media": 67.9,
+    "brier": 0.1998,
+    "logloss": 0.5883,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 49,
+    "aciertos": 37,
+    "fallos": 12,
+    "acierto": 75.5,
+    "ic95": [
+     61.9,
+     85.4
+    ],
+    "prob_media": 71.9,
+    "brier": 0.1858,
+    "logloss": 0.5588,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 10,
+    "aciertos": 8,
+    "fallos": 2,
+    "acierto": 80.0,
+    "ic95": [
+     49.0,
+     94.3
+    ],
+    "prob_media": 75.7,
+    "brier": 0.1625,
+    "logloss": 0.5074,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "en camino (acierto 70 %+ sin prueba suficiente)",
+   "prueba_historica": 80.9,
+   "sobreajuste": true
+  },
+  "Córners (partido)": {
+   "todos": {
+    "n": 80,
+    "aciertos": 58,
+    "fallos": 22,
+    "acierto": 72.5,
+    "ic95": [
+     61.9,
+     81.1
+    ],
+    "prob_media": 68.8,
+    "brier": 0.2044,
+    "logloss": 0.5991,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 49,
+    "aciertos": 35,
+    "fallos": 14,
+    "acierto": 71.4,
+    "ic95": [
+     57.6,
+     82.2
+    ],
+    "prob_media": 72.0,
+    "brier": 0.2034,
+    "logloss": 0.5965,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 9,
+    "aciertos": 6,
+    "fallos": 3,
+    "acierto": 66.7,
+    "ic95": [
+     35.4,
+     87.9
+    ],
+    "prob_media": 75.1,
+    "brier": 0.2271,
+    "logloss": 0.6483,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "en camino (acierto 70 %+ sin prueba suficiente)",
+   "prueba_historica": 76.5,
+   "sobreajuste": false
+  },
+  "Tiros a puerta (partido)": {
+   "todos": {
+    "n": 70,
+    "aciertos": 51,
+    "fallos": 19,
+    "acierto": 72.9,
+    "ic95": [
+     61.5,
+     81.9
+    ],
+    "prob_media": 69.5,
+    "brier": 0.1966,
+    "logloss": 0.5821,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 43,
+    "aciertos": 34,
+    "fallos": 9,
+    "acierto": 79.1,
+    "ic95": [
+     64.8,
+     88.6
+    ],
+    "prob_media": 72.7,
+    "brier": 0.1739,
+    "logloss": 0.5348,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 14,
+    "aciertos": 9,
+    "fallos": 5,
+    "acierto": 64.3,
+    "ic95": [
+     38.8,
+     83.7
+    ],
+    "prob_media": 75.6,
+    "brier": 0.2419,
+    "logloss": 0.6823,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "en camino (acierto 70 %+ sin prueba suficiente)",
+   "prueba_historica": 82.1,
+   "sobreajuste": true
+  },
+  "Faltas (jugador) · liga nueva": {
+   "todos": {
+    "n": 65,
+    "aciertos": 45,
+    "fallos": 20,
+    "acierto": 69.2,
+    "ic95": [
+     57.2,
+     79.1
+    ],
+    "prob_media": 70.7,
+    "brier": 0.2136,
+    "logloss": 0.6187,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 65,
+    "aciertos": 45,
+    "fallos": 20,
+    "acierto": 69.2,
+    "ic95": [
+     57.2,
+     79.1
+    ],
+    "prob_media": 70.7,
+    "brier": 0.2136,
+    "logloss": 0.6187,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 0
+   },
+   "estado": "no alcanza el 70 %",
+   "prueba_historica": 77.0,
+   "sobreajuste": false
+  },
+  "Tiros (jugador) · liga nueva": {
+   "todos": {
+    "n": 61,
+    "aciertos": 41,
+    "fallos": 20,
+    "acierto": 67.2,
+    "ic95": [
+     54.7,
+     77.7
+    ],
+    "prob_media": 70.8,
+    "brier": 0.2218,
+    "logloss": 0.6362,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 61,
+    "aciertos": 41,
+    "fallos": 20,
+    "acierto": 67.2,
+    "ic95": [
+     54.7,
+     77.7
+    ],
+    "prob_media": 70.8,
+    "brier": 0.2218,
+    "logloss": 0.6362,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 0
+   },
+   "estado": "no alcanza el 70 %",
+   "prueba_historica": 77.0,
+   "sobreajuste": true
+  },
+  "Faltas (partido)": {
+   "todos": {
+    "n": 59,
+    "aciertos": 39,
+    "fallos": 20,
+    "acierto": 66.1,
+    "ic95": [
+     53.4,
+     76.9
+    ],
+    "prob_media": 67.5,
+    "brier": 0.2129,
+    "logloss": 0.6163,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 28,
+    "aciertos": 22,
+    "fallos": 6,
+    "acierto": 78.6,
+    "ic95": [
+     60.5,
+     89.8
+    ],
+    "prob_media": 73.1,
+    "brier": 0.1762,
+    "logloss": 0.5398,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 11,
+    "aciertos": 7,
+    "fallos": 4,
+    "acierto": 63.6,
+    "ic95": [
+     35.4,
+     84.8
+    ],
+    "prob_media": 75.1,
+    "brier": 0.2465,
+    "logloss": 0.6932,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "datos insuficientes",
+   "prueba_historica": 80.4,
+   "sobreajuste": true
+  },
+  "Tiros (partido)": {
+   "todos": {
+    "n": 57,
+    "aciertos": 42,
+    "fallos": 15,
+    "acierto": 73.7,
+    "ic95": [
+     61.0,
+     83.4
+    ],
+    "prob_media": 67.1,
+    "brier": 0.183,
+    "logloss": 0.5505,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 25,
+    "aciertos": 24,
+    "fallos": 1,
+    "acierto": 96.0,
+    "ic95": [
+     80.5,
+     99.3
+    ],
+    "prob_media": 72.6,
+    "brier": 0.0923,
+    "logloss": 0.3565,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 7,
+    "aciertos": 7,
+    "fallos": 0,
+    "acierto": 100.0,
+    "ic95": [
+     64.6,
+     100.0
+    ],
+    "prob_media": 75.0,
+    "brier": 0.0627,
+    "logloss": 0.2881,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "datos insuficientes",
+   "prueba_historica": 81.1,
+   "sobreajuste": false
+  },
+  "Resultado": {
+   "todos": {
+    "n": 34,
+    "aciertos": 22,
+    "fallos": 12,
+    "acierto": 64.7,
+    "ic95": [
+     47.9,
+     78.5
+    ],
+    "prob_media": 66.1,
+    "brier": 0.2162,
+    "logloss": 0.6227,
+    "roi": {
+     "n": 4,
+     "unidades": -0.58,
+     "yield": -14.5,
+     "roi_banca_100": -0.58
+    },
+    "cuota_media": 1.96,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 18,
+    "aciertos": 14,
+    "fallos": 4,
+    "acierto": 77.8,
+    "ic95": [
+     54.8,
+     91.0
+    ],
+    "prob_media": 71.6,
+    "brier": 0.1786,
+    "logloss": 0.5444,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 3,
+    "aciertos": 2,
+    "fallos": 1,
+    "acierto": 66.7,
+    "ic95": [
+     20.8,
+     93.9
+    ],
+    "prob_media": 74.4,
+    "brier": 0.2294,
+    "logloss": 0.6545,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "datos insuficientes"
+  },
+  "pts (equipo)": {
+   "todos": {
+    "n": 28,
+    "aciertos": 17,
+    "fallos": 11,
+    "acierto": 60.7,
+    "ic95": [
+     42.4,
+     76.4
+    ],
+    "prob_media": 65.6,
+    "brier": 0.243,
+    "logloss": 0.6799,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 0
+   },
+   "p74": {
+    "n": 0
+   },
+   "estado": "datos insuficientes"
+  },
+  "Goles": {
+   "todos": {
+    "n": 27,
+    "aciertos": 19,
+    "fallos": 8,
+    "acierto": 70.4,
+    "ic95": [
+     51.5,
+     84.1
+    ],
+    "prob_media": 67.2,
+    "brier": 0.204,
+    "logloss": 0.598,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 17,
+    "aciertos": 12,
+    "fallos": 5,
+    "acierto": 70.6,
+    "ic95": [
+     46.9,
+     86.7
+    ],
+    "prob_media": 70.8,
+    "brier": 0.2068,
+    "logloss": 0.6037,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 1,
+    "aciertos": 1,
+    "fallos": 0,
+    "acierto": 100.0,
+    "ic95": [
+     20.7,
+     100.0
+    ],
+    "prob_media": 74.3,
+    "brier": 0.0663,
+    "logloss": 0.2976,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "datos insuficientes"
+  },
+  "Tiros a puerta (equipo) · liga nueva": {
+   "todos": {
+    "n": 26,
+    "aciertos": 12,
+    "fallos": 14,
+    "acierto": 46.2,
+    "ic95": [
+     28.8,
+     64.5
+    ],
+    "prob_media": 70.8,
+    "brier": 0.3108,
+    "logloss": 0.826,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 26,
+    "aciertos": 12,
+    "fallos": 14,
+    "acierto": 46.2,
+    "ic95": [
+     28.8,
+     64.5
+    ],
+    "prob_media": 70.8,
+    "brier": 0.3108,
+    "logloss": 0.826,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 0
+   },
+   "estado": "datos insuficientes"
+  },
+  "Córners (equipo) · liga nueva": {
+   "todos": {
+    "n": 24,
+    "aciertos": 15,
+    "fallos": 9,
+    "acierto": 62.5,
+    "ic95": [
+     42.7,
+     78.8
+    ],
+    "prob_media": 70.8,
+    "brier": 0.2423,
+    "logloss": 0.68,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 24,
+    "aciertos": 15,
+    "fallos": 9,
+    "acierto": 62.5,
+    "ic95": [
+     42.7,
+     78.8
+    ],
+    "prob_media": 70.8,
+    "brier": 0.2423,
+    "logloss": 0.68,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 0
+   },
+   "estado": "datos insuficientes"
+  },
+  "Tiros a puerta (jugador) · liga nueva": {
+   "todos": {
+    "n": 24,
+    "aciertos": 17,
+    "fallos": 7,
+    "acierto": 70.8,
+    "ic95": [
+     50.8,
+     85.1
+    ],
+    "prob_media": 70.7,
+    "brier": 0.2054,
+    "logloss": 0.6008,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 24,
+    "aciertos": 17,
+    "fallos": 7,
+    "acierto": 70.8,
+    "ic95": [
+     50.8,
+     85.1
+    ],
+    "prob_media": 70.7,
+    "brier": 0.2054,
+    "logloss": 0.6008,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 0
+   },
+   "estado": "datos insuficientes"
+  },
+  "Faltas (equipo) · liga nueva": {
+   "todos": {
+    "n": 17,
+    "aciertos": 13,
+    "fallos": 4,
+    "acierto": 76.5,
+    "ic95": [
+     52.7,
+     90.4
+    ],
+    "prob_media": 70.9,
+    "brier": 0.1837,
+    "logloss": 0.555,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 17,
+    "aciertos": 13,
+    "fallos": 4,
+    "acierto": 76.5,
+    "ic95": [
+     52.7,
+     90.4
+    ],
+    "prob_media": 70.9,
+    "brier": 0.1837,
+    "logloss": 0.555,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 0
+   },
+   "estado": "datos insuficientes"
+  },
+  "Córners (partido) · liga nueva": {
+   "todos": {
+    "n": 16,
+    "aciertos": 10,
+    "fallos": 6,
+    "acierto": 62.5,
+    "ic95": [
+     38.6,
+     81.5
+    ],
+    "prob_media": 70.6,
+    "brier": 0.2421,
+    "logloss": 0.6794,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 16,
+    "aciertos": 10,
+    "fallos": 6,
+    "acierto": 62.5,
+    "ic95": [
+     38.6,
+     81.5
+    ],
+    "prob_media": 70.6,
+    "brier": 0.2421,
+    "logloss": 0.6794,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 0
+   },
+   "estado": "datos insuficientes"
+  },
+  "Tiros a puerta (partido) · liga nueva": {
+   "todos": {
+    "n": 16,
+    "aciertos": 12,
+    "fallos": 4,
+    "acierto": 75.0,
+    "ic95": [
+     50.5,
+     89.8
+    ],
+    "prob_media": 70.8,
+    "brier": 0.1881,
+    "logloss": 0.5638,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 16,
+    "aciertos": 12,
+    "fallos": 4,
+    "acierto": 75.0,
+    "ic95": [
+     50.5,
+     89.8
+    ],
+    "prob_media": 70.8,
+    "brier": 0.1881,
+    "logloss": 0.5638,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 0
+   },
+   "estado": "datos insuficientes"
+  },
+  "Tiros (partido) · liga nueva": {
+   "todos": {
+    "n": 15,
+    "aciertos": 9,
+    "fallos": 6,
+    "acierto": 60.0,
+    "ic95": [
+     35.7,
+     80.2
+    ],
+    "prob_media": 70.6,
+    "brier": 0.25,
+    "logloss": 0.6956,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 15,
+    "aciertos": 9,
+    "fallos": 6,
+    "acierto": 60.0,
+    "ic95": [
+     35.7,
+     80.2
+    ],
+    "prob_media": 70.6,
+    "brier": 0.25,
+    "logloss": 0.6956,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 0
+   },
+   "estado": "datos insuficientes"
+  },
+  "Faltas (partido) · liga nueva": {
+   "todos": {
+    "n": 13,
+    "aciertos": 10,
+    "fallos": 3,
+    "acierto": 76.9,
+    "ic95": [
+     49.7,
+     91.8
+    ],
+    "prob_media": 70.7,
+    "brier": 0.1809,
+    "logloss": 0.5489,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 13,
+    "aciertos": 10,
+    "fallos": 3,
+    "acierto": 76.9,
+    "ic95": [
+     49.7,
+     91.8
+    ],
+    "prob_media": 70.7,
+    "brier": 0.1809,
+    "logloss": 0.5489,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 0
+   },
+   "estado": "datos insuficientes"
+  },
+  "Tiros (equipo) · liga nueva": {
+   "todos": {
+    "n": 11,
+    "aciertos": 5,
+    "fallos": 6,
+    "acierto": 45.5,
+    "ic95": [
+     21.3,
+     72.0
+    ],
+    "prob_media": 70.9,
+    "brier": 0.3119,
+    "logloss": 0.8279,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 11,
+    "aciertos": 5,
+    "fallos": 6,
+    "acierto": 45.5,
+    "ic95": [
+     21.3,
+     72.0
+    ],
+    "prob_media": 70.9,
+    "brier": 0.3119,
+    "logloss": 0.8279,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 0
+   },
+   "estado": "datos insuficientes"
+  },
+  "Tarjetas (equipo) · liga nueva": {
+   "todos": {
+    "n": 9,
+    "aciertos": 7,
+    "fallos": 2,
+    "acierto": 77.8,
+    "ic95": [
+     45.3,
+     93.7
+    ],
+    "prob_media": 70.7,
+    "brier": 0.1799,
+    "logloss": 0.5475,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 9,
+    "aciertos": 7,
+    "fallos": 2,
+    "acierto": 77.8,
+    "ic95": [
+     45.3,
+     93.7
+    ],
+    "prob_media": 70.7,
+    "brier": 0.1799,
+    "logloss": 0.5475,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 0
+   },
+   "estado": "datos insuficientes"
+  },
+  "Tarjetas (partido) · liga nueva": {
+   "todos": {
+    "n": 9,
+    "aciertos": 7,
+    "fallos": 2,
+    "acierto": 77.8,
+    "ic95": [
+     45.3,
+     93.7
+    ],
+    "prob_media": 70.5,
+    "brier": 0.1789,
+    "logloss": 0.545,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 9,
+    "aciertos": 7,
+    "fallos": 2,
+    "acierto": 77.8,
+    "ic95": [
+     45.3,
+     93.7
+    ],
+    "prob_media": 70.5,
+    "brier": 0.1789,
+    "logloss": 0.545,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 0
+   },
+   "estado": "datos insuficientes"
+  },
+  "NBA · Total de puntos": {
+   "todos": {
+    "n": 8,
+    "aciertos": 3,
+    "fallos": 5,
+    "acierto": 37.5,
+    "ic95": [
+     13.7,
+     69.4
+    ],
+    "prob_media": 58.2,
+    "brier": 0.278,
+    "logloss": 0.75,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 0
+   },
+   "p74": {
+    "n": 0
+   },
+   "estado": "datos insuficientes"
+  },
+  "Goles · liga nueva": {
+   "todos": {
+    "n": 8,
+    "aciertos": 7,
+    "fallos": 1,
+    "acierto": 87.5,
+    "ic95": [
+     52.9,
+     97.8
+    ],
+    "prob_media": 70.9,
+    "brier": 0.1375,
+    "logloss": 0.4565,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 8,
+    "aciertos": 7,
+    "fallos": 1,
+    "acierto": 87.5,
+    "ic95": [
+     52.9,
+     97.8
+    ],
+    "prob_media": 70.9,
+    "brier": 0.1375,
+    "logloss": 0.4565,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 0
+   },
+   "estado": "datos insuficientes"
+  },
+  "NBA · Hándicap": {
+   "todos": {
+    "n": 7,
+    "aciertos": 5,
+    "fallos": 2,
+    "acierto": 71.4,
+    "ic95": [
+     35.9,
+     91.8
+    ],
+    "prob_media": 60.2,
+    "brier": 0.2178,
+    "logloss": 0.627,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 0
+   },
+   "p74": {
+    "n": 0
+   },
+   "estado": "datos insuficientes"
+  },
+  "Resultado · liga nueva": {
+   "todos": {
+    "n": 6,
+    "aciertos": 6,
+    "fallos": 0,
+    "acierto": 100.0,
+    "ic95": [
+     61.0,
+     100.0
+    ],
+    "prob_media": 70.6,
+    "brier": 0.0863,
+    "logloss": 0.3479,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 6,
+    "aciertos": 6,
+    "fallos": 0,
+    "acierto": 100.0,
+    "ic95": [
+     61.0,
+     100.0
+    ],
+    "prob_media": 70.6,
+    "brier": 0.0863,
+    "logloss": 0.3479,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 0
+   },
+   "estado": "datos insuficientes"
+  },
+  "NBA · Ganador": {
+   "todos": {
+    "n": 3,
+    "aciertos": 1,
+    "fallos": 2,
+    "acierto": 33.3,
+    "ic95": [
+     6.1,
+     79.2
+    ],
+    "prob_media": 48.4,
+    "brier": 0.1908,
+    "logloss": 0.574,
+    "roi": {
+     "n": 3,
+     "unidades": -1.54,
+     "yield": -51.3,
+     "roi_banca_100": -1.54
+    },
+    "cuota_media": 2.22,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 0
+   },
+   "p74": {
+    "n": 0
+   },
+   "estado": "datos insuficientes"
+  },
+  "Tarjetas (jugador)": {
+   "todos": {
+    "n": 3,
+    "aciertos": 3,
+    "fallos": 0,
+    "acierto": 100.0,
+    "ic95": [
+     43.8,
+     100.0
+    ],
+    "prob_media": 74.5,
+    "brier": 0.0651,
+    "logloss": 0.2942,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p70": {
+    "n": 3,
+    "aciertos": 3,
+    "fallos": 0,
+    "acierto": 100.0,
+    "ic95": [
+     43.8,
+     100.0
+    ],
+    "prob_media": 74.5,
+    "brier": 0.0651,
+    "logloss": 0.2942,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "p74": {
+    "n": 1,
+    "aciertos": 1,
+    "fallos": 0,
+    "acierto": 100.0,
+    "ic95": [
+     20.7,
+     100.0
+    ],
+    "prob_media": 76.5,
+    "brier": 0.0551,
+    "logloss": 0.2675,
+    "clv": {
+     "n": 0,
+     "medio": null
+    }
+   },
+   "estado": "datos insuficientes"
+  }
+ },
+ "calibracion": [
+  {
+   "rango": "50-60 %",
+   "n": 2140,
+   "dijo": 55.0,
+   "paso": 51.6
+  },
+  {
+   "rango": "60-70 %",
+   "n": 1361,
+   "dijo": 64.6,
+   "paso": 58.8
+  },
+  {
+   "rango": "70-74 %",
+   "n": 1207,
+   "dijo": 71.2,
+   "paso": 70.4
+  },
+  {
+   "rango": "74-80 %",
+   "n": 329,
+   "dijo": 75.4,
+   "paso": 76.9
+  },
+  {
+   "rango": "80-100 %",
+   "n": 3,
+   "dijo": 86.0,
+   "paso": 100.0
+  }
+ ],
+ "validados": []
+}
